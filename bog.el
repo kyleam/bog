@@ -345,6 +345,23 @@ The citekey is split by groups in `bog-citekey-format' and joined by
   (let ((query (bog-citekey-groups-with-delim citekey "+")))
     (format bog-web-search-url query)))
 
+
+;;; Font-lock
+
+(defface bog-citekey-face
+  '((((class color) (background dark))
+     (:bold t))
+    (((class color) (background light))
+     (:bold t)))
+  "Face used to highlight text that matches `bog-citekey-format'.")
+
+(defun bog-non-heading-citekey-p (limit)
+  (and (re-search-forward bog-citekey-format limit t)
+       (not (org-at-heading-p))))
+
+(font-lock-add-keywords 'org-mode
+                        '((bog-non-heading-citekey-p . 'bog-citekey-face)))
+
 (provide 'bog)
 
 ;; bog.el ends here
