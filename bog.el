@@ -50,6 +50,14 @@
   :group 'bog
   :type 'string)
 
+(defcustom bog-pdf-directory-stage
+  (expand-file-name "pdf-stage" bog-notes-directory)
+  "The name of the directory to search for new PDFs in.
+`bog-rename-staged-pdf-to-citekey' will search here for files to
+rename."
+  :group 'bog
+  :type 'string)
+
 (defcustom bog-read-file-name 'read-file-name
   "A function that will be used to promtp for file name.
 The function should accept one arguments, a string to use for the
@@ -152,6 +160,36 @@ first parent heading that matches `bog-citekey-format'."
     (unless (file-exists-p pdf-file)
       (error "%s does not exist" pdf-file))
     (start-process "bog-pdf" nil bog-pdf-opener pdf-file)))
+
+;;;###autoload
+(defun bog-rename-staged-pdf-to-citekey ()
+  "Rename PDF in  `bog-pdf-directory-stage' to `bog-pdf-directory'/<citekey>.pdf.
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the first parent heading that
+matches `bog-citekey-format'."
+  (interactive)
+  (bog-citekey-action 'bog-rename-staged-pdf
+                      nil
+                      nil))
+
+(defun bog-rename-staged-pdf (citekey)
+  (let* ((pdf-file (bog-citekey-as-pdf citekey))
+         (choices
+          (file-expand-wildcards
+           (concat (file-name-as-directory bog-pdf-directory-stage) "*.pdf")))
+         (num-choices (length choices))
+         staged-pdf)
+    (cond
+     ((= 0 num-choices)
+      (setq staged-pdf (funcall bog-read-file-name
+                                "Select PDF file to rename: ")))
+     ((= 1 num-choices)
+      (setq staged-pdf (car choices)))
+     (t
+      (setq staged-pdf (funcall bog-completing-read
+                                "Select PDF file to rename: " choices))))
+    (rename-file staged-pdf pdf-file)
+    (message "Renamed %s to %s." staged-pdf pdf-file)))
 
 (defun bog-citekey-as-pdf (citekey)
   (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
