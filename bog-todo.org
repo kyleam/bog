@@ -1,5 +1,5 @@
 #+typ_todo: BUG(b) ENH(e) DOC(d) | DONE(n) CANCELED(c@)
-#+tags: maybe prerel
+#+tags: maybe
 
 
 * General
@@ -15,7 +15,8 @@ Some citekeys are not highlighed until the surrounding text is altered.
 Perhaps use a cache file. This could be used in
 `bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
 
-** DOC [#A] Add README
+** DONE [#A] Add README
+   CLOSED: [2014-02-03 Mon 01:53]
 
 ** DOC Installation instructions
 
