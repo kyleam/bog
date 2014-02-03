@@ -1,0 +1,63 @@
+#+typ_todo: BUG(b) ENH(e) DOC(d) | DONE(n) CANCELED(c@)
+#+tags: maybe prerel
+
+
+* General
+
+** BUG Inconsistent face highlighting
+
+Some citekeys are not highlighed until the surrounding text is altered.
+
+** ENH Citekey selection if locating fails
+
+** ENH Function for getting all citekeys in notes
+
+Perhaps use a cache file. This could be used in
+`bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
+
+** DOC [#A] Add README
+
+** DOC Installation instructions
+
+** DOC Suggest keybindings
+
+* Notes
+
+** ENH [#A] Allow citekeys to be properties instead of headings
+
+** ENH Find in-text citekeys that don't have a header
+
+** ENH Check for duplicate citekeys headings
+
+** ENH Refiling for just bib notes
+
+Redefine org refile targets.
+
+* BibTeX files
+
+** ENH [#A] Make `bog-find-citekey-bib' compatible with a single BibTeX file
+
+** ENH Create combined bib from a suffix glob
+
+For documents generated from multiple files
+
+Default could be "*.tex".
+
+** ENH Use a stage for new BibTeX files
+
+Avoid filtering all bib file names.
+
+* PDF files
+
+** ENH Better handling of multiple PDFs
+
+If multiple PDFs for a citekey, complete read.
+
+** ENH Map basename to full name for PDF rename
+
+When more than one file in staged, completing read prompts with full
+paths, which is inconvenient if using default completing read function.
+
+* Testing
+
+** ENH Switch from obsolete `flet' to `noflet'
