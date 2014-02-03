@@ -20,6 +20,12 @@ Perhaps use a cache file. This could be used in
 
 ** DOC Describe BibTeX autokey settings for `bog-citekey-format'
 
+** DOC Mention useful tools
+
+- projectile: Store the notes files in git directory and use projectile
+  to manage as project.
+- git annex: Store and sync associated PDF files using git annex.
+
 ** DOC Installation instructions
 
 ** DOC Suggest keybindings
