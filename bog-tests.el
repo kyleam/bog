@@ -114,3 +114,46 @@
     (org-mode)
     (show-all)
     (should-error (bog-citekey-action nil nil nil))))
+
+
+;;; BibTeX functions
+
+;; `bog-prepare-bib-file'
+
+(ert-deftest bog-prepare-bib-file ()
+  (let ((temp-file (make-temp-file "bog-testing-" nil ".bib"))
+        (citekey "name2010word"))
+    (with-current-buffer (find-file-noselect temp-file)
+      (insert (format "\n@article{%s,\n" citekey)
+              "title = {A title},\n"
+              "author = {Last, First},\n"
+              "journal = {Some journal},\n"
+              "year = 2009,\n"
+              "\n}")
+        (save-buffer))
+    (kill-buffer (get-file-buffer temp-file))
+    (bog-prepare-bib-file temp-file)
+    (should-not (file-exists-p temp-file))
+    (let* ((new-file (expand-file-name (concat citekey ".bib") "/tmp"))
+           (new-buffer (get-file-buffer new-file)))
+      (should-not new-buffer)
+      (delete-file new-file))))
+
+(ert-deftest bog-prepare-bib-file-was-open ()
+  (let ((temp-file (make-temp-file "bog-testing-" nil ".bib"))
+        (citekey "name2010word"))
+    (with-current-buffer (find-file-noselect temp-file)
+      (insert (format "\n@article{%s,\n" citekey)
+              "title = {A title},\n"
+              "author = {Last, First},\n"
+              "journal = {Some journal},\n"
+              "year = 2009,\n"
+              "\n}")
+        (save-buffer))
+    (bog-prepare-bib-file temp-file)
+    (should-not (file-exists-p temp-file))
+    (let* ((new-file (expand-file-name (concat citekey ".bib") "/tmp"))
+           (new-buffer (get-file-buffer new-file)))
+      (should new-buffer)
+      (kill-buffer new-buffer)
+      (delete-file new-file))))

@@ -229,6 +229,39 @@ first parent heading that matches `bog-citekey-format'."
       (error "%s does not exist" bib-file))
     (find-file-other-window bib-file)))
 
+;;;###autoload
+(defun bog-rename-and-clean-new-bib-files ()
+  "Prepare new BibTeX files.
+New files are determined as files in `bog-bib-directory' that do
+not have a basename matching `bog-citekey-format'. This is only
+useful if you use the non-standard setup of one entry per BibTeX
+file."
+  (interactive)
+  (let* ((new (--filter (not (string-match bog-citekey-format it))
+                    (bog-bib-citekeys)))
+         (new (--map (concat (expand-file-name it bog-bib-directory) ".bib")
+                     new)))
+    (--each new (bog-prepare-bib-file it t))))
+
+(defun bog-prepare-bib-file (file &optional new-key)
+  (save-excursion
+    (let ((was-open (get-file-buffer file))
+          (buffer (find-file-noselect file)))
+      (with-current-buffer buffer
+        (goto-char (point-min))
+        (bibtex-skip-to-valid-entry)
+        (bibtex-clean-entry new-key)
+        (let* ((citekey (bibtex-key-in-head))
+               (bib-file (concat citekey ".bib")))
+          (when (get-buffer bib-file)
+            (error "Buffer for %s already exists" bib-file))
+          (rename-file file bib-file)
+          (rename-buffer bib-file)
+          (set-visited-file-name bib-file)
+          (save-buffer)))
+      (unless was-open
+        (kill-buffer buffer)))))
+
 (defun bog-citekey-as-bib (citekey)
   (expand-file-name (concat citekey ".bib") bog-bib-directory))
 
