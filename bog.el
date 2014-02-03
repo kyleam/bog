@@ -93,6 +93,13 @@ then lower case letters."
   :type 'string
   :group 'bog)
 
+(defcustom bog-web-search-url
+  "http://scholar.google.com/scholar?q=%s"
+  "URL to use for CITEKEY search.
+It should contain the placeholder \"%s\" for the query."
+  :type 'string
+  :group 'bog)
+
 
 ;;; General utilities
 
@@ -113,6 +120,20 @@ ACTION will be called with the resulting citekey as an argument."
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS"
   (funcall bog-completing-read "Select citekey: " citekeys))
+
+(defun bog-citekey-groups-with-delim (citekey &optional delim groups)
+  "Return groups of `bog-citekey-format', seperated by DELIM.
+
+If DELIM is nil, space is used.
+
+If GROUPS is nil, groups 1, 2, and 3 are selected (which
+corresponds to the last name of the first author, the publication
+year, and the first meaningful word in the title)."
+  (let ((groups (or groups '(1 2 3)))
+        (delim (or delim " ")))
+    (string-match bog-citekey-format citekey)
+    (mapconcat '(lambda (g) (match-string-no-properties g citekey))
+               groups delim)))
 
 (defun bog-citekey-at-point ()
   (let ((maybe-citekey (thing-at-point 'word)))
@@ -298,6 +319,31 @@ occur in buffer instead of alphabetical order."
         (file-expand-wildcards (concat
                                 (file-name-as-directory bog-bib-directory)
                                 "*.bib"))))
+
+
+;;; Web
+
+;;;###autoload
+(defun bog-search-citekey-on-web ()
+  "Open browser and perform query based for a citekey.
+
+The URL will be taken from `bog-web-search-url'.
+
+The citekey is split by groups in `bog-citekey-format' and joined by
+\"+\" to form the query string."
+  (interactive)
+  (bog-citekey-action 'bog-open-citekey-on-web
+                      nil
+                      nil))
+
+(defun bog-open-citekey-on-web (citekey)
+  (let ((url (bog-citekey-as-search-url citekey)))
+    (browse-url url)))
+
+(defun bog-citekey-as-search-url (citekey)
+  "Return URL to use for search."
+  (let ((query (bog-citekey-groups-with-delim citekey "+")))
+    (format bog-web-search-url query)))
 
 (provide 'bog)
 
