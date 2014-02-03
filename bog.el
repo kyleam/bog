@@ -58,6 +58,12 @@ rename."
   :group 'bog
   :type 'string)
 
+(defcustom bog-bib-directory
+  (expand-file-name "bibs" bog-notes-directory)
+  "The name of the directory that BibTeX files are stored in."
+  :group 'bog
+  :type 'string)
+
 (defcustom bog-read-file-name 'read-file-name
   "A function that will be used to promtp for file name.
 The function should accept one arguments, a string to use for the
@@ -201,6 +207,37 @@ matches `bog-citekey-format'."
         (file-expand-wildcards (concat
                                 (file-name-as-directory bog-pdf-directory)
                                 "*.pdf"))))
+
+
+;;; BibTeX-related
+
+;;;###autoload
+(defun bog-find-citekey-bib (arg)
+  "Open BibTeX file for a citekey.
+If a prefix argument is given, a prompt will open to select from
+available citekeys. Otherwise, the citekey will be taken from the
+text under point if it matches `bog-citekey-format' or from the
+first parent heading that matches `bog-citekey-format'."
+  (interactive "P")
+  (bog-citekey-action 'bog-open-citekey-bib
+                      '(lambda () (bog-select-citekey (bog-bib-citekeys)))
+                      arg))
+
+(defun bog-open-citekey-bib (citekey)
+  (let ((bib-file (bog-citekey-as-bib citekey)))
+    (unless (file-exists-p bib-file)
+      (error "%s does not exist" bib-file))
+    (find-file-other-window bib-file)))
+
+(defun bog-citekey-as-bib (citekey)
+  (expand-file-name (concat citekey ".bib") bog-bib-directory))
+
+(defun bog-bib-citekeys ()
+  "Return a list citekeys for all BibTeX files in `bog-bib-directory'."
+  (-map 'file-name-base
+        (file-expand-wildcards (concat
+                                (file-name-as-directory bog-bib-directory)
+                                "*.bib"))))
 
 (provide 'bog)
 
