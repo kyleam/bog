@@ -18,6 +18,8 @@ Perhaps use a cache file. This could be used in
 ** DONE [#A] Add README
    CLOSED: [2014-02-03 Mon 01:53]
 
+** DOC Describe BibTeX autokey settings for `bog-citekey-format'
+
 ** DOC Installation instructions
 
 ** DOC Suggest keybindings
