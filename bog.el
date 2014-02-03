@@ -44,6 +44,12 @@
   :group 'bog
   :type 'string)
 
+(defcustom bog-pdf-directory
+  (expand-file-name "pdfs" bog-notes-directory)
+  "The name of the directory that PDF files are stored in."
+  :group 'bog
+  :type 'string)
+
 (defcustom bog-read-file-name 'read-file-name
   "A function that will be used to promtp for file name.
 The function should accept one arguments, a string to use for the
@@ -58,6 +64,11 @@ prompt and a list of strings to offer as choices. A good
 alternative is `ido-completing-read'."
   :group 'bog
   :type 'function)
+
+(defcustom bog-pdf-opener "xdg-open"
+  "Program to open PDF files with."
+  :group 'bog
+  :type 'string)
 
 (defcustom bog-citekey-format
   "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
@@ -120,6 +131,38 @@ ACTION will be called with the resulting citekey as an argument."
   (string-match bog-citekey-format text)
   (when (equal (length text) (match-end 0))
     t))
+
+
+;;; PDF-related
+
+;;;###autoload
+(defun bog-find-citekey-pdf (arg)
+  "Open PDF file for a citekey.
+If a prefix argument is given, a prompt will open to select from
+available citekeys. Otherwise, the citekey will be taken from the
+text under point if it matches `bog-citekey-format' or from the
+first parent heading that matches `bog-citekey-format'."
+  (interactive "P")
+  (bog-citekey-action 'bog-open-citekey-pdf
+                      '(lambda () (bog-select-citekey (bog-pdf-citekeys)))
+                      arg))
+
+(defun bog-open-citekey-pdf (citekey)
+  (let ((pdf-file (bog-citekey-as-pdf citekey)))
+    (unless (file-exists-p pdf-file)
+      (error "%s does not exist" pdf-file))
+    (start-process "bog-pdf" nil bog-pdf-opener pdf-file)))
+
+(defun bog-citekey-as-pdf (citekey)
+  (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
+
+(defun bog-pdf-citekeys ()
+  "Return a list citekeys for all pdf files in
+`bog-pdf-directory'."
+  (-map 'file-name-base
+        (file-expand-wildcards (concat
+                                (file-name-as-directory bog-pdf-directory)
+                                "*.pdf"))))
 
 (provide 'bog)
 
