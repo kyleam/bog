@@ -157,3 +157,17 @@
       (should new-buffer)
       (kill-buffer new-buffer)
       (delete-file new-file))))
+
+;; `bog-collect-references'
+
+(ert-deftest bog-collect-references ()
+  (with-temp-buffer
+    (insert  "abc1900word\nhij2000word\nefg1800word\n")
+    (should (equal (bog-collect-references)
+                   '("abc1900word" "efg1800word" "hij2000word")))))
+
+(ert-deftest bog-collect-references-no-sort ()
+  (with-temp-buffer
+    (insert  "abc1900word\nhij2000word\nefg1800word\n")
+    (should (equal (bog-collect-references t)
+                   '("efg1800word" "hij2000word" "abc1900word")))))

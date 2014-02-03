@@ -262,6 +262,33 @@ file."
       (unless was-open
         (kill-buffer buffer)))))
 
+;;;###autoload
+(defun bog-create-combined-bib ()
+  "Create buffer that has entries for all citekeys in buffer."
+  (interactive)
+  (let ((bib-buffer (get-buffer-create "*Bib*"))
+        (refs (-map 'bog-citekey-as-bib (bog-collect-references))))
+    (--each refs (unless (file-exists-p it) (error "%s does not exist" it)))
+    (switch-to-buffer-other-window bib-buffer)
+    (--each refs
+      (insert "\n")
+      (insert-file-contents it)
+      (goto-char (point-max)))
+    (bibtex-mode)))
+
+(defun bog-collect-references (&optional no-sort)
+  "Return names in buffer that match `bog-citekey-format'.
+If NO-SORT, citekeys are returned in reverse order that they
+occur in buffer instead of alphabetical order."
+  (let (refs)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward bog-citekey-format nil t)
+        (add-to-list 'refs (match-string-no-properties 0)))
+      (if no-sort
+          refs
+        (--sort (string-lessp it other) refs)))))
+
 (defun bog-citekey-as-bib (citekey)
   (expand-file-name (concat citekey ".bib") bog-bib-directory))
 
