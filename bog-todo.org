@@ -63,4 +63,6 @@ paths, which is inconvenient if using default completing read function.
 
 * Testing
 
+** ENH Ability to run tests from makefile
+
 ** ENH Switch from obsolete `flet' to `noflet'
