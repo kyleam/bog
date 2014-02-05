@@ -39,6 +39,15 @@
   :group 'tools
   :group 'convenience)
 
+(defcustom bog-citekey-format
+  "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
+  "Regex used to match study citekey.
+By default, this matches any sequence of lower case
+letters (allowing hyphenation) that is followed by 4 digits and
+then lower case letters."
+  :type 'string
+  :group 'bog)
+
 (defcustom bog-notes-directory "~/bib"
   "The name of the directory that Org note are stored in."
   :group 'bog
@@ -83,15 +92,6 @@ alternative is `ido-completing-read'."
   "Program to open PDF files with."
   :group 'bog
   :type 'string)
-
-(defcustom bog-citekey-format
-  "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
-  "Regex used to match study citekey.
-By default, this matches any sequence of lower case
-letters (allowing hyphenation) that is followed by 4 digits and
-then lower case letters."
-  :type 'string
-  :group 'bog)
 
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
