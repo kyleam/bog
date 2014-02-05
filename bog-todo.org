@@ -32,7 +32,8 @@ Perhaps use a cache file. This could be used in
 
 * Notes
 
-** ENH [#A] Allow citekeys to be properties instead of headings
+** DONE [#A] Allow citekeys to be properties instead of headings
+   CLOSED: [2014-02-06 Thu 00:31]
 
 ** ENH Find in-text citekeys that don't have a header
 

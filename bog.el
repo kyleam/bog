@@ -48,6 +48,27 @@ then lower case letters."
   :type 'string
   :group 'bog)
 
+(defcustom bog-citekey-func 'bog-citekey-from-heading-title
+  "Function used to get citekey from study notes.
+
+By default, this is `bog-citekey-from-heading-title', which
+selects the citekey from the first parent heading whose title
+matches `bog-citekey-format'.
+
+The other option is `bog-citekey-from-property', which selects
+the citekey from the first parent that has the property
+`bog-citekey-property'."
+  :group 'bog
+  :type 'function)
+
+(defcustom bog-citekey-property "CUSTOM_ID"
+  "Property name used to store citekey.
+This is only used if `bog-citekey-func' is set to
+`bog-citekey-from-property'. The default corresponds to the
+default value of `org-bibtex-key-property'."
+  :group 'bog
+  :type 'string)
+
 (defcustom bog-notes-directory "~/bib"
   "The name of the directory that Org note are stored in."
   :group 'bog
@@ -109,12 +130,12 @@ It should contain the placeholder \"%s\" for the query."
 ASK-FUNC should be a function that queries the user for a citekey
 when ASK-CITEKEY is non-nil. Otherwise, the citekey will be taken
 from the text under point if it matches `bog-citekey-format' or
-from the first parent heading that matches `bog-citekey-format'.
+using `bog-citekey-func'.
 
 ACTION will be called with the resulting citekey as an argument."
   (let* ((citekey (and ask-citekey (funcall ask-func)))
          (citekey (or (bog-citekey-at-point)
-                      (bog-citekey-from-heading-title))))
+                      (funcall bog-citekey-func))))
     (funcall action citekey)))
 
 (defun bog-select-citekey (citekeys)
@@ -155,6 +176,20 @@ year, and the first meaningful word in the title)."
           (error "Citekey not found"))
         heading))))
 
+(defun bog-citekey-from-property ()
+  "Retrieve citekey from first parent heading that has the
+ property `bog-citekey-property'."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (let ((citekey (org-entry-get (point) bog-citekey-property)))
+        (while (and (not citekey)
+                    (org-up-heading-safe))
+          (setq citekey (org-entry-get (point) bog-citekey-property)))
+        (when (not citekey)
+          (error "Citekey not found"))
+        citekey))))
+
 (defun bog-citekey-p (text)
   "Indicate if TEXT matches `bog-citekey-format'."
   (when (string-match bog-citekey-format text)
@@ -174,8 +209,8 @@ year, and the first meaningful word in the title)."
   "Open PDF file for a citekey.
 If a prefix argument is given, a prompt will open to select from
 available citekeys. Otherwise, the citekey will be taken from the
-text under point if it matches `bog-citekey-format' or from the
-first parent heading that matches `bog-citekey-format'."
+text under point if it matches `bog-citekey-format' or using
+`bog-citekey-func'."
   (interactive "P")
   (bog-citekey-action 'bog-open-citekey-pdf
                       '(lambda () (bog-select-citekey (bog-pdf-citekeys)))
@@ -191,8 +226,7 @@ first parent heading that matches `bog-citekey-format'."
 (defun bog-rename-staged-pdf-to-citekey ()
   "Rename PDF in  `bog-pdf-directory-stage' to `bog-pdf-directory'/<citekey>.pdf.
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the first parent heading that
-matches `bog-citekey-format'."
+`bog-citekey-format' or using `bog-citekey-func'."
   (interactive)
   (bog-citekey-action 'bog-rename-staged-pdf
                       nil
@@ -236,8 +270,8 @@ matches `bog-citekey-format'."
   "Open BibTeX file for a citekey.
 If a prefix argument is given, a prompt will open to select from
 available citekeys. Otherwise, the citekey will be taken from the
-text under point if it matches `bog-citekey-format' or from the
-first parent heading that matches `bog-citekey-format'."
+text under point if it matches `bog-citekey-format' or using
+`bog-citekey-func'."
   (interactive "P")
   (bog-citekey-action 'bog-open-citekey-bib
                       '(lambda () (bog-select-citekey (bog-bib-citekeys)))

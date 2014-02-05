@@ -67,9 +67,8 @@ file studies under.
 
 "name2000word" is the study header. (The default format for the citekey
 is the first author's last name, the year, and then the first
-non-trivial word.) Currently, Bog expects the study citekey to be
-heading text, but I plan to add support for storing the citekeys as
-properties instead (see [[./bog-todo.org][bog-todo.org]]).
+non-trivial word.) Bog expects the study citekey to be the title or
+property of a heading.
 
 If the study was added when checking journals online, I tend to add the
 URL right under the heading. However, I often add citekeys from the

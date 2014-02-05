@@ -74,17 +74,41 @@
       (re-search-backward bog-citekey-format)
       (should (equal (bog-citekey-from-heading-title) citekey)))))
 
-;; `bog-citekey-action'
+;; `bog-citekey-from-property'
 
-(ert-deftest bog-citekey-action-in-normal-text ()
+(ert-deftest bog-citekey-from-property-current-level ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
-      (insert (format "\n* top level\n\n** %s\n\nsome text\n"
-                      citekey))
+      (insert "\n* top level\n\n** subhead\n"
+              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
+              ":END:\nsome text\n")
       (org-mode)
       (show-all)
-      (flet ((funcall (action citekey) citekey))
-        (should (equal (bog-citekey-action nil nil nil) citekey))))))
+      (should (equal (bog-citekey-from-property) citekey)))))
+
+(ert-deftest bog-citekey-from-property-in-parent ()
+  (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert "\n* top level\n"
+              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
+              ":END:\nsome text\n"
+              "** subhead\n\n")
+      (org-mode)
+      (show-all)
+      (should (equal (bog-citekey-from-property) citekey)))))
+
+(ert-deftest bog-citekey-from-property-on-heading ()
+  (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert "\n* top level\n\n** subhead\n"
+              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
+              ":END:\nsome text\n")
+      (org-mode)
+      (show-all)
+      (org-back-to-heading)
+      (should (equal (bog-citekey-from-property) citekey)))))
+
+;; `bog-citekey-action'
 
 (ert-deftest bog-citekey-action-on-heading ()
   (let ((citekey "name2010word"))
