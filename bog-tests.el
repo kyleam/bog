@@ -44,27 +44,27 @@
       (goto-char (point-min))
       (should (equal (bog-citekey-at-point) citekey)))))
 
-;; `bog-citekey-heading'
+;; `bog-citekey-from-heading-title'
 
-(ert-deftest bog-citekey-heading-current-level ()
+(ert-deftest bog-citekey-from-heading-title-current-level ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
                       citekey))
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-heading) citekey)))))
+      (should (equal (bog-citekey-from-heading-title) citekey)))))
 
-(ert-deftest bog-citekey-heading-in-parent ()
+(ert-deftest bog-citekey-from-heading-title-in-parent ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** %s\n\n*** subheading\n\nsome text\n"
                       citekey))
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-heading) citekey)))))
+      (should (equal (bog-citekey-from-heading-title) citekey)))))
 
-(ert-deftest bog-citekey-heading-on-heading ()
+(ert-deftest bog-citekey-from-heading-title-on-heading ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
@@ -72,7 +72,7 @@
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (should (equal (bog-citekey-heading) citekey)))))
+      (should (equal (bog-citekey-from-heading-title) citekey)))))
 
 (ert-deftest bog-citekey-action-in-normal-text ()
   (let ((citekey "name2010word"))

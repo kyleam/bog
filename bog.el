@@ -114,7 +114,7 @@ from the first parent heading that matches `bog-citekey-format'.
 ACTION will be called with the resulting citekey as an argument."
   (let* ((citekey (and ask-citekey (funcall ask-func)))
          (citekey (or (bog-citekey-at-point)
-                      (bog-citekey-heading))))
+                      (bog-citekey-from-heading-title))))
     (funcall action citekey)))
 
 (defun bog-select-citekey (citekeys)
@@ -141,7 +141,7 @@ year, and the first meaningful word in the title)."
                (bog-citekey-only-p maybe-citekey))
       maybe-citekey)))
 
-(defun bog-citekey-heading ()
+(defun bog-citekey-from-heading-title ()
   "Return first org heading that matches `bog-citekey-format'."
   (save-excursion
     (save-restriction
