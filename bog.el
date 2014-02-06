@@ -147,12 +147,10 @@ year, and the first meaningful word in the title)."
   (save-excursion
     (save-restriction
       (widen)
-      (org-back-to-heading)
-      (let ((heading (org-element-property :raw-value (org-element-at-point))))
+      (let ((heading (org-no-properties (org-get-heading t t))))
         (while (and (not (bog-citekey-only-p heading))
                     (org-up-heading-safe))
-          (setq heading
-                (org-element-property :raw-value (org-element-at-point))))
+          (setq heading (org-no-properties (org-get-heading t t))))
         (when (not (bog-citekey-only-p heading))
           (error "Citekey not found"))
         heading))))
