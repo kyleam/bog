@@ -74,6 +74,8 @@
       (re-search-backward bog-citekey-format)
       (should (equal (bog-citekey-from-heading-title) citekey)))))
 
+;; `bog-citekey-action'
+
 (ert-deftest bog-citekey-action-in-normal-text ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
@@ -83,8 +85,6 @@
       (show-all)
       (flet ((funcall (action citekey) citekey))
         (should (equal (bog-citekey-action nil nil nil) citekey))))))
-
-;; `bog-citekey-action'
 
 (ert-deftest bog-citekey-action-on-heading ()
   (let ((citekey "name2010word"))
