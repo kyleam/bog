@@ -142,7 +142,8 @@ year, and the first meaningful word in the title)."
       maybe-citekey)))
 
 (defun bog-citekey-from-heading-title ()
-  "Return first org heading that matches `bog-citekey-format'."
+  "Retrieve citekey from first parent heading that matches
+`bog-citekey-format'."
   (save-excursion
     (save-restriction
       (widen)
