@@ -45,7 +45,8 @@ Redefine org refile targets.
 
 * BibTeX files
 
-** ENH [#A] Make `bog-find-citekey-bib' compatible with a single BibTeX file
+** DONE [#A] Make `bog-find-citekey-bib' compatible with a single BibTeX file
+   CLOSED: [2014-02-07 Fri 01:16]
 
 ** ENH Create combined bib from a suffix glob
 

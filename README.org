@@ -98,13 +98,15 @@ heading that is a study.
 
 ** Opening a BibTeX file
 
-All BibTeX files are kept in a single directory and are named as
-<citekey>.bib. The function =bog-find-citekey-bib= will open the BibTeX
-file associated with a citekey. The citekey is obtained in the same way
-as the [[Opening a PDF file][PDF citekey]].
+The function =bog-find-citekey-bib= will open the BibTeX entry
+associated with a citekey.
 
-Although I prefer the above setup, using a single for all entries is
-more common, so I plan to add support for this (see [[./bog-todo.org][bog-todo.org]]).
+The citekey is obtained in the same way as the [[Opening%20a%20PDF%20file][PDF citekey]].
+
+BibTeX entries can be stored in one of two ways:
+
+1. As a single file with many entries
+2. As single-entry files named <citekey>.bib within a common directory
 
 ** Searching citekey on the web
 

@@ -88,9 +88,29 @@ rename."
   :group 'bog
   :type 'string)
 
+(defcustom bog-find-citekey-bib-func 'bog-find-citekey-bib-file
+  "Function used to find BibTeX entry for citekey.
+
+Default is `bog-find-citekey-bib-file' that locates single entry
+BibTeX files in `bog-bib-directory'.
+
+The other option is `bog-find-citekey-entry' that searches within
+a single BibTeX file, `bog-bib-file', for the citekey entry."
+  :group 'bog
+  :type 'function)
+
 (defcustom bog-bib-directory
   (expand-file-name "bibs" bog-notes-directory)
-  "The name of the directory that BibTeX files are stored in."
+  "The name of the directory that BibTeX files are stored in.
+This is only meaningful if `bog-find-citekey-bib-func' set to
+`bog-find-citekey-bib-file'."
+  :group 'bog
+  :type 'string)
+
+(defcustom bog-bib-file nil
+  "BibTeX file name.
+This is only meaningful if `bog-find-citekey-bib-func' set to
+`bog-find-citekey-entry'."
   :group 'bog
   :type 'string)
 
@@ -273,15 +293,21 @@ available citekeys. Otherwise, the citekey will be taken from the
 text under point if it matches `bog-citekey-format' or using
 `bog-citekey-func'."
   (interactive "P")
-  (bog-citekey-action 'bog-open-citekey-bib
+  (bog-citekey-action bog-find-citekey-bib-func
                       '(lambda () (bog-select-citekey (bog-bib-citekeys)))
                       arg))
 
-(defun bog-open-citekey-bib (citekey)
+(defun bog-find-citekey-bib-file (citekey)
+  "Open BibTeX file of CITEKEY contained in `bog-bib-directory'."
   (let ((bib-file (bog-citekey-as-bib citekey)))
     (unless (file-exists-p bib-file)
       (error "%s does not exist" bib-file))
     (find-file-other-window bib-file)))
+
+(defun bog-find-citekey-entry (citekey)
+  "Search for CITEKEY in `bog-bib-file'."
+  (find-file-other-window bog-bib-file)
+  (bibtex-search-entry citekey))
 
 ;;;###autoload
 (defun bog-rename-and-clean-new-bib-files ()
