@@ -52,7 +52,7 @@ file studies under.
 
   ,* Topic heder
 
-  ,** name2000word                                                        :atag:
+  ,** name2000word                                    :atag:
 
   <URL for study>
 
@@ -85,7 +85,7 @@ only the heading.
 You can reference other studies with their citekey.
 
 #+begin_example
-  ,** name2000word                                                        :atag:
+  ,** name2000word                                    :atag:
 
   Another study (another1999word).
 #+end_example

@@ -84,7 +84,7 @@ and taking notes with Org, not on writing research articles with Org.
   | 
   | * Topic heder
   | 
-  | ** name2000word                                                        :atag:
+  | ** name2000word                                    :atag:
   | 
   | <URL for study>
   | 
@@ -119,7 +119,7 @@ and taking notes with Org, not on writing research articles with Org.
   You can reference other studies with their citekey.
 
   ,----
-  | ** name2000word                                                        :atag:
+  | ** name2000word                                    :atag:
   | 
   | Another study (another1999word).
   `----
