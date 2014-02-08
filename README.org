@@ -1,4 +1,4 @@
-#+title: Bog - Extensions for research notes in Org
+#+title: Bog
 
 Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. As any Org user
 knows, Org handles notetaking beautifully. Bog just adds a few
