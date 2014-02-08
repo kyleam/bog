@@ -45,8 +45,8 @@
 By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
 then lower case letters."
-  :type 'string
-  :group 'bog)
+  :group 'bog
+  :type 'string)
 
 (defcustom bog-citekey-func 'bog-citekey-from-heading-title
   "Function used to get citekey from study notes.
@@ -138,8 +138,8 @@ alternative is `ido-completing-read'."
   "http://scholar.google.com/scholar?q=%s"
   "URL to use for CITEKEY search.
 It should contain the placeholder \"%s\" for the query."
-  :type 'string
-  :group 'bog)
+  :group 'bog
+  :type 'string)
 
 
 ;;; General utilities
