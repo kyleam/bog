@@ -91,10 +91,21 @@ and taking notes with Org, not on writing research articles with Org.
   | Article notes
   `----
 
-  "name2000word" is the study header. (The default format for the
-  citekey is the first author's last name, the year, and then the first
-  non-trivial word.) Bog expects the study citekey to be the title or
-  property of a heading.
+  "name2000word" is the study header. Bog expects the study citekey to
+  be the title or property of a heading.
+
+  The default format for the citekey is the first author's last name,
+  the year, and then the first non-trivial word. To have BibTeX mode
+  automatically generate a key of this format, the `bibtex=autokey-*'
+  settings can be modified.
+
+  ,----
+  | (setq bibtex-autokey-year-length 4
+  |       bibtex-autokey-titleword-length nil
+  |       bibtex-autokey-titlewords-stretch 0
+  |       bibtex-autokey-titlewords 1
+  |       bibtex-autokey-year-title-separator "")
+  `----
 
   If the study was added when checking journals online, I tend to add
   the URL right under the heading. However, I often add citekeys from

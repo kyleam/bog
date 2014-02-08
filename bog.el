@@ -41,9 +41,20 @@
 (defcustom bog-citekey-format
   "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
   "Regex used to match study citekey.
+
 By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
-then lower case letters."
+then lower case letters.
+
+The default format corresponds to the following BibTeX autokey
+settings:
+
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-titleword-length nil
+        bibtex-autokey-titlewords-stretch 0
+        bibtex-autokey-titlewords 1
+        bibtex-autokey-year-title-separator \"\")
+"
   :group 'bog
   :type 'string)
 
