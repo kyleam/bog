@@ -354,7 +354,8 @@ file."
       (insert "\n")
       (insert-file-contents it)
       (goto-char (point-max)))
-    (bibtex-mode)))
+    (bibtex-mode)
+    (goto-char (point-min))))
 
 (defun bog-collect-references (&optional no-sort)
   "Return names in buffer that match `bog-citekey-format'.
