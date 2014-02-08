@@ -64,7 +64,7 @@ the title or property of a heading.
 
 The default format for the citekey is the first author's last name, the
 year, and then the first non-trivial word. To have BibTeX mode
-automatically generate a key of this format, the =bibtex=autokey-*=
+automatically generate a key of this format, the =bibtex-autokey-*=
 settings can be modified.
 
 #+begin_src emacs-lisp
