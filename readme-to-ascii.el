@@ -4,7 +4,7 @@
   (add-to-list 'load-path org-location)
   (require 'org))
 
-(let ((readme-file "README.org")
+(let ((readme-file "bog-readme.org")
       exported-file
       (final-file "README"))
   (with-current-buffer (find-file-noselect readme-file)
