@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+emacs --batch --load readme-to-ascii.el
+git add README
