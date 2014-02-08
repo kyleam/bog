@@ -4,14 +4,8 @@ Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. 
 knows, Org handles notetaking beautifully. Bog just adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
-The main features include
 
-- Opening a PDF associated with reference citekey
-- Opening a BibTeX entry associated with a citekey
-- Searching Google Scholar using elements from citekey
-- Renaming a newly downloaded PDF based on the current citekey
-
-* Workflows
+* Bog workflow
 
 Many people use Org for taking research notes, and there are some really
 nice descriptions of systems people have come up with (for a few
@@ -44,9 +38,9 @@ The workflow for Bog is based on these preferences:
    citekey. I make sure to add a link to the study online. I only
    retrieve the BibTeX file or PDF file when I need to use them.
 
-Below is a more detailed description of the workflow and what Bog does.
+* Features
 
-** Adding citekeys
+** Adding citekeys to notes
 
 As mentioned above, when citekeys are added, they should be filed under
 the appropriate topic. I organize my research notes into a few files
@@ -75,9 +69,9 @@ URL right under the heading. However, I often add citekeys from the
 references of an article that I'm reading. In this case, I often store
 only the heading.
 
-** Referencing studies
+** Referencing studies within notes
 
-Within the notes, you can references other studies with their citekey.
+You can reference other studies with their citekey.
 
 #+begin_example
   ,** name2000word                                                        :atag:
@@ -88,7 +82,7 @@ Within the notes, you can references other studies with their citekey.
 "another1999word" will be highlighted within the text. When the point is
 within the citekey, many Bog functions can extract and use the citekey.
 
-** Opening a PDF file
+** Opening a PDF file for a citekey
 
 All PDF files are kept in a single directory and are named as
 <citekey>-*.pdf. The function =bog-find-citekey-pdf= will open a PDF
@@ -96,7 +90,7 @@ associated with a citekey. If the point is on a citekey, it will open
 that citekey. Otherwise, it will use the citekey from the first parent
 heading that is a study.
 
-** Opening a BibTeX file
+** Opening a BibTeX file for a citekey
 
 The function =bog-find-citekey-bib= will open the BibTeX entry
 associated with a citekey.
@@ -108,7 +102,7 @@ BibTeX entries can be stored in one of two ways:
 1. As a single file with many entries
 2. As single-entry files named <citekey>.bib within a common directory
 
-** Searching citekey on the web
+** Searching online for a citekey
 
 The function =bog-search-citekey-on-web= will perform a search with the
 citekey information. By default, Google Scholar is searched. The default
