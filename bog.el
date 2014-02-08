@@ -24,7 +24,7 @@
 ;;; Commentary:
 ;;
 ;; Bog provides a few convenience functions for taking research notes in
-;; Org mode.
+;; Org mode. See README.org for more information.
 
 ;;; Code:
 
