@@ -36,8 +36,7 @@
 
 (defgroup bog nil
   "Extensions for research notes in Org mode"
-  :group 'tools
-  :group 'convenience)
+  :group 'org)
 
 (defcustom bog-citekey-format
   "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
