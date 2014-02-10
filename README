@@ -17,6 +17,7 @@ _________________
 .. 2.6 Renaming a new PDF
 .. 2.7 Renaming a new BibTeX file
 .. 2.8 Generating a combined BibTeX file
+3 Recommended keybindings
 
 
 Bog is a system for taking research notes in [Org mode]. As any Org user
@@ -187,3 +188,26 @@ and taking notes with Org, not on writing research articles with Org.
   collect the references that are needed. `bog-create-combined-bib' can
   be used to create a BibTeX file that has entries for all the citekeys
   in the current buffer.
+
+
+3 Recommended keybindings
+=========================
+
+  Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
+  in Org mode is a good option.
+
+   Key      Command                   
+  ------------------------------------
+   C-c b p  bog-find-citekey-pdf      
+   C-c b b  bog-find-citekey-bib      
+   C-c b w  bog-search-citekey-on-web 
+
+  This can be achieved by placing the code below in your .emacs file.
+
+  ,----
+  | (define-prefix-command 'bog-map)
+  | (define-key org-mode-map (kbd "C-c b") 'bog-map)
+  | (define-key bog-map "p" 'bog-find-citekey-pdf)
+  | (define-key bog-map "b" 'bog-find-citekey-bib)
+  | (define-key bog-map "w" 'bog-search-citekey-on-web)
+  `----
