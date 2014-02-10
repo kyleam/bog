@@ -136,7 +136,7 @@ autogenerate the key.
 
 ** Generating a combined BibTeX file
 
-If single-entry BibTeX files are used, there needs to be a way to
-collect the references that are needed. =bog-create-combined-bib= can be
-used to create a BibTeX file that has entries for all the citekeys in
-the current buffer.
+If single-entry BibTeX files are used, there should be a way to collect
+the references that are needed. =bog-create-combined-bib= can be used to
+create a BibTeX file that has entries for all the citekeys in the
+current buffer.
