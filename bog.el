@@ -53,8 +53,7 @@ settings:
         bibtex-autokey-titleword-length nil
         bibtex-autokey-titlewords-stretch 0
         bibtex-autokey-titlewords 1
-        bibtex-autokey-year-title-separator \"\")
-"
+        bibtex-autokey-year-title-separator \"\")"
   :group 'bog
   :type 'string)
 
