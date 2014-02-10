@@ -182,7 +182,7 @@ year, and the first meaningful word in the title)."
   (let ((groups (or groups '(1 2 3)))
         (delim (or delim " ")))
     (string-match bog-citekey-format citekey)
-    (mapconcat '(lambda (g) (match-string-no-properties g citekey))
+    (mapconcat #'(lambda (g) (match-string-no-properties g citekey))
                groups delim)))
 
 (defun bog-citekey-at-point ()
