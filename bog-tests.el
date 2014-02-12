@@ -111,26 +111,26 @@
 ;; `bog-citekey-action'
 
 (ert-deftest bog-citekey-action-on-heading ()
-  (let ((citekey "name2010word"))
+  (let ((citekey "name2010word")
+        (action '(lambda (ck) ck)))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
                       citekey))
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (flet ((funcall (action citekey) citekey))
-        (should (equal (bog-citekey-action nil nil nil) citekey))))))
+      (should (equal (bog-citekey-action action nil nil) citekey)))))
 
 (ert-deftest bog-citekey-action-on-in-text-citekey ()
-  (let ((citekey "name2010word"))
+  (let ((citekey "name2010word")
+        (action '(lambda (ck) ck)))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** other2000key\n\nsome text and %s\n"
                       citekey))
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (flet ((funcall (action citekey) citekey))
-        (should (equal (bog-citekey-action nil nil nil) citekey))))))
+      (should (equal (bog-citekey-action action nil nil) citekey)))))
 
 (ert-deftest bog-citekey-action-no-citekey ()
   (with-temp-buffer
