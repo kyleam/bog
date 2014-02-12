@@ -139,6 +139,16 @@
     (show-all)
     (should-error (bog-citekey-action nil nil nil))))
 
+(ert-deftest bog-citekey-action-askfunc ()
+  (let* ((citekey "name2010word")
+         (ask-func '(lambda () citekey))
+         (action '(lambda (ck) ck)))
+    (with-temp-buffer
+      (insert  "\n* top level\n\n** second\n\n")
+      (org-mode)
+      (show-all)
+      (should (equal (bog-citekey-action action ask-func t) citekey)))))
+
 
 ;;; BibTeX functions
 

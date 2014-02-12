@@ -162,9 +162,9 @@ from the text under point if it matches `bog-citekey-format' or
 using `bog-citekey-func'.
 
 ACTION will be called with the resulting citekey as an argument."
-  (let* ((citekey (and ask-citekey (funcall ask-func)))
-         (citekey (or (bog-citekey-at-point)
-                      (funcall bog-citekey-func))))
+  (let ((citekey (or (and ask-citekey (funcall ask-func))
+                     (bog-citekey-at-point)
+                     (funcall bog-citekey-func))))
     (funcall action citekey)))
 
 (defun bog-select-citekey (citekeys)
