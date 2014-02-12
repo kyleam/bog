@@ -52,16 +52,12 @@ and taking notes with Org, not on writing research articles with Org.
      not mindless.
 
      There is an endless stream of research articles, so it should be
-     easy to add them. On the other hand, it shouldn't be so easy that I
-     file them away without giving them any thought. For me, this means
-     capturing the article and a link in my normal Org notes system. At
-     some point, I glance over it enough to decide what general topic it
-     should be in and refile it into a research notes file.
-
-     I prefer adding BibTeX and PDF files lazily. My only requirement is
-     that I put it in a relevant heading and that I name it with a
-     proper citekey. I make sure to add a link to the study online. I
-     only retrieve the BibTeX file or PDF file when I need to use them.
+     easy to add them, but it shouldn't be so easy that I file them away
+     without giving them any thought. For me, this means glancing over
+     it at least enough to place it under a general topic (or capturing
+     the article and a link in my normal Org notes system until I take
+     time to refile it to my research notes). I only retrieve the BibTeX
+     file or PDF file when I need to use them.
 
 
   [these] http://thread.gmane.org/gmane.emacs.orgmode/78983
