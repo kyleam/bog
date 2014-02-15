@@ -110,44 +110,32 @@
 
 ;; `bog-citekey-action'
 
-(ert-deftest bog-citekey-action-on-heading ()
-  (let ((citekey "name2010word")
-        (action '(lambda (ck) ck)))
+(ert-deftest bog-citekey-from-notes-on-heading ()
+  (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
                       citekey))
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (should (equal (bog-citekey-action action nil nil) citekey)))))
+      (should (equal (bog-citekey-from-notes) citekey)))))
 
-(ert-deftest bog-citekey-action-on-in-text-citekey ()
-  (let ((citekey "name2010word")
-        (action '(lambda (ck) ck)))
+(ert-deftest bog-citekey-from-notes-on-in-text-citekey ()
+  (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert (format "\n* top level\n\n** other2000key\n\nsome text and %s\n"
                       citekey))
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (should (equal (bog-citekey-action action nil nil) citekey)))))
+      (should (equal (bog-citekey-from-notes) citekey)))))
 
-(ert-deftest bog-citekey-action-no-citekey ()
+(ert-deftest bog-citekey-from-notes-no-citekey ()
   (with-temp-buffer
     (insert  "\n* top level\n\n** second\n\n")
     (org-mode)
     (show-all)
-    (should-error (bog-citekey-action nil nil nil))))
-
-(ert-deftest bog-citekey-action-askfunc ()
-  (let* ((citekey "name2010word")
-         (ask-func '(lambda () citekey))
-         (action '(lambda (ck) ck)))
-    (with-temp-buffer
-      (insert  "\n* top level\n\n** second\n\n")
-      (org-mode)
-      (show-all)
-      (should (equal (bog-citekey-action action ask-func t) citekey)))))
+    (should-error (bog-citekey-from-notes))))
 
 
 ;;; BibTeX functions

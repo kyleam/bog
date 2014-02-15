@@ -153,20 +153,6 @@ It should contain the placeholder \"%s\" for the query."
 
 ;;; General utilities
 
-(defun bog-citekey-action (action ask-func ask-citekey)
-  "Perform ACTION on file associtated with a citekey.
-
-ASK-FUNC should be a function that queries the user for a citekey
-when ASK-CITEKEY is non-nil. Otherwise, the citekey will be taken
-from the text under point if it matches `bog-citekey-format' or
-using `bog-citekey-func'.
-
-ACTION will be called with the resulting citekey as an argument."
-  (let ((citekey (or (and ask-citekey (funcall ask-func))
-                     (bog-citekey-at-point)
-                     (funcall bog-citekey-func))))
-    (funcall action citekey)))
-
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS"
   (funcall bog-completing-read "Select citekey: " citekeys))
@@ -190,6 +176,11 @@ year, and the first meaningful word in the title)."
     (when (and maybe-citekey
                (bog-citekey-only-p maybe-citekey))
       maybe-citekey)))
+
+(defun bog-citekey-from-notes ()
+  "Get the citekey from the context of the Org file."
+  (or (bog-citekey-at-point)
+      (funcall bog-citekey-func)))
 
 (defun bog-citekey-from-heading-title ()
   "Retrieve citekey from first parent heading that matches
@@ -241,9 +232,9 @@ available citekeys. Otherwise, the citekey will be taken from the
 text under point if it matches `bog-citekey-format' or using
 `bog-citekey-func'."
   (interactive "P")
-  (bog-citekey-action 'bog-open-citekey-pdf
-                      '(lambda () (bog-select-citekey (bog-pdf-citekeys)))
-                      arg))
+  (let ((citekey (or (and arg (bog-select-citekey (bog-pdf-citekeys)))
+                     (bog-citekey-from-notes))))
+    (bog-open-citekey-pdf citekey)))
 
 (defun bog-open-citekey-pdf (citekey)
   (let ((pdf-file (bog-citekey-as-pdf citekey)))
@@ -257,9 +248,8 @@ text under point if it matches `bog-citekey-format' or using
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or using `bog-citekey-func'."
   (interactive)
-  (bog-citekey-action 'bog-rename-staged-pdf
-                      nil
-                      nil))
+  (let ((citekey (bog-citekey-from-notes)))
+    (bog-rename-staged-pdf citekey)))
 
 (defun bog-rename-staged-pdf (citekey)
   (let* ((pdf-file (bog-citekey-as-pdf citekey))
@@ -302,9 +292,9 @@ available citekeys. Otherwise, the citekey will be taken from the
 text under point if it matches `bog-citekey-format' or using
 `bog-citekey-func'."
   (interactive "P")
-  (bog-citekey-action bog-find-citekey-bib-func
-                      '(lambda () (bog-select-citekey (bog-bib-citekeys)))
-                      arg))
+  (let ((citekey (or (and arg (bog-select-citekey (bog-pdf-citekeys)))
+                     (bog-citekey-from-notes))))
+    (funcall bog-find-citekey-bib-func citekey)))
 
 (defun bog-find-citekey-bib-file (citekey)
   "Open BibTeX file of CITEKEY contained in `bog-bib-directory'."
@@ -401,9 +391,8 @@ The URL will be taken from `bog-web-search-url'.
 The citekey is split by groups in `bog-citekey-format' and joined by
 \"+\" to form the query string."
   (interactive)
-  (bog-citekey-action 'bog-open-citekey-on-web
-                      nil
-                      nil))
+  (let ((citekey (bog-citekey-from-notes)))
+    (bog-open-citekey-on-web citekey)))
 
 (defun bog-open-citekey-on-web (citekey)
   (let ((url (bog-citekey-as-search-url citekey)))
