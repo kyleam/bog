@@ -254,9 +254,10 @@ The citekey will be taken from the text under point if it matches
 
 (defun bog-rename-staged-pdf (citekey)
   (let* ((pdf-file (bog-citekey-as-pdf citekey))
-         (choices
+         (staged-pdfs
           (file-expand-wildcards
            (concat (file-name-as-directory bog-stage-directory) "*.pdf")))
+         (choices (-map 'file-name-nondirectory staged-pdfs))
          (num-choices (length choices))
          staged-pdf)
     (cond
@@ -266,8 +267,10 @@ The citekey will be taken from the text under point if it matches
      ((= 1 num-choices)
       (setq staged-pdf (car choices)))
      (t
-      (setq staged-pdf (funcall bog-completing-read
-                                "Select PDF file to rename: " choices))))
+      (setq staged-pdf
+            (expand-file-name (funcall bog-completing-read
+                                       "Select PDF file to rename: " choices)
+                              bog-stage-directory))))
     (rename-file staged-pdf pdf-file)
     (message "Renamed %s to %s" staged-pdf pdf-file)))
 

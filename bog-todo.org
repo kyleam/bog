@@ -67,7 +67,8 @@ Avoid filtering all bib file names.
 
 If multiple PDFs for a citekey, complete read.
 
-** ENH Map basename to full name for PDF rename
+** DONE Map basename to full name for PDF rename
+   CLOSED: [2014-02-15 Sat 15:07]
 
 When more than one file in staged, completing read prompts with full
 paths, which is inconvenient if using default completing read function.
