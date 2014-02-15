@@ -14,8 +14,8 @@ _________________
 .. 2.3 Opening a PDF file for a citekey
 .. 2.4 Opening a BibTeX file for a citekey
 .. 2.5 Searching online for a citekey
-.. 2.6 Renaming a new PDF
-.. 2.7 Renaming a new BibTeX file
+.. 2.6 Renaming new PDFs
+.. 2.7 Renaming new BibTeX files
 .. 2.8 Generating a combined BibTeX file
 3 Recommended keybindings
 
@@ -160,16 +160,15 @@ and taking notes with Org, not on writing research articles with Org.
   search successful.
 
 
-2.6 Renaming a new PDF
-~~~~~~~~~~~~~~~~~~~~~~
+2.6 Renaming new PDFs
+~~~~~~~~~~~~~~~~~~~~~
 
   New PDF files can be put in a "stage" directory and then renamed to a
-  citekey. (The citekey can be taken from the notes context, as
-  described in Opening a PDF file.)
+  citekey. (The citekey is taken from the notes context.)
 
 
-2.7 Renaming a new BibTeX file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+2.7 Renaming new BibTeX files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   If a separate BibTeX file is used for each citekey,
   `bog-clean-and-rename-staged-bibs' can be used to rename all new

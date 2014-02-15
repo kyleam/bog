@@ -117,13 +117,12 @@ citekey format (first author's last name, year, and first non-trivial
 word) usually contains enough information to make this search
 successful.
 
-** Renaming a new PDF
+** Renaming new PDFs
 
 New PDF files can be put in a "stage" directory and then renamed to a
-citekey. (The citekey can be taken from the notes context, as described
-in [[Opening%20a%20PDF%20file][Opening a PDF file]].)
+citekey. (The citekey is taken from the notes context.)
 
-** Renaming a new BibTeX file
+** Renaming new BibTeX files
 
 If a separate BibTeX file is used for each citekey,
 =bog-clean-and-rename-staged-bibs= can be used to rename all new BibTeX
