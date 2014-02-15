@@ -278,7 +278,7 @@ The citekey will be taken from the text under point if it matches
       (setq staged-pdf (funcall bog-completing-read
                                 "Select PDF file to rename: " choices))))
     (rename-file staged-pdf pdf-file)
-    (message "Renamed %s to %s." staged-pdf pdf-file)))
+    (message "Renamed %s to %s" staged-pdf pdf-file)))
 
 (defun bog-citekey-as-pdf (citekey)
   (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
