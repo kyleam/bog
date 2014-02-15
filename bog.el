@@ -265,7 +265,7 @@ The citekey will be taken from the text under point if it matches
       (setq staged-pdf (funcall bog-read-file-name
                                 "Select PDF file to rename: ")))
      ((= 1 num-choices)
-      (setq staged-pdf (car choices)))
+      (setq staged-pdf (car staged-pdfs)))
      (t
       (setq staged-pdf
             (expand-file-name (funcall bog-completing-read

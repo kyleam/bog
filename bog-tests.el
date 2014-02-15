@@ -2,6 +2,15 @@
 (require 'org)
 (require 'bog)
 
+;; Modified from magit-tests.el.
+(defmacro bog-tests--with-temp-dir (&rest body)
+  (declare (indent 0) (debug t))
+  (let ((dir (gensym)))
+    `(let ((,dir (file-name-as-directory (make-temp-file "dir" t))))
+       (unwind-protect
+           (let ((default-directory ,dir)) ,@body)
+         (delete-directory ,dir t)))))
+
 
 ;;; Citekey functions
 
@@ -136,6 +145,29 @@
     (org-mode)
     (show-all)
     (should-error (bog-citekey-from-notes))))
+
+
+;;; PDF functions
+
+(ert-deftest bog-rename-staged-pdf-to-citekey-one-pdf ()
+  (bog-tests--with-temp-dir
+   (let ((bog-stage-directory (expand-file-name "stage"))
+         (bog-pdf-directory (expand-file-name "pdfs"))
+         (citekey "name2010word"))
+     (make-directory bog-stage-directory)
+     (make-directory bog-pdf-directory)
+     (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
+     (with-temp-buffer
+       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
+                       citekey))
+       (org-mode)
+       (show-all)
+       (re-search-backward bog-citekey-format)
+       (bog-rename-staged-pdf-to-citekey))
+     (should (file-exists-p (expand-file-name
+                             (concat citekey ".pdf") bog-pdf-directory)))
+     (should-not (file-exists-p (expand-file-name
+                                 (concat "one.pdf") bog-pdf-directory))))))
 
 
 ;;; BibTeX functions
