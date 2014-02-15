@@ -126,9 +126,9 @@ in [[Opening%20a%20PDF%20file][Opening a PDF file]].)
 ** Renaming a new BibTeX file
 
 If a separate BibTeX file is used for each citekey,
-=bog-rename-and-clean-new-bib-files= can be used to rename all new
-BibTeX files. =bibtex-clean-entry= is used to clean the entry and
-autogenerate the key.
+=bog-clean-and-rename-staged-bibs= can be used to rename all new BibTeX
+files. =bibtex-clean-entry= is used to clean the entry and autogenerate
+the key.
 
 ** Generating a combined BibTeX file
 

@@ -89,10 +89,11 @@ default value of `org-bibtex-key-property'."
   :group 'bog
   :type 'string)
 
-(defcustom bog-pdf-directory-stage
-  (expand-file-name "pdf-stage" bog-notes-directory)
-  "The name of the directory to search for new PDFs in.
-`bog-rename-staged-pdf-to-citekey' will search here for files to
+(defcustom bog-stage-directory
+  (expand-file-name "stage" bog-notes-directory)
+  "The name of the directory to search for new files.
+`bog-rename-staged-pdf-to-citekey' and
+`bog-rename-staged-bib-to-citekey' will search here for files to
 rename."
   :group 'bog
   :type 'string)
@@ -244,7 +245,7 @@ text under point if it matches `bog-citekey-format' or using
 
 ;;;###autoload
 (defun bog-rename-staged-pdf-to-citekey ()
-  "Rename PDF in  `bog-pdf-directory-stage' to `bog-pdf-directory'/<citekey>.pdf.
+  "Rename PDF in `bog-stage-directory' to `bog-pdf-directory'/<citekey>.pdf.
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or using `bog-citekey-func'."
   (interactive)
@@ -255,7 +256,7 @@ The citekey will be taken from the text under point if it matches
   (let* ((pdf-file (bog-citekey-as-pdf citekey))
          (choices
           (file-expand-wildcards
-           (concat (file-name-as-directory bog-pdf-directory-stage) "*.pdf")))
+           (concat (file-name-as-directory bog-stage-directory) "*.pdf")))
          (num-choices (length choices))
          staged-pdf)
     (cond
@@ -309,20 +310,23 @@ text under point if it matches `bog-citekey-format' or using
   (bibtex-search-entry citekey))
 
 ;;;###autoload
-(defun bog-rename-and-clean-new-bib-files ()
-  "Prepare new BibTeX files.
-New files are determined as files in `bog-bib-directory' that do
-not have a basename matching `bog-citekey-format'. This is only
-useful if you use the non-standard setup of one entry per BibTeX
-file."
-  (interactive)
-  (let* ((new (--filter (not (string-match bog-citekey-format it))
-                    (bog-bib-citekeys)))
-         (new (--map (concat (expand-file-name it bog-bib-directory) ".bib")
-                     new)))
-    (--each new (bog-prepare-bib-file it t))))
+(defun bog-clean-and-rename-staged-bibs ()
+  "Clean and rename BibTeX files in `bog-stage-directory'.
 
-(defun bog-prepare-bib-file (file &optional new-key)
+New BibTeX files are searched for in `bog-stage-directory', and
+`bog-prepare-bib-file' will be run one each file before it is
+moved to `bog-bib-directory'/<citekey>.bib.
+
+This function is only useful if you use the non-standard setup of
+one entry per BibTeX file."
+  (interactive)
+  (let ((staged
+         (file-expand-wildcards
+          (concat (file-name-as-directory bog-stage-directory) "*.bib"))))
+    (--each staged
+      (bog-prepare-bib-file it t bog-bib-directory))))
+
+(defun bog-prepare-bib-file (file &optional new-key new-directory)
   (save-excursion
     (let ((was-open (get-file-buffer file))
           (buffer (find-file-noselect file)))
@@ -331,7 +335,8 @@ file."
         (bibtex-skip-to-valid-entry)
         (bibtex-clean-entry new-key)
         (let* ((citekey (bibtex-key-in-head))
-               (bib-file (concat citekey ".bib")))
+               (bib-file
+                (expand-file-name (concat citekey ".bib") new-directory)))
           (when (get-buffer bib-file)
             (error "Buffer for %s already exists" bib-file))
           (rename-file file bib-file)

@@ -56,7 +56,8 @@ For documents generated from multiple files
 
 Default could be "*.tex".
 
-** ENH Use a stage for new BibTeX files
+** DONE Use a stage for new BibTeX files
+   CLOSED: [2014-02-15 Sat 15:06]
 
 Avoid filtering all bib file names.
 

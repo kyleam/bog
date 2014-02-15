@@ -172,7 +172,7 @@ and taking notes with Org, not on writing research articles with Org.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   If a separate BibTeX file is used for each citekey,
-  `bog-rename-and-clean-new-bib-files' can be used to rename all new
+  `bog-clean-and-rename-staged-bibs' can be used to rename all new
   BibTeX files. `bibtex-clean-entry' is used to clean the entry and
   autogenerate the key.
 
