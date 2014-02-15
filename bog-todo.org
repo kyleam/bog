@@ -77,6 +77,10 @@ paths, which is inconvenient if using default completing read function.
 
 ** ENH Ability to run tests from makefile
 
+** ENH Put some of the common setup in macros
+
+I'm thinking mainly of temporary Org buffers.
+
 ** CANCELED Switch from obsolete `flet' to `noflet'
    CLOSED: [2014-02-12 Wed 00:50]
    - State "CANCELED"   from "ENH"        [2014-02-12 Wed 00:50] \\
