@@ -108,7 +108,7 @@
       (org-back-to-heading)
       (should (equal (bog-citekey-from-property) citekey)))))
 
-;; `bog-citekey-action'
+;; `bog-citekey-from-notes'
 
 (ert-deftest bog-citekey-from-notes-on-heading ()
   (let ((citekey "name2010word"))
