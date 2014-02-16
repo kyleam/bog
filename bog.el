@@ -151,6 +151,11 @@ It should contain the placeholder \"%s\" for the query."
   :group 'bog
   :type 'string)
 
+(defcustom  bog-refile-maxlevel 1
+  "Consider up to this level when refiling with `bog-refile'."
+  :group 'bog
+  :type 'integer)
+
 
 ;;; General utilities
 
@@ -410,6 +415,23 @@ The citekey is split by groups in `bog-citekey-format' and joined by
   "Return URL to use for search."
   (let ((query (bog-citekey-groups-with-delim citekey "+")))
     (format bog-web-search-url query)))
+
+
+;;; Refiling
+
+(defun bog-refile ()
+  "Refile heading with note files.
+All headings Org files in `bog-notes-directory' at or above level
+`bog-refile-maxlevel' are considered."
+  (interactive)
+  (let ((org-refile-targets `((,(bog-notes-files)
+                               :maxlevel . ,bog-refile-maxlevel))))
+    (org-refile)))
+
+(defun bog-notes-files ()
+  (file-expand-wildcards
+   (concat (file-name-as-directory bog-notes-directory)
+           "*.org")))
 
 
 ;;; Font-lock
