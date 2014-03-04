@@ -243,10 +243,25 @@ text under point if it matches `bog-citekey-format' or using
     (bog-open-citekey-pdf citekey)))
 
 (defun bog-open-citekey-pdf (citekey)
-  (let ((pdf-file (bog-citekey-as-pdf citekey)))
-    (unless (file-exists-p pdf-file)
-      (error "%s does not exist" pdf-file))
-    (start-process "bog-pdf" nil bog-pdf-opener pdf-file)))
+  (let* (citekey-pdf
+         (citekey-pdfs
+          (--mapcat (file-expand-wildcards
+                     (concat (file-name-as-directory bog-pdf-directory)
+                             citekey it ".pdf"))
+                    '("" "-*")))
+         (choices (-map 'file-name-nondirectory citekey-pdfs))
+         (num-choices (length choices)))
+    (cond
+     ((= 0 num-choices)
+      (error "No PDF found for %s" citekey))
+     ((= 1 num-choices)
+      (setq citekey-pdf (car citekey-pdfs)))
+     (t
+      (setq citekey-pdf
+            (expand-file-name (funcall bog-completing-read
+                                       "Select PDF file: " choices)
+                              bog-pdf-directory))))
+    (start-process "bog-pdf" nil bog-pdf-opener citekey-pdf)))
 
 ;;;###autoload
 (defun bog-rename-staged-pdf-to-citekey ()
