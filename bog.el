@@ -39,7 +39,7 @@
   :group 'org)
 
 (defcustom bog-citekey-format
-  "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z]+\\)"
+  "\\([0-9]*[a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z][a-z0-9]*\\)"
   "Regex used to match study citekey.
 
 By default, this matches any sequence of lower case
