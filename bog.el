@@ -181,7 +181,7 @@ year, and the first meaningful word in the title)."
   (let ((maybe-citekey (thing-at-point 'word)))
     (when (and maybe-citekey
                (bog-citekey-only-p maybe-citekey))
-      maybe-citekey)))
+      (substring-no-properties maybe-citekey))))
 
 (defun bog-citekey-from-notes ()
   "Get the citekey from the context of the Org file."
