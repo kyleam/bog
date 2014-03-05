@@ -432,7 +432,39 @@ The citekey is split by groups in `bog-citekey-format' and joined by
     (format bog-web-search-url query)))
 
 
-;;; Refiling
+;;; Notes-related
+
+(defun bog-goto-citekey-heading-in-buffer ()
+  "Find citekey heading in this buffer.
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format'."
+  (interactive)
+  (let* ((citekey (or (bog-citekey-at-point)
+                      (read-string "Enter citekey: ")))
+         (pos (org-find-exact-headline-in-buffer citekey nil t)))
+    (if pos
+        (progn
+          (org-mark-ring-push)
+          (goto-char pos)
+          (org-show-context))
+      (message "Heading for %s not found in buffer" citekey))))
+
+(defun bog-goto-citekey-heading-in-notes ()
+  "Find citekey heading in all Bog notes.
+All org files in `bog-notes-directory' will be searched. The
+citekey will be taken from the text under point if it matches
+`bog-citekey-format'."
+  (interactive)
+  (let* ((citekey (or (bog-citekey-at-point)
+                      (read-string "Enter citekey: ")))
+        (marker
+         (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+    (if marker
+        (progn
+          (switch-to-buffer (marker-buffer marker))
+          (goto-char (marker-position marker))
+          (org-show-context))
+      (message "Heading for %s not found in notes" citekey))))
 
 (defun bog-refile ()
   "Refile heading with note files.
