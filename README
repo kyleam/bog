@@ -191,12 +191,14 @@ and taking notes with Org, not on writing research articles with Org.
   Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
   in Org mode is a good option.
 
-   Key      Command                          
-  -------------------------------------------
-   C-c b p  bog-find-citekey-pdf             
-   C-c b r  bog-rename-staged-pdf-to-citekey 
-   C-c b b  bog-find-citekey-bib             
-   C-c b w  bog-search-citekey-on-web        
+   Key      Command                            
+  ---------------------------------------------
+   C-c b p  bog-find-citekey-pdf               
+   C-c b r  bog-rename-staged-pdf-to-citekey   
+   C-c b b  bog-find-citekey-bib               
+   C-c b h  bog-goto-citekey-heading-in-buffer 
+   C-c b H  bog-goto-citekey-heading-in-notes  
+   C-c b w  bog-search-citekey-on-web          
 
   This can be achieved by placing the code below in your .emacs file.
 
