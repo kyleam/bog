@@ -436,8 +436,8 @@ The citekey is split by groups in `bog-citekey-format' and joined by
 
 (defun bog-refile ()
   "Refile heading with note files.
-All headings Org files in `bog-notes-directory' at or above level
-`bog-refile-maxlevel' are considered."
+All headings from Org files in `bog-notes-directory' at or above
+level `bog-refile-maxlevel' are considered."
   (interactive)
   (let ((org-refile-targets `((,(bog-notes-files)
                                :maxlevel . ,bog-refile-maxlevel))))
