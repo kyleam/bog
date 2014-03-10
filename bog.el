@@ -150,6 +150,20 @@ When `bog-find-citekey-pdf' is run on <citekey>, it will find
 files with the format <citekey><sep>*.pdf, where <sep> is one of
 the characters in `bog-pdf-file-name-separators'.")
 
+(defcustom bog-pdf-renaming-func 'bog-pdf-ask-on-conflict
+  "Function used to rename stage PDF files.
+This function should accept a PDF file name and a citekey as an
+argument and return the name of the final PDF file. Currently the
+only built-in function is `bog-pdf-ask-on-conflict'.")
+
+(defcustom bog-pdf-secondary-name "-supplement"
+  "Modification to make to PDF file name on renaming confict.
+When a staged PDF is being renamed with
+`bog-pdf-ask-on-conflict', the user will be prompted if
+<citekey>.pdf already exists.
+<citekey>`bog-pdf-secondary-name'.pdf will be the default value
+for the prompt.")
+
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
   "URL to use for CITEKEY search.
@@ -283,8 +297,7 @@ The citekey will be taken from the text under point if it matches
     (bog-rename-staged-pdf citekey)))
 
 (defun bog-rename-staged-pdf (citekey)
-  (let* ((pdf-file (bog-citekey-as-pdf citekey))
-         (staged-pdfs
+  (let* ((staged-pdfs
           (file-expand-wildcards
            (concat (file-name-as-directory bog-stage-directory) "*.pdf")))
          (choices (-map 'file-name-nondirectory staged-pdfs))
@@ -301,8 +314,31 @@ The citekey will be taken from the text under point if it matches
             (expand-file-name (funcall bog-completing-read
                                        "Select PDF file to rename: " choices)
                               bog-stage-directory))))
-    (rename-file staged-pdf pdf-file)
-    (message "Renamed %s to %s" staged-pdf pdf-file)))
+    (message "Renamed %s to %s" staged-pdf
+             (funcall bog-pdf-renaming-func staged-pdf citekey))))
+
+(defun bog-pdf-ask-on-conflict (staged-pdf citekey)
+  "Prompt for a new name of PDF file for CITEKEY already exists.
+STAGED-PDF will be renamed to <citekey>.pdf within
+`bog-pdf-directory'. If this file already exists, the user will
+be prompted for another name. `bog-pdf-secondary-name' can be
+used to control the default string used in the prompt."
+  (let ((pdf-file (bog-citekey-as-pdf citekey)))
+    (condition-case nil
+        (rename-file staged-pdf pdf-file)
+      (file-error
+       (let ((new-file-name
+              (replace-regexp-in-string ".pdf"
+                                        (concat bog-pdf-secondary-name ".pdf")
+                                        (file-name-nondirectory pdf-file))))
+         (setq new-file-name
+               (read-string
+                (format "File %s already exists. Name to use instead: "
+                        pdf-file)
+                new-file-name nil nil '(new-file-name)))
+         (setq pdf-file (expand-file-name new-file-name bog-pdf-directory))
+         (rename-file staged-pdf pdf-file))))
+    pdf-file))
 
 (defun bog-citekey-as-pdf (citekey)
   (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
