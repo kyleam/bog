@@ -265,8 +265,8 @@ text under point if it matches `bog-citekey-format' or using
 (defun bog-open-citekey-pdf (citekey)
   (let* (citekey-pdf
          (citekey-pdfs (bog-citekey-pdfs citekey))
-         (choices (-map 'file-name-nondirectory citekey-pdfs))
-         (num-choices (length choices)))
+         (citekey-pdfs-names (-map 'file-name-nondirectory citekey-pdfs))
+         (num-choices (length citekey-pdfs-names)))
     (cond
      ((= 0 num-choices)
       (error "No PDF found for %s" citekey))
@@ -275,7 +275,8 @@ text under point if it matches `bog-citekey-format' or using
      (t
       (setq citekey-pdf
             (expand-file-name (funcall bog-completing-read
-                                       "Select PDF file: " choices)
+                                       "Select PDF file: "
+                                       citekey-pdfs-names)
                               bog-pdf-directory))))
     (start-process "bog-pdf" nil bog-pdf-opener citekey-pdf)))
 
@@ -300,8 +301,8 @@ The citekey will be taken from the text under point if it matches
   (let* ((staged-pdfs
           (file-expand-wildcards
            (concat (file-name-as-directory bog-stage-directory) "*.pdf")))
-         (choices (-map 'file-name-nondirectory staged-pdfs))
-         (num-choices (length choices))
+         (staged-pdfs-names (-map 'file-name-nondirectory staged-pdfs))
+         (num-choices (length staged-pdfs-names))
          staged-pdf)
     (cond
      ((= 0 num-choices)
@@ -312,7 +313,8 @@ The citekey will be taken from the text under point if it matches
      (t
       (setq staged-pdf
             (expand-file-name (funcall bog-completing-read
-                                       "Select PDF file to rename: " choices)
+                                       "Select PDF file to rename: "
+                                       staged-pdfs-names)
                               bog-stage-directory))))
     (message "Renamed %s to %s" staged-pdf
              (funcall bog-pdf-renaming-func staged-pdf citekey))))
