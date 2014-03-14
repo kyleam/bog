@@ -130,7 +130,7 @@ and taking notes with Org, not on writing research articles with Org.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   All PDF files are kept in a single directory and are named as
-  <citekey>-*.pdf. The function `bog-find-citekey-pdf' will open a PDF
+  <citekey>.pdf. The function `bog-find-citekey-pdf' will open a PDF
   associated with a citekey. If the point is on a citekey, it will open
   that citekey. Otherwise, it will use the citekey from the first parent
   heading that is a study.

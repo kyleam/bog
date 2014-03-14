@@ -92,7 +92,7 @@ within the citekey, many Bog functions can extract and use the citekey.
 ** Opening a PDF file for a citekey
 
 All PDF files are kept in a single directory and are named as
-<citekey>-*.pdf. The function =bog-find-citekey-pdf= will open a PDF
+<citekey>.pdf. The function =bog-find-citekey-pdf= will open a PDF
 associated with a citekey. If the point is on a citekey, it will open
 that citekey. Otherwise, it will use the citekey from the first parent
 heading that is a study.
