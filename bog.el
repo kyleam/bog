@@ -144,6 +144,12 @@ alternative is `ido-completing-read'."
   :group 'bog
   :type 'string)
 
+(defcustom bog-pdf-file-name-separators '("-" "_")
+  "Characters allowed to follow the citekey in PDF file names.
+When `bog-find-citekey-pdf' is run on <citekey>, it will find
+files with the format <citekey><sep>*.pdf, where <sep> is one of
+the characters in `bog-pdf-file-name-separators'.")
+
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
   "URL to use for CITEKEY search.
@@ -244,11 +250,7 @@ text under point if it matches `bog-citekey-format' or using
 
 (defun bog-open-citekey-pdf (citekey)
   (let* (citekey-pdf
-         (citekey-pdfs
-          (--mapcat (file-expand-wildcards
-                     (concat (file-name-as-directory bog-pdf-directory)
-                             citekey it ".pdf"))
-                    '("" "-*")))
+         (citekey-pdfs (bog-citekey-pdfs citekey))
          (choices (-map 'file-name-nondirectory citekey-pdfs))
          (num-choices (length choices)))
     (cond
@@ -262,6 +264,14 @@ text under point if it matches `bog-citekey-format' or using
                                        "Select PDF file: " choices)
                               bog-pdf-directory))))
     (start-process "bog-pdf" nil bog-pdf-opener citekey-pdf)))
+
+(defun bog-citekey-pdfs (citekey)
+  (let* ((patterns (--map (concat it "*") bog-pdf-file-name-separators))
+         (patterns (cons "" patterns)))
+    (--mapcat (file-expand-wildcards
+               (concat (file-name-as-directory bog-pdf-directory)
+                       citekey it ".pdf"))
+              patterns)))
 
 ;;;###autoload
 (defun bog-rename-staged-pdf-to-citekey ()

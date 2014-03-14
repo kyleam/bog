@@ -1,5 +1,6 @@
 (require 'ert)
 (require 'org)
+(require 'dash)
 (require 'bog)
 
 ;; Modified from magit-tests.el.
@@ -168,6 +169,19 @@
                              (concat citekey ".pdf") bog-pdf-directory)))
      (should-not (file-exists-p (expand-file-name
                                  (concat "one.pdf") bog-pdf-directory))))))
+
+(ert-deftest bog-pdf-citekeys-multiple-variants ()
+  (bog-tests--with-temp-dir
+   (let* ((bog-pdf-directory (expand-file-name "pdfs"))
+          (citekey "name2010word")
+          (variants (--map (concat citekey it ".pdf")
+                           '("" "_0" "-supplement")))
+          found-files)
+     (make-directory bog-pdf-directory)
+     (--each variants
+       (write-region "" nil (expand-file-name it bog-pdf-directory)))
+     (setq files-found (bog-citekey-pdfs citekey))
+     (should (= (length files-found) 3)))))
 
 
 ;;; BibTeX functions
