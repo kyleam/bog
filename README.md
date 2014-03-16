@@ -54,7 +54,7 @@ heading that is a study.
     BibTeX entries can be stored in one of two ways:
     
     -   As a single file with many entries
-    -   As single-entry files named <citekey>.bib within a common directory
+    -   As single-entry files named citekey.bib within a common directory
 
 -   `bog-search-citekey-on-web`
     
