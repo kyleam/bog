@@ -8,7 +8,11 @@
 
 Some citekeys are not highlighed until the surrounding text is altered.
 
-** ENH Citekey selection if locating fails
+** CANCELED Citekey selection if locating fails
+   CLOSED: [2014-03-16 Sun 17:59]
+   - State "CANCELED"   from "ENH"        [2014-03-16 Sun 17:59] \\
+     For now, I will stick to issuing an error message if no citekey is
+     found, and only prompting if a prefix argument is given.
 
 ** ENH Function for getting all citekeys in notes
 
