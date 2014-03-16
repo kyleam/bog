@@ -50,80 +50,80 @@ is on a citekey (like "another1999study" above), then that citekey will
 be used. Otherwise, the citekey will be taken from the first parent
 heading that is a study.
 
-** Opening a PDF file for a citekey
+- =bog-find-citekey-pdf=
 
-The function =bog-find-citekey-pdf= will open a PDF associated with a
-citekey.
+  Open a PDF file for a citekey.
 
-** Opening a BibTeX file for a citekey
+- =bog-find-citekey-bib=
 
-The function =bog-find-citekey-bib= will open the BibTeX entry
-associated with a citekey.
+  Open a BibTeX file for a citekey.
 
-BibTeX entries can be stored in one of two ways:
+  BibTeX entries can be stored in one of two ways:
+  1. As a single file with many entries
+  2. As single-entry files named <citekey>.bib within a common directory
 
-1. As a single file with many entries
-2. As single-entry files named <citekey>.bib within a common directory
+- =bog-search-citekey-on-web=
 
-** Searching online for a citekey
+  Search Google Scholar for a citekey. The default citekey format (first
+  author's last name, year, and first non-trivial word) usually contains
+  enough information to make this search successful.
 
-The function =bog-search-citekey-on-web= will perform a Google Scholar
-search with the citekey information. The default citekey format (first
-author's last name, year, and first non-trivial word) usually contains
-enough information to make this search successful.
+- =bog-rename-staged-pdf-to-citekey=
 
-** Renaming new PDFs
+  Rename a new PDF.
 
-New PDF files can be put in a "stage" directory and then renamed to a
-citekey.
+- =bog-clean-and-rename-staged-bibs=
 
-** Renaming new BibTeX files
+  Renaming new BibTeX files. If a separate BibTeX file is used for each
+  citekey, this function can be used to rename all new BibTeX files.
+  =bibtex-clean-entry= is used to clean the entry and autogenerate the
+  key.
 
-If a separate BibTeX file is used for each citekey,
-=bog-clean-and-rename-staged-bibs= can be used to rename all new BibTeX
-files. =bibtex-clean-entry= is used to clean the entry and autogenerate
-the key.
+- =bog-create-combined-bib=
 
-** Generating a combined BibTeX file
-
-If single-entry BibTeX files are used, there should be a way to collect
-the references that are needed. =bog-create-combined-bib= can be used to
-create a BibTeX file that has entries for all the citekeys in the
-current buffer.
+  Generate a combined BibTeX file for all citekeys in buffer. This is
+  useful if single-entry BibTeX files are used.
 
 * Variables
 
 Several variables determine where Bog looks for things.
 
-- bog-notes-directory
-- bog-pdf-directory
-- bog-bib-directory or bog-bib-file
-- bog-stage-directory
+- =bog-notes-directory=
+- =bog-pdf-directory=
+- =bog-bib-directory= or =bog-bib-file=
+- =bog-stage-directory=
 
 The variables below are important for specifying how Bog behaves.
 
-- bog-citekey-format :: A regular expression that defines the format
-     used for citekeys
-- bog-citekey-func :: A function to extract a citekey from the current
-     subtree. Use this to indicate whether the citekey should be taken
-     from the heading or property.
-- bog-find-citekey-bib-func :: A function to find a citekey in a BibTeX
-     file. This determines whether a directory of single-entry BibTeX
-     files or a single BibTeX file is used.
+- =bog-citekey-format=
+
+  A regular expression that defines the format used for citekeys
+
+- =bog-citekey-function=
+
+  A function to extract a citekey from the current subtree. Use this to
+  indicate whether the citekey should be taken from the heading or
+  property.
+
+- =bog-find-citekey-bib-function=
+
+  A function to find a citekey in a BibTeX file. This determines whether
+  a directory of single-entry BibTeX files or a single BibTeX file is
+  used.
 
 * Recommended keybindings
 
 Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
 in Org mode is a good option.
 
-| Key     | Command                            |
-|---------+------------------------------------|
-| C-c b p | bog-find-citekey-pdf               |
-| C-c b r | bog-rename-staged-pdf-to-citekey   |
-| C-c b b | bog-find-citekey-bib               |
-| C-c b h | bog-goto-citekey-heading-in-buffer |
-| C-c b H | bog-goto-citekey-heading-in-notes  |
-| C-c b w | bog-search-citekey-on-web          |
+| Key     | Command                              |
+|---------+--------------------------------------|
+| C-c b p | =bog-find-citekey-pdf=               |
+| C-c b r | =bog-rename-staged-pdf-to-citekey=   |
+| C-c b b | =bog-find-citekey-bib=               |
+| C-c b h | =bog-goto-citekey-heading-in-buffer= |
+| C-c b H | =bog-goto-citekey-heading-in-notes=  |
+| C-c b w | =bog-search-citekey-on-web=          |
 
 This can be achieved by placing the code below in your .emacs file.
 
