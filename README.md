@@ -115,61 +115,6 @@ The variables below are important for specifying how Bog behaves.
 Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
 in Org mode is a good option.
 
-<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
-
-
-<colgroup>
-<col  class="left" />
-
-<col  class="left" />
-</colgroup>
-<thead>
-<tr>
-<th scope="col" class="left">Key</th>
-<th scope="col" class="left">Command</th>
-</tr>
-</thead>
-
-<tbody>
-<tr>
-<td class="left">C-c b p</td>
-<td class="left">`bog-find-citekey-pdf`</td>
-</tr>
-
-
-<tr>
-<td class="left">C-c b r</td>
-<td class="left">`bog-rename-staged-pdf-to-citekey`</td>
-</tr>
-
-
-<tr>
-<td class="left">C-c b b</td>
-<td class="left">`bog-find-citekey-bib`</td>
-</tr>
-
-
-<tr>
-<td class="left">C-c b h</td>
-<td class="left">`bog-goto-citekey-heading-in-buffer`</td>
-</tr>
-
-
-<tr>
-<td class="left">C-c b H</td>
-<td class="left">`bog-goto-citekey-heading-in-notes`</td>
-</tr>
-
-
-<tr>
-<td class="left">C-c b w</td>
-<td class="left">`bog-search-citekey-on-web`</td>
-</tr>
-</tbody>
-</table>
-
-This can be achieved by placing the code below in your .emacs file.
-
     (define-prefix-command 'bog-map)
     (define-key org-mode-map (kbd "C-c b") 'bog-map)
     (define-key bog-map "p" 'bog-find-citekey-pdf)
