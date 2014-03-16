@@ -48,8 +48,7 @@ settings can be modified.
 Many Bog functions take the citekey from the notes context. If the point
 is on a citekey (like "another1999study" above), then that citekey will
 be used. Otherwise, the citekey will be taken from the first parent
-heading that is a study. If one isn't found, the user will be prompted
-for the citekey.
+heading that is a study.
 
 ** Opening a PDF file for a citekey
 
