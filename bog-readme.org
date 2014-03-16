@@ -60,8 +60,8 @@ heading that is a study.
   Open a BibTeX file for a citekey.
 
   BibTeX entries can be stored in one of two ways:
-  1. As a single file with many entries
-  2. As single-entry files named <citekey>.bib within a common directory
+  - As a single file with many entries
+  - As single-entry files named <citekey>.bib within a common directory
 
 - =bog-search-citekey-on-web=
 
