@@ -79,7 +79,7 @@ default value of `org-bibtex-key-property'."
   :type 'string)
 
 (defcustom bog-notes-directory "~/bib"
-  "The name of the directory that Org note are stored in."
+  "The name of the directory that Org files are stored in."
   :group 'bog
   :type 'string)
 
@@ -498,7 +498,7 @@ The citekey will be taken from the text under point if it matches
       (message "Heading for %s not found in buffer" citekey))))
 
 (defun bog-goto-citekey-heading-in-notes ()
-  "Find citekey heading in all Bog notes.
+  "Find citekey heading in notes.
 All org files in `bog-notes-directory' will be searched. The
 citekey will be taken from the text under point if it matches
 `bog-citekey-format'."
@@ -515,7 +515,7 @@ citekey will be taken from the text under point if it matches
       (message "Heading for %s not found in notes" citekey))))
 
 (defun bog-refile ()
-  "Refile heading with note files.
+  "Refile heading within notes.
 All headings from Org files in `bog-notes-directory' at or above
 level `bog-refile-maxlevel' are considered."
   (interactive)
