@@ -68,7 +68,7 @@ heading that is a study.
 
 -   `bog-clean-and-rename-staged-bibs`
     
-    Renaming new BibTeX files. If a separate BibTeX file is used for each
+    Rename new BibTeX files. If a separate BibTeX file is used for each
     citekey, this function can be used to rename all new BibTeX files.
     `bibtex-clean-entry` is used to clean the entry and autogenerate the
     key.
