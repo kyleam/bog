@@ -7,21 +7,19 @@
 Table of Contents
 _________________
 
-1 Bog workflow
-2 Features
-.. 2.1 Adding citekeys to notes
-.. 2.2 Referencing studies within notes
-.. 2.3 Opening a PDF file for a citekey
-.. 2.4 Opening a BibTeX file for a citekey
-.. 2.5 Searching online for a citekey
-.. 2.6 Renaming new PDFs
-.. 2.7 Renaming new BibTeX files
-.. 2.8 Generating a combined BibTeX file
-3 Recommended keybindings
+1 Workflow
+2 Main features
+.. 2.1 Opening a PDF file for a citekey
+.. 2.2 Opening a BibTeX file for a citekey
+.. 2.3 Searching online for a citekey
+.. 2.4 Renaming new PDFs
+.. 2.5 Renaming new BibTeX files
+.. 2.6 Generating a combined BibTeX file
+3 Variables
+4 Recommended keybindings
 
 
-Bog is a system for taking research notes in [Org mode]. As any Org user
-knows, Org handles notetaking beautifully. Bog just adds a few
+Bog is a system for taking research notes in [Org mode]. It adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
 
@@ -29,67 +27,32 @@ and taking notes with Org, not on writing research articles with Org.
 [Org mode] http://orgmode.org/
 
 
-1 Bog workflow
-==============
+1 Workflow
+==========
 
   Many people use Org for taking research notes, and there are some
   really nice descriptions of systems people have come up with (for a
   few examples, see [these] [threads] on the Org mode mailing list).
 
-  The workflow for Bog is based on these preferences:
+  The Bog workflow is focused around the citekey, which is the only
+  study information that must be included in the notes. This unique
+  identifier is used as a link to the BibTeX and PDF files.
 
-  1. I don't want to store a lot of metadata with my notes.
-
-     The citekey is the unique identifier that I use to link the notes
-     with the BibTeX and PDF files. With just the citekey, I should be
-     able to access this. If desired, more information can be added
-     (such as bibliographic properties that can be generated with
-     org-bibtex), but this is not required.
-
-     One of the reasons for this is #2.
-
-  2. I want to have low friction for adding articles to the notes, but
-     not mindless.
-
-     There is an endless stream of research articles, so it should be
-     easy to add them, but it shouldn't be so easy that I file them away
-     without giving them any thought. For me, this means glancing over
-     it at least enough to place it under a general topic (or capturing
-     the article and a link in my normal Org notes system until I take
-     time to refile it to my research notes). I only retrieve the BibTeX
-     file or PDF file when I need to use them.
-
-
-  [these] http://thread.gmane.org/gmane.emacs.orgmode/78983
-
-  [threads] http://thread.gmane.org/gmane.emacs.orgmode/14756
-
-
-2 Features
-==========
-
-2.1 Adding citekeys to notes
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  As mentioned above, when citekeys are added, they should be filed
-  under the appropriate topic. I organize my research notes into a few
-  files with broad topics then have one level of headers representing
-  topics to file studies under.
+  In the example below, the citekey "name2000word" is a study
+  heading. Bog expects the citekey to be the title or property of a
+  heading. The citekey "another1999study" is a reference to another
+  study (which may or may not have a subtree in this or another Org
+  file).
 
   ,----
-  | # In a very general topic file
+  | * Topic heading
   | 
-  | * Topic heder
-  | 
-  | ** name2000word                                    :atag:
+  | ** TODO name2000word                               :atag:
   | 
   | <URL for study>
   | 
-  | Article notes
+  | Article notes ... a reference to another1999study ...
   `----
-
-  "name2000word" is the study header. Bog expects the study citekey to
-  be the title or property of a heading.
 
   The default format for the citekey is the first author's last name,
   the year, and then the first non-trivial word. To have BibTeX mode
@@ -104,45 +67,34 @@ and taking notes with Org, not on writing research articles with Org.
   |       bibtex-autokey-year-title-separator "")
   `----
 
-  If the study was added when checking journals online, I tend to add
-  the URL right under the heading. However, I often add citekeys from
-  the references of an article that I'm reading. In this case, I often
-  store only the heading.
+
+  [these] http://thread.gmane.org/gmane.emacs.orgmode/78983
+
+  [threads] http://thread.gmane.org/gmane.emacs.orgmode/14756
 
 
-2.2 Referencing studies within notes
+2 Main features
+===============
+
+  Many Bog functions take the citekey from the notes context. If the
+  point is on a citekey (like "another1999study" above), then that
+  citekey will be used. Otherwise, the citekey will be taken from the
+  first parent heading that is a study. If one isn't found, the user
+  will be prompted for the citekey.
+
+
+2.1 Opening a PDF file for a citekey
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  You can reference other studies with their citekey.
-
-  ,----
-  | ** name2000word                                    :atag:
-  | 
-  | Another study (another1999word).
-  `----
-
-  "another1999word" will be highlighted within the text. When the point
-  is within the citekey, many Bog functions can extract and use the
+  The function `bog-find-citekey-pdf' will open a PDF associated with a
   citekey.
 
 
-2.3 Opening a PDF file for a citekey
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-  All PDF files are kept in a single directory and are named as
-  <citekey>.pdf. The function `bog-find-citekey-pdf' will open a PDF
-  associated with a citekey. If the point is on a citekey, it will open
-  that citekey. Otherwise, it will use the citekey from the first parent
-  heading that is a study.
-
-
-2.4 Opening a BibTeX file for a citekey
+2.2 Opening a BibTeX file for a citekey
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   The function `bog-find-citekey-bib' will open the BibTeX entry
   associated with a citekey.
-
-  The citekey is obtained in the same way as the PDF citekey.
 
   BibTeX entries can be stored in one of two ways:
 
@@ -150,24 +102,23 @@ and taking notes with Org, not on writing research articles with Org.
   2. As single-entry files named <citekey>.bib within a common directory
 
 
-2.5 Searching online for a citekey
+2.3 Searching online for a citekey
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  The function `bog-search-citekey-on-web' will perform a search with
-  the citekey information. By default, Google Scholar is searched. The
-  default citekey format (first author's last name, year, and first
-  non-trivial word) usually contains enough information to make this
-  search successful.
+  The function `bog-search-citekey-on-web' will perform a Google Scholar
+  search with the citekey information. The default citekey format (first
+  author's last name, year, and first non-trivial word) usually contains
+  enough information to make this search successful.
 
 
-2.6 Renaming new PDFs
+2.4 Renaming new PDFs
 ~~~~~~~~~~~~~~~~~~~~~
 
   New PDF files can be put in a "stage" directory and then renamed to a
-  citekey. (The citekey is taken from the notes context.)
+  citekey.
 
 
-2.7 Renaming new BibTeX files
+2.5 Renaming new BibTeX files
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   If a separate BibTeX file is used for each citekey,
@@ -176,7 +127,7 @@ and taking notes with Org, not on writing research articles with Org.
   autogenerate the key.
 
 
-2.8 Generating a combined BibTeX file
+2.6 Generating a combined BibTeX file
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
   If single-entry BibTeX files are used, there should be a way to
@@ -185,7 +136,30 @@ and taking notes with Org, not on writing research articles with Org.
   in the current buffer.
 
 
-3 Recommended keybindings
+3 Variables
+===========
+
+  Several variables determine where Bog looks for things.
+
+  - bog-notes-directory
+  - bog-pdf-directory
+  - bog-bib-directory or bog-bib-file
+  - bog-stage-directory
+
+  The variables below are important for specifying how Bog behaves.
+
+  bog-citekey-format: A regular expression that defines the format used
+                      for citekeys
+  bog-citekey-func: A function to extract a citekey from the current
+                    subtree. Use this to indicate whether the citekey
+                    should be taken from the heading or property.
+  bog-find-citekey-bib-func: A function to find a citekey in a BibTeX
+                             file. This determines whether a directory of
+                             single-entry BibTeX files or a single BibTeX
+                             file is used.
+
+
+4 Recommended keybindings
 =========================
 
   Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
