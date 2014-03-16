@@ -152,9 +152,9 @@ the characters in `bog-pdf-file-name-separators'.")
 
 (defcustom bog-pdf-renaming-func 'bog-pdf-ask-on-conflict
   "Function used to rename stage PDF files.
-This function should accept a PDF file name and a citekey as an
-argument and return the name of the final PDF file. Currently the
-only built-in function is `bog-pdf-ask-on-conflict'.")
+This function should accept a PDF file name and a citekey as
+arguments and return the name of the final PDF file. Currently
+the only built-in function is `bog-pdf-ask-on-conflict'.")
 
 (defcustom bog-pdf-secondary-name "-supplement"
   "Modification to make to PDF file name on renaming confict.
