@@ -1,4 +1,5 @@
 #+title: Bog
+#+options: toc:nil
 
 Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. It adds a few
 research-specific features, nearly all of which are focused on managing

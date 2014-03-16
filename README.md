@@ -1,15 +1,3 @@
-<div id="table-of-contents">
-<h2>Table of Contents</h2>
-<div id="text-table-of-contents">
-<ul>
-<li><a href="#sec-1">1. Workflow</a></li>
-<li><a href="#sec-2">2. Main features</a></li>
-<li><a href="#sec-3">3. Variables</a></li>
-<li><a href="#sec-4">4. Recommended keybindings</a></li>
-</ul>
-</div>
-</div>
-
 Bog is a system for taking research notes in [Org mode](http://orgmode.org/). It adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
