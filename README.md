@@ -78,6 +78,12 @@ heading that is a study.
     Generate a combined BibTeX file for all citekeys in buffer. This is
     useful if single-entry BibTeX files are used.
 
+Other useful functions include
+
+-   `bog-goto-citekey-heading-in-buffer`
+-   `bog-goto-citekey-heading-in-notes`
+-   `bog-refile`
+
 # Variables
 
 Several variables determine where Bog looks for things.
