@@ -3,10 +3,11 @@
 (when (and org-location (file-exists-p org-location))
   (add-to-list 'load-path org-location)
   (require 'org))
+(require 'ox-md)
 
 (let ((readme-file "bog-readme.org")
       exported-file
-      (final-file "README"))
+      (final-file "README.md"))
   (with-current-buffer (find-file-noselect readme-file)
-    (setq exported-file (org-ascii-export-to-ascii)))
+    (setq exported-file (org-md-export-to-markdown)))
   (rename-file exported-file final-file t))
