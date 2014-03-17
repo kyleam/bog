@@ -45,6 +45,12 @@ Perhaps use a cache file. This could be used in
 
 ** ENH Check for duplicate citekeys headings
 
+** ENH Make bog-goto functions work when citekey is property
+
+Currently, `bog-goto-citekey-heading-in-buffer' and
+`bog-goto-citekey-heading-in-notes' only work if the citekey is stored
+as a heading, not a property.
+
 ** DONE Refiling for just bib notes
    CLOSED: [2014-02-16 Sun 00:40]
 
@@ -78,6 +84,8 @@ If multiple PDFs for a citekey, complete read.
 
 When more than one file in staged, completing read prompts with full
 paths, which is inconvenient if using default completing read function.
+
+** ENH Use `org-file-apps' instead of `bog-pdf-opener'
 
 * Testing
 
