@@ -118,18 +118,12 @@ The variables below are important for specifying how Bog behaves.
   a directory of single-entry BibTeX files or a single BibTeX file is
   used.
 
-* Recommended keybindings
+* Keybindings
 
-Bog doesn't claim any keybindings, but using "C-c b" as a prefix while
-in Org mode is a good option.
+A keymap is defined for Bog, but a prefix isn't claimed. The code below
+shows how to use "C-c b" as the prefix while in Org mode.
 
 #+begin_src emacs-lisp
-  (define-prefix-command 'bog-map)
-  (define-key org-mode-map (kbd "C-c b") 'bog-map)
-  (define-key bog-map "p" 'bog-find-citekey-pdf)
-  (define-key bog-map "r" 'bog-rename-staged-pdf-to-citekey)
-  (define-key bog-map "b" 'bog-find-citekey-bib)
-  (define-key bog-map "h" 'bog-goto-citekey-heading-in-buffer)
-  (define-key bog-map "H" 'bog-goto-citekey-heading-in-notes)
-  (define-key bog-map "w" 'bog-search-citekey-on-web)
+  (eval-after-load 'org
+    '(define-key org-mode-map (kbd "C-c b") bog-mode-map))
 #+end_src

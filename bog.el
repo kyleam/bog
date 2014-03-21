@@ -545,6 +545,20 @@ level `bog-refile-maxlevel' are considered."
 (font-lock-add-keywords 'org-mode
                         '((bog-non-heading-citekey-p . 'bog-citekey-face)))
 
+
+;;; Keymap
+
+(defvar bog-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "p" 'bog-find-citekey-pdf)
+    (define-key map "r" 'bog-rename-staged-pdf-to-citekey)
+    (define-key map "b" 'bog-find-citekey-bib)
+    (define-key map "h" 'bog-goto-citekey-heading-in-buffer)
+    (define-key map "H" 'bog-goto-citekey-heading-in-notes)
+    (define-key map "w" 'bog-search-citekey-on-web)
+    map)
+  "Keymap for Bog.")
+
 (provide 'bog)
 
 ;; bog.el ends here
