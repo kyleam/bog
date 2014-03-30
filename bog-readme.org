@@ -120,5 +120,5 @@ The variables below are important for specifying how Bog behaves.
 
 * Keybindings
 
-A keymap is defined for Bog under the prefix `C-c "'. If you prefer
-something else (like `C-c b'), set =bog-keymap-prefix=.
+A keymap is defined for Bog under the prefix =C-c "​=. If you prefer
+something else (like =C-c b=), set =bog-keymap-prefix=.
