@@ -176,6 +176,11 @@ It should contain the placeholder \"%s\" for the query."
   :group 'bog
   :type 'integer)
 
+(defcustom bog-keymap-prefix (kbd "C-c \"")
+  "Bog keymap prefix."
+  :group 'bog
+  :type 'string)
+
 
 ;;; General utilities
 
@@ -542,22 +547,49 @@ level `bog-refile-maxlevel' are considered."
   (and (re-search-forward bog-citekey-format limit t)
        (not (org-at-heading-p))))
 
-(font-lock-add-keywords 'org-mode
-                        '((bog-non-heading-citekey-p . 'bog-citekey-face)))
+(defun bog-add-fontlock ()
+  (font-lock-add-keywords nil
+                          '((bog-non-heading-citekey-p . 'bog-citekey-face)))
+  (font-lock-fontify-buffer))
+
+(defun bog-remove-fontlock ()
+  (font-lock-remove-keywords nil
+                             '((bog-non-heading-citekey-p . 'bog-citekey-face)))
+  (font-lock-fontify-buffer))
 
 
-;;; Keymap
+;;; Minor mode
 
 (defvar bog-mode-map
   (let ((map (make-sparse-keymap)))
-    (define-key map "p" 'bog-find-citekey-pdf)
-    (define-key map "r" 'bog-rename-staged-pdf-to-citekey)
-    (define-key map "b" 'bog-find-citekey-bib)
-    (define-key map "h" 'bog-goto-citekey-heading-in-buffer)
-    (define-key map "H" 'bog-goto-citekey-heading-in-notes)
-    (define-key map "w" 'bog-search-citekey-on-web)
+    (let ((prefix-map (make-sparse-keymap)))
+      (define-key prefix-map "p" 'bog-find-citekey-pdf)
+      (define-key prefix-map "r" 'bog-rename-staged-pdf-to-citekey)
+      (define-key prefix-map "b" 'bog-find-citekey-bib)
+      (define-key prefix-map "h" 'bog-goto-citekey-heading-in-buffer)
+      (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
+      (define-key prefix-map "w" 'bog-search-citekey-on-web)
+      (define-key map bog-keymap-prefix prefix-map))
     map)
   "Keymap for Bog.")
+
+;;;###autoload
+(define-minor-mode bog-mode
+  "Toggle Bog in this buffer.
+With a prefix argument ARG, enable `bog-mode' if ARG is positive,
+and disable it otherwise. If called from Lisp, enable the mode if
+ARG is omitted or nil.
+
+\\{bog-mode-map}"
+  :keymap bog-mode-map
+  :group 'bog
+  :lighter " Bog"
+  :require 'bog
+  (cond
+   (bog-mode
+    (bog-add-fontlock))
+   (t
+    (bog-remove-fontlock))))
 
 (provide 'bog)
 

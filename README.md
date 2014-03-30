@@ -112,8 +112,5 @@ The variables below are important for specifying how Bog behaves.
 
 # Keybindings
 
-A keymap is defined for Bog, but a prefix isn't claimed. The code below
-shows how to use "C-c b" as the prefix while in Org mode.
-
-    (eval-after-load 'org
-      '(define-key org-mode-map (kbd "C-c b") bog-mode-map))
+A keymap is defined for Bog under the prefix \`C-c "'. If you prefer
+something else (like \`C-c b'), set `bog-keymap-prefix`.
