@@ -181,6 +181,17 @@ It should contain the placeholder \"%s\" for the query."
   :group 'bog
   :type 'string)
 
+(defcustom bog-agenda-custom-command-key "b"
+  "Key to use for Bog notes search key in agenda dispatch.
+If nil, a custom command will not be added to Org agenda
+dispatch, but searching Bog notes through the agenda interface
+will still be available through `bog-search-notes' and
+`bog-search-notes-for-citekey'."
+  :group 'bog
+  :type '(choice
+          (const :tag "Don't display in agenda dispatch" nil)
+          (string :tag "Key for agenda dispatch")))
+
 
 ;;; General utilities
 
@@ -533,6 +544,23 @@ level `bog-refile-maxlevel' are considered."
    (concat (file-name-as-directory bog-notes-directory)
            "*.org")))
 
+(defun bog-search-notes (&optional todo-only)
+  "Search notes using `org-search-view'.
+With prefix argument TODO-ONLY, only TODO entries are searched."
+  (interactive "P")
+  (let ((lprops (nth 4 bog-agenda-custom-command)))
+    (put 'org-agenda-redo-command 'org-lprops lprops)
+    (org-let lprops '(org-search-view todo-only))))
+
+(defun bog-search-notes-for-citekey (&optional todo-only)
+  "Search notes for citekey using `org-search-view'.
+With prefix argument TODO-ONLY, only TODO entries are searched."
+  (interactive "P")
+  (let ((citekey (bog-citekey-from-notes))
+        (lprops (nth 4 bog-agenda-custom-command)))
+    (put 'org-agenda-redo-command 'org-lprops lprops)
+    (org-let lprops '(org-search-view todo-only citekey))))
+
 
 ;;; Font-lock
 
@@ -566,12 +594,19 @@ level `bog-refile-maxlevel' are considered."
       (define-key prefix-map "p" 'bog-find-citekey-pdf)
       (define-key prefix-map "r" 'bog-rename-staged-pdf-to-citekey)
       (define-key prefix-map "b" 'bog-find-citekey-bib)
+      (define-key prefix-map "s" 'bog-search-notes)
+      (define-key prefix-map "c" 'bog-search-notes-for-citekey)
       (define-key prefix-map "h" 'bog-goto-citekey-heading-in-buffer)
       (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
       (define-key prefix-map "w" 'bog-search-citekey-on-web)
       (define-key map bog-keymap-prefix prefix-map))
     map)
   "Keymap for Bog.")
+
+(defvar bog-agenda-custom-command
+  `(,(or bog-agenda-custom-command-key "b") "Search Bog notes" search ""
+    ((org-agenda-files (bog-notes-files))
+     (org-agenda-text-search-extra-files nil))))
 
 ;;;###autoload
 (define-minor-mode bog-mode
@@ -587,9 +622,15 @@ ARG is omitted or nil.
   :require 'bog
   (cond
    (bog-mode
-    (bog-add-fontlock))
+    (bog-add-fontlock)
+    (when bog-agenda-custom-command-key
+      (add-to-list 'org-agenda-custom-commands
+                   bog-agenda-custom-command)))
    (t
-    (bog-remove-fontlock))))
+    (bog-remove-fontlock)
+    (when bog-agenda-custom-command
+      (setq org-agenda-custom-commands (delete bog-agenda-custom-command
+                                               org-agenda-custom-commands))))))
 
 (provide 'bog)
 
