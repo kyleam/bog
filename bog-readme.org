@@ -90,6 +90,8 @@ Other useful functions include
 - =bog-goto-citekey-heading-in-buffer=
 - =bog-goto-citekey-heading-in-notes=
 - =bog-refile=
+- =bog-search-notes=
+- =bog-search-notes-for-citekey=
 
 * Variables
 
