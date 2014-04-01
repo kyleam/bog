@@ -688,4 +688,4 @@ ARG is omitted or nil.
 
 (provide 'bog)
 
-;; bog.el ends here
+;;; bog.el ends here
