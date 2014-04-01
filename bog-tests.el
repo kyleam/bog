@@ -239,3 +239,92 @@
     (insert  "abc1900word\nhij2000word\nefg1800word\n")
     (should (equal (bog-collect-references t)
                    '("efg1800word" "hij2000word" "abc1900word")))))
+
+;; `bog-sort-topic-headings-in-buffer'
+
+(ert-deftest bog-sort-topic-headings-in-buffer ()
+  (with-temp-buffer
+    (let ((bog-topic-heading-level 1))
+      (insert  "\n* topic heading\n\n"
+               "** zoo2000key\n\nsome text\n\n"
+               "** apple2000key\n\nsome text\n"
+               "* another topic heading\n\n"
+               "** orange2000key\n\nsome text\n\n"
+               "** banana2000key\n\nsome text\n"
+               "** yogurt2000key\n\nsome text\n")
+      (org-mode)
+      (show-all)
+      (bog-sort-topic-headings-in-buffer)
+      (goto-char 0)
+      (outline-next-visible-heading 2)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "apple2000key"))
+      (outline-next-visible-heading 3)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "banana2000key")))))
+
+(ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-heading ()
+  (with-temp-buffer
+    (let ((bog-topic-heading-level 1))
+      (insert  "\n* topic heading\n\n"
+               "** zoo2000key\n\nsome text\n\n"
+               "** apple2000key\n\nsome text\n"
+               "* citekey2000heading\n\n"
+               "** orange2000key\n\nsome text\n\n"
+               "** banana2000key\n\nsome text\n"
+               "** yogurt2000key\n\nsome text\n")
+      (org-mode)
+      (show-all)
+      (bog-sort-topic-headings-in-buffer)
+      (goto-char 0)
+      (outline-next-visible-heading 2)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "apple2000key"))
+      (outline-next-visible-heading 3)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "orange2000key")))))
+
+(ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-property ()
+  (with-temp-buffer
+    (let ((bog-topic-heading-level 1))
+      (insert  "\n* topic heading\n\n"
+               "** zoo2000key\n\nsome text\n\n"
+               "** apple2000key\n\nsome text\n"
+               "* non-topic heading\n"
+               " :PROPERTIES:\n"
+               (format " :%s: citekey2000prop\n" bog-citekey-property)
+               " :END:\n"
+               "** orange2000key\n\nsome text\n\n"
+               "** banana2000key\n\nsome text\n"
+               "** yogurt2000key\n\nsome text\n")
+      (org-mode)
+      (show-all)
+      (bog-sort-topic-headings-in-buffer)
+      (goto-char 0)
+      (outline-next-visible-heading 2)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "apple2000key"))
+      (outline-next-visible-heading 3)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "orange2000key")))))
+
+(ert-deftest bog-sort-topic-headings-in-buffer-passed-sorting-type ()
+  (with-temp-buffer
+    (let ((bog-topic-heading-level 1))
+      (insert  "\n* topic heading\n\n"
+               "** zoo2000key\n\nsome text\n\n"
+               "** apple2000key\n\nsome text\n"
+               "* another topic heading\n\n"
+               "** orange2000key\n\nsome text\n\n"
+               "** banana2000key\n\nsome text\n"
+               "** yogurt2000key\n\nsome text\n")
+      (org-mode)
+      (show-all)
+      (bog-sort-topic-headings-in-buffer ?n)
+      (goto-char 0)
+      (outline-next-visible-heading 2)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "zoo2000key"))
+      (outline-next-visible-heading 3)
+      (should (equal (org-no-properties (org-get-heading t t))
+                     "orange2000key")))))

@@ -171,7 +171,15 @@ It should contain the placeholder \"%s\" for the query."
   :group 'bog
   :type 'string)
 
-(defcustom  bog-refile-maxlevel 1
+(defcustom  bog-topic-heading-level 1
+  "Consider headings at this level to be topic headings.
+Topic headings for studies may be at any level, but
+`bog-sort-topic-headings' uses this variable to determine what
+level to operate on."
+  :group 'bog
+  :type 'integer)
+
+(defcustom  bog-refile-maxlevel bog-topic-heading-level
   "Consider up to this level when refiling with `bog-refile'."
   :group 'bog
   :type 'integer)
@@ -251,6 +259,11 @@ year, and the first meaningful word in the title)."
         (when (not citekey)
           (error "Citekey not found"))
         citekey))))
+
+(defun bog-citekey-heading-p ()
+  (let ((heading (org-no-properties (org-get-heading t t))))
+    (or (bog-citekey-only-p heading)
+        (org-entry-get (point) bog-citekey-property))))
 
 (defun bog-citekey-p (text)
   "Indicate if TEXT matches `bog-citekey-format'."
@@ -560,6 +573,31 @@ With prefix argument TODO-ONLY, only TODO entries are searched."
         (lprops (nth 4 bog-agenda-custom-command)))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only citekey))))
+
+(defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
+  "Sort topic headings in this buffer.
+SORTING-TYPE is a character passed to `org-sort-entries'. If nil,
+?a is used. The level to sort is determined by
+`bog-topic-heading-level'."
+  (interactive)
+  (org-map-entries '(lambda () (bog-sort-if-topic-header sorting-type))))
+
+(defun bog-sort-topic-headings-in-notes (&optional sorting-type)
+  "Sort topic headings in notes.
+Unlike `bog-sort-topic-headings-in-buffer', sort topic headings
+in all Bog notes."
+  (interactive)
+  (org-map-entries '(lambda ()  (bog-sort-if-topic-header sorting-type))
+                   nil (bog-notes-files)))
+
+(defun bog-sort-if-topic-header (sorting-type)
+  "Sort heading with `org-sort-entries' according to SORTING-TYPE.
+Sorting is only done if the heading's level matches
+`bog-topic-heading-level' and it isn't a citekey heading."
+  (let ((sorting-type (or sorting-type ?a)))
+    (when (and (= (org-current-level) bog-topic-heading-level)
+               (not (bog-citekey-heading-p)))
+      (org-sort-entries nil sorting-type))))
 
 
 ;;; Font-lock

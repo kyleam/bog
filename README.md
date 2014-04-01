@@ -85,6 +85,8 @@ Other useful functions include
 -   `bog-refile`
 -   `bog-search-notes`
 -   `bog-search-notes-for-citekey`
+-   `bog-sort-topic-headings-in-buffer`
+-   `bog-sort-topic-headings-in-notes`
 
 # Variables
 
