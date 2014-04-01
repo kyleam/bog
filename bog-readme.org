@@ -5,6 +5,16 @@ Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. 
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
 
+* Installation
+
+Bog is available on [[http://melpa.milkbox.net/][MELPA]].
+
+To enable Bog in all Org buffers, add it to =org-mode-hook=.
+
+#+begin_src emacs-lisp
+  (add-hook 'org-mode-hook 'bog-mode)
+#+end_src
+
 * Workflow
 
 Many people use Org for taking research notes, and there are some really
