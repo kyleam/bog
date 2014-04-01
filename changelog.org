@@ -1,0 +1,30 @@
+* v0.6.0
+
+** New features
+
+- Citekeys can now be stored as a property in addition to as a heading
+  title.
+- Make functions compatible with a single BibTeX file.
+- Add new command =bog-refile=.
+- Multiple PDFs can be associated with a citekey.
+- Add commands =bog-goto-citekey-heading-in-buffer= and
+  =bog-goto-citekey-heading-in-notes=.
+- Make PDF file separator customizable.
+- Add agenda search commands =bog-search-notes= and
+  =bog-search-notes-for-citekey=.
+- Add commands =bog-sort-topic-headings-in-buffer= and
+  =bog-sort-topic-headings-in-notes=.
+- Read a new name if renaming to PDF that exists (instead of giving an
+  error).
+- Allow numbers to be in the title word of citekey.
+
+** Bugs fixed
+
+- Fix a logic bug in citekey selection.
+
+** Other changes
+
+- In addition to renaming PDF files, use the stage for renaming and
+  cleaning BibTeX files.
+- Remove the path when presenting choices for renaming a PDF.
+- Define a keymap and minor mode for Bog.
