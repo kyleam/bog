@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+emacs --batch --load scripts/readme-to-md.el
+git add README.md
