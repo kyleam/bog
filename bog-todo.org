@@ -43,6 +43,14 @@ Default could be "*.tex".
 
 * PDF files
 
+** ENH Generalize PDF functions in bog
+
+Replace bog-find-citekey-pdf with bog-find-citekey-file. The extensions
+that will be considered could be customized. Rebind this to "f".
+bog-rename-staged-pdf-to-citekey would be
+bog-rename-staged-file-to-citekey and could use the same customized
+extensions (or maybe just take the extension from the original file).
+
 ** ENH Use `org-file-apps' instead of `bog-pdf-opener'
 
 * Testing
