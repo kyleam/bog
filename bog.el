@@ -6,7 +6,7 @@
 ;; URL: https://github.com/kyleam/bog
 ;; Keywords: BibTeX, org-mode
 ;; Version: 0.6.0
-;; Package-Requires: ((org "8.0.0") (dash "2.5.0"))
+;; Package-Requires: ((dash "2.5.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
