@@ -140,21 +140,6 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   :group 'bog
   :type 'string)
 
-(defcustom bog-read-file-name 'read-file-name
-  "A function that will be used to promtp for file name.
-The function should accept one arguments, a string to use for the
-prompt. A good alternative is `ido-read-file-name'."
-  :group 'bog
-  :type 'function)
-
-(defcustom bog-completing-read 'completing-read
-  "A function that will be used for completion prompts.
-The function should accept two arguments, a string to use for the
-prompt and a list of strings to offer as choices. A good
-alternative is `ido-completing-read'."
-  :group 'bog
-  :type 'function)
-
 (defcustom bog-pdf-opener "xdg-open"
   "Program to open PDF files with."
   :group 'bog
@@ -221,7 +206,7 @@ will still be available through `bog-search-notes' and
 
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS"
-  (funcall bog-completing-read "Select citekey: " citekeys))
+  (org-icompleting-read "Select citekey: " citekeys))
 
 (defun bog-citekey-groups-with-delim (citekey &optional delim groups)
   "Return groups of `bog-citekey-format', seperated by DELIM.
@@ -351,16 +336,15 @@ The citekey will be taken from the text under point if it matches
          staged-pdf)
     (cond
      ((= 0 num-choices)
-      (setq staged-pdf (funcall bog-read-file-name
-                                "Select PDF file to rename: ")))
+      (setq staged-pdf (org-iread-file-name "Select PDF file to rename: ")))
      ((= 1 num-choices)
       (setq staged-pdf (car staged-pdfs)))
      (t
       (setq staged-pdf
-            (expand-file-name (funcall bog-completing-read
-                                       "Select PDF file to rename: "
-                                       staged-pdfs-names)
-                              bog-stage-directory))))
+            (expand-file-name
+             (org-icompleting-read "Select PDF file to rename: "
+                                   staged-pdfs-names)
+             bog-stage-directory))))
     (message "Renamed %s to %s" staged-pdf
              (funcall bog-pdf-renaming-func staged-pdf citekey))))
 
