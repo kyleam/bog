@@ -140,11 +140,6 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   :group 'bog
   :type 'string)
 
-(defcustom bog-pdf-opener "xdg-open"
-  "Program to open PDF files with."
-  :group 'bog
-  :type 'string)
-
 (defcustom bog-pdf-file-name-separators '("-" "_")
   "Characters allowed to follow the citekey in PDF file names.
 When `bog-find-citekey-pdf' is run on <citekey>, it will find
@@ -308,7 +303,7 @@ text under point if it matches `bog-citekey-format' or using
                                        "Select PDF file: "
                                        citekey-pdfs-names)
                               bog-pdf-directory))))
-    (start-process "bog-pdf" nil bog-pdf-opener citekey-pdf)))
+    (org-open-file citekey-pdf)))
 
 (defun bog-citekey-pdfs (citekey)
   (let* ((patterns (--map (concat it "*") bog-pdf-file-name-separators))

@@ -51,7 +51,8 @@ bog-rename-staged-pdf-to-citekey would be
 bog-rename-staged-file-to-citekey and could use the same customized
 extensions (or maybe just take the extension from the original file).
 
-** ENH Use `org-file-apps' instead of `bog-pdf-opener'
+** DONE Use `org-file-apps' instead of `bog-pdf-opener'
+   CLOSED: [2014-04-02 Wed 23:30]
 
 * Testing
 
