@@ -299,9 +299,8 @@ text under point if it matches `bog-citekey-format' or using
       (setq citekey-pdf (car citekey-pdfs)))
      (t
       (setq citekey-pdf
-            (expand-file-name (funcall bog-completing-read
-                                       "Select PDF file: "
-                                       citekey-pdfs-names)
+            (expand-file-name (org-icompleting-read "Select PDF file: "
+                                                    citekey-pdfs-names)
                               bog-pdf-directory))))
     (org-open-file citekey-pdf)))
 
