@@ -25,7 +25,6 @@ expects the citekey to be the title or property of a heading. The
 citekey "another1999study" is a reference to another study (which may or
 may not have a subtree in this or another Org file).
 
-    
     * Topic heading
     
     ** TODO name2000word                               :atag:
