@@ -5,7 +5,7 @@
   (require 'org))
 (require 'ox-md)
 
-(let ((readme-file "bog-readme.org")
+(let ((readme-file "README")
       exported-file
       (final-file "README.md"))
   (with-current-buffer (find-file-noselect readme-file)
