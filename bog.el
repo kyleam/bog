@@ -95,19 +95,19 @@ default value of `org-bibtex-key-property'."
   :type 'string)
 
 (defcustom bog-notes-directory "~/bib"
-  "The name of the directory that Org files are stored in."
+  "Directory with Org research notes."
   :group 'bog
   :type 'string)
 
 (defcustom bog-pdf-directory
   (expand-file-name "pdfs" bog-notes-directory)
-  "The name of the directory that PDF files are stored in."
+  "Directory with citekey-associated PDF files."
   :group 'bog
   :type 'string)
 
 (defcustom bog-stage-directory
   (expand-file-name "stage" bog-notes-directory)
-  "The name of the directory to search for new files.
+  "Directory to search for new files.
 `bog-rename-staged-pdf-to-citekey' and
 `bog-rename-staged-bib-to-citekey' will search here for files to
 rename."
