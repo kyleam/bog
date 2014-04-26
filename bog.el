@@ -369,7 +369,7 @@ used to control the default string used in the prompt."
   (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
 
 (defun bog-pdf-citekeys ()
-  "Return a list citekeys for all pdf files in
+  "Return a list of citekeys for all pdf files in
 `bog-pdf-directory'."
   (-map 'file-name-base
         (file-expand-wildcards (concat
