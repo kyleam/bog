@@ -143,8 +143,9 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
 (defcustom bog-citekey-file-name-separators '("-" "_")
   "Characters allowed to follow the citekey in file names.
 When `bog-find-citekey-file' is run on <citekey>, it will find
-files with the format <citekey><sep>*.<ext>, where <sep> is one
-of the characters in `bog-citekey-file-name-separators'.")
+files with the format <citekey>.* and <citekey><sep>*.<ext>,
+where <sep> is one of the characters in
+`bog-citekey-file-name-separators'.")
 
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
   "Function used to rename staged files.
@@ -314,7 +315,7 @@ text under point if it matches `bog-citekey-format' or using
 
 ;;;###autoload
 (defun bog-rename-staged-file-to-citekey ()
-  "Rename file in `bog-stage-directory' to `bog-file-directory'/<citekey>.<ext>.
+  "Rename citekey file in `bog-stage-directory' with `bog-file-renaming-func'.
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or using `bog-citekey-func'."
   (interactive)
@@ -342,7 +343,7 @@ The citekey will be taken from the text under point if it matches
              (funcall bog-file-renaming-func staged-file citekey))))
 
 (defun bog-file-ask-on-conflict (staged-file citekey)
-  "Prompt for a new name of file for CITEKEY already exists.
+  "Rename citekey file, prompting for a new name if it already exists.
 STAGED-FILE will be renamed to <citekey>.<ext> within
 `bog-file-directory'. If this file already exists, the user will
 be prompted for another name. `bog-file-secondary-name' can be
