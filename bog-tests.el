@@ -168,7 +168,7 @@
      (should (file-exists-p (expand-file-name
                              (concat citekey ".pdf") bog-pdf-directory)))
      (should-not (file-exists-p (expand-file-name
-                                 (concat "one.pdf") bog-pdf-directory))))))
+                                 (concat "one.pdf") bog-stage-directory))))))
 
 (ert-deftest bog-pdf-citekeys-multiple-variants ()
   (bog-tests--with-temp-dir
