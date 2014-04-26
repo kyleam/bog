@@ -387,7 +387,7 @@ available citekeys. Otherwise, the citekey will be taken from the
 text under point if it matches `bog-citekey-format' or using
 `bog-citekey-func'."
   (interactive "P")
-  (let ((citekey (or (and arg (bog-select-citekey (bog-pdf-citekeys)))
+  (let ((citekey (or (and arg (bog-select-citekey (bog-bib-citekeys)))
                      (bog-citekey-from-notes))))
     (funcall bog-find-citekey-bib-func citekey)))
 
