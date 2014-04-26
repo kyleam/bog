@@ -27,10 +27,10 @@
 ;; Org mode. Many of these commands center around a citekey, the unique
 ;; identifier for a study. Some of the main commands are listed below.
 ;;
-;; - `bog-find-citekey-pdf'
+;; - `bog-find-citekey-file'
 ;; - `bog-find-citekey-bib'
 ;; - `bog-search-citekey-on-web'
-;; - `bog-rename-staged-pdf-to-citekey'
+;; - `bog-rename-staged-file-to-citekey'
 ;; - `bog-goto-citekey-heading-in-buffer'
 ;; - `bog-goto-citekey-heading-in-notes'
 ;; - `bog-search-notes-for-citekey'
@@ -99,16 +99,16 @@ default value of `org-bibtex-key-property'."
   :group 'bog
   :type 'string)
 
-(defcustom bog-pdf-directory
-  (expand-file-name "pdfs" bog-notes-directory)
-  "Directory with citekey-associated PDF files."
+(defcustom bog-file-directory
+  (expand-file-name "citekey-files" bog-notes-directory)
+  "Directory with citekey-associated files."
   :group 'bog
   :type 'string)
 
 (defcustom bog-stage-directory
   (expand-file-name "stage" bog-notes-directory)
   "Directory to search for new files.
-`bog-rename-staged-pdf-to-citekey' and
+`bog-rename-staged-file-to-citekey' and
 `bog-rename-staged-bib-to-citekey' will search here for files to
 rename."
   :group 'bog
@@ -140,25 +140,25 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   :group 'bog
   :type 'string)
 
-(defcustom bog-pdf-file-name-separators '("-" "_")
-  "Characters allowed to follow the citekey in PDF file names.
-When `bog-find-citekey-pdf' is run on <citekey>, it will find
-files with the format <citekey><sep>*.pdf, where <sep> is one of
-the characters in `bog-pdf-file-name-separators'.")
+(defcustom bog-citekey-file-name-separators '("-" "_")
+  "Characters allowed to follow the citekey in file names.
+When `bog-find-citekey-file' is run on <citekey>, it will find
+files with the format <citekey><sep>*.<ext>, where <sep> is one
+of the characters in `bog-citekey-file-name-separators'.")
 
-(defcustom bog-pdf-renaming-func 'bog-pdf-ask-on-conflict
-  "Function used to rename stage PDF files.
-This function should accept a PDF file name and a citekey as
-arguments and return the name of the final PDF file. Currently
-the only built-in function is `bog-pdf-ask-on-conflict'.")
+(defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
+  "Function used to rename staged files.
+This function should accept a file name and a citekey as
+arguments and return the name of the final file. Currently the
+only built-in function is `bog-file-ask-on-conflict'.")
 
-(defcustom bog-pdf-secondary-name "-supplement"
-  "Modification to make to PDF file name on renaming confict.
-When a staged PDF is being renamed with
-`bog-pdf-ask-on-conflict', the user will be prompted if
-<citekey>.pdf already exists.
-<citekey>`bog-pdf-secondary-name'.pdf will be the default value
-for the prompt.")
+(defcustom bog-file-secondary-name "-supplement"
+  "Modification to make to file name on renaming confict.
+When a staged file is being renamed with
+`bog-file-ask-on-conflict', the user will be prompted if
+<citekey>.<ext> already exists.
+<citekey>`bog-file-secondary-name'.<ext> will be the default
+value for the prompt.")
 
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
@@ -273,108 +273,119 @@ year, and the first meaningful word in the title)."
     t))
 
 
-;;; PDF-related
+;;; Citekey-associated files
 
 ;;;###autoload
-(defun bog-find-citekey-pdf (arg)
-  "Open PDF file for a citekey.
+(defun bog-find-citekey-file (arg)
+  "Open citekey-associated file.
 If a prefix argument is given, a prompt will open to select from
 available citekeys. Otherwise, the citekey will be taken from the
 text under point if it matches `bog-citekey-format' or using
 `bog-citekey-func'."
   (interactive "P")
-  (let ((citekey (or (and arg (bog-select-citekey (bog-pdf-citekeys)))
+  (let ((citekey (or (and arg (bog-select-citekey (bog-all-file-citekeys)))
                      (bog-citekey-from-notes))))
-    (bog-open-citekey-pdf citekey)))
+    (bog-open-citekey-file citekey)))
 
-(defun bog-open-citekey-pdf (citekey)
-  (let* (citekey-pdf
-         (citekey-pdfs (bog-citekey-pdfs citekey))
-         (citekey-pdfs-names (-map 'file-name-nondirectory citekey-pdfs))
-         (num-choices (length citekey-pdfs-names)))
+(defun bog-open-citekey-file (citekey)
+  (let* (citekey-file
+         (citekey-files (bog-citekey-files citekey))
+         (citekey-file-names (-map 'file-name-nondirectory citekey-files))
+         (num-choices (length citekey-file-names)))
     (cond
      ((= 0 num-choices)
-      (error "No PDF found for %s" citekey))
+      (error "No file found for %s" citekey))
      ((= 1 num-choices)
-      (setq citekey-pdf (car citekey-pdfs)))
+      (setq citekey-file (car citekey-files)))
      (t
-      (setq citekey-pdf
-            (expand-file-name (org-icompleting-read "Select PDF file: "
-                                                    citekey-pdfs-names)
-                              bog-pdf-directory))))
-    (org-open-file citekey-pdf)))
+      (setq citekey-file
+            (expand-file-name (org-icompleting-read "Select file: "
+                                                    citekey-file-names)
+                              bog-file-directory))))
+    (org-open-file citekey-file)))
 
-(defun bog-citekey-pdfs (citekey)
-  (let* ((patterns (--map (concat it "*") bog-pdf-file-name-separators))
-         (patterns (cons "" patterns)))
+(defun bog-citekey-files (citekey)
+  (let* ((patterns (--map (concat it "*") bog-citekey-file-name-separators))
+         (patterns (cons ".*" patterns)))
     (--mapcat (file-expand-wildcards
-               (concat (file-name-as-directory bog-pdf-directory)
-                       citekey it ".pdf"))
+               (concat (file-name-as-directory bog-file-directory)
+                       citekey it))
               patterns)))
 
 ;;;###autoload
-(defun bog-rename-staged-pdf-to-citekey ()
-  "Rename PDF in `bog-stage-directory' to `bog-pdf-directory'/<citekey>.pdf.
+(defun bog-rename-staged-file-to-citekey ()
+  "Rename file in `bog-stage-directory' to `bog-file-directory'/<citekey>.<ext>.
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or using `bog-citekey-func'."
   (interactive)
   (let ((citekey (bog-citekey-from-notes)))
-    (bog-rename-staged-pdf citekey)))
+    (bog-rename-staged-file citekey)))
 
-(defun bog-rename-staged-pdf (citekey)
-  (let* ((staged-pdfs
-          (file-expand-wildcards
-           (concat (file-name-as-directory bog-stage-directory) "*.pdf")))
-         (staged-pdfs-names (-map 'file-name-nondirectory staged-pdfs))
-         (num-choices (length staged-pdfs-names))
-         staged-pdf)
+(defun bog-rename-staged-file (citekey)
+  (let* ((staged-files (bog-staged-files))
+         (staged-file-names (-map 'file-name-nondirectory staged-files))
+         (num-choices (length staged-file-names))
+         staged-file)
+    (message "choices: %s" num-choices)
     (cond
      ((= 0 num-choices)
-      (setq staged-pdf (org-iread-file-name "Select PDF file to rename: ")))
+      (setq staged-file (org-iread-file-name "Select file to rename: ")))
      ((= 1 num-choices)
-      (setq staged-pdf (car staged-pdfs)))
+      (setq staged-file (car staged-files)))
      (t
-      (setq staged-pdf
+      (setq staged-file
             (expand-file-name
-             (org-icompleting-read "Select PDF file to rename: "
-                                   staged-pdfs-names)
+             (org-icompleting-read "Select file to rename: "
+                                   staged-file-names)
              bog-stage-directory))))
-    (message "Renamed %s to %s" staged-pdf
-             (funcall bog-pdf-renaming-func staged-pdf citekey))))
+    (message "Renamed %s to %s" staged-file
+             (funcall bog-file-renaming-func staged-file citekey))))
 
-(defun bog-pdf-ask-on-conflict (staged-pdf citekey)
-  "Prompt for a new name of PDF file for CITEKEY already exists.
-STAGED-PDF will be renamed to <citekey>.pdf within
-`bog-pdf-directory'. If this file already exists, the user will
-be prompted for another name. `bog-pdf-secondary-name' can be
+(defun bog-file-ask-on-conflict (staged-file citekey)
+  "Prompt for a new name of file for CITEKEY already exists.
+STAGED-FILE will be renamed to <citekey>.<ext> within
+`bog-file-directory'. If this file already exists, the user will
+be prompted for another name. `bog-file-secondary-name' can be
 used to control the default string used in the prompt."
-  (let ((pdf-file (bog-citekey-as-pdf citekey)))
+  (let* ((ext (file-name-extension staged-file))
+         (citekey-file (bog-citekey-as-file citekey ext)))
     (condition-case nil
-        (rename-file staged-pdf pdf-file)
+        (rename-file staged-file citekey-file)
       (file-error
        (let ((new-file-name
-              (replace-regexp-in-string ".pdf"
-                                        (concat bog-pdf-secondary-name ".pdf")
-                                        (file-name-nondirectory pdf-file))))
+              (file-name-nondirectory
+               (bog-citekey-as-file (concat citekey bog-file-secondary-name)
+                                    ext))))
          (setq new-file-name
                (read-string
                 (format "File %s already exists. Name to use instead: "
-                        pdf-file)
+                        citekey-file)
                 new-file-name nil nil '(new-file-name)))
-         (setq pdf-file (expand-file-name new-file-name bog-pdf-directory))
-         (rename-file staged-pdf pdf-file))))
-    pdf-file))
+         (setq citekey-file (expand-file-name new-file-name bog-file-directory))
+         (rename-file staged-file citekey-file))))
+    citekey-file))
 
-(defun bog-citekey-as-pdf (citekey)
-  (expand-file-name (concat citekey ".pdf") bog-pdf-directory))
+(defun bog-citekey-as-file (citekey ext)
+  (expand-file-name (concat citekey "." ext) bog-file-directory))
 
-(defun bog-pdf-citekeys ()
-  "Return a list of citekeys for all pdf files in
-`bog-pdf-directory'."
-  (-map 'file-name-base
-        (file-expand-wildcards (concat
-                                (file-name-as-directory bog-pdf-directory)
-                                "*.pdf"))))
+(defun bog-all-file-citekeys ()
+  "Return a list of citekeys for files in `bog-file-directory'."
+  (-distinct (-keep 'bog-file-citekey (bog-all-citekey-files))))
+
+(defun bog-file-citekey (file)
+  (let ((fname (file-name-base file)))
+    (when (string-match (concat "^" bog-citekey-format) fname)
+      (match-string 0 fname))))
+
+(defun bog-all-citekey-files ()
+  (-remove 'file-directory-p
+           (directory-files bog-file-directory
+                            t directory-files-no-dot-files-regexp)))
+
+(defun bog-staged-files ()
+  (-remove 'file-directory-p
+           (directory-files bog-stage-directory
+                            t directory-files-no-dot-files-regexp)))
 
 
 ;;; BibTeX-related
@@ -623,8 +634,8 @@ Sorting is only done if the heading's level matches
 (defvar bog-mode-map
   (let ((map (make-sparse-keymap)))
     (let ((prefix-map (make-sparse-keymap)))
-      (define-key prefix-map "p" 'bog-find-citekey-pdf)
-      (define-key prefix-map "r" 'bog-rename-staged-pdf-to-citekey)
+      (define-key prefix-map "f" 'bog-find-citekey-file)
+      (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
       (define-key prefix-map "b" 'bog-find-citekey-bib)
       (define-key prefix-map "s" 'bog-search-notes)
       (define-key prefix-map "c" 'bog-search-notes-for-citekey)

@@ -1,5 +1,11 @@
 # -*- mode: org -*-
 
+* Master (unreleased)
+
+** New features
+
+- Any file type (not just PDFs) can now be associated with a citekey.
+
 * v0.6.0
 
 ** New features

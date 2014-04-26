@@ -148,15 +148,34 @@
     (should-error (bog-citekey-from-notes))))
 
 
-;;; PDF functions
+;;; File functions
 
-(ert-deftest bog-rename-staged-pdf-to-citekey-one-pdf ()
+(ert-deftest bog-file-citekey ()
+  (should (equal (bog-file-citekey "name2000word.pdf") "name2000word"))
+  (should (equal (bog-file-citekey "name2000word-supp.pdf") "name2000word"))
+  (should (equal (bog-file-citekey "name2000word_0.pdf") "name2000word"))
+  (should-not (bog-file-citekey "name2000.pdf"))
+  (should-not (bog-file-citekey "leader_name2000word.pdf")))
+
+(ert-deftest bog-all-file-citekeys ()
+  (bog-tests--with-temp-dir
+   (let ((bog-file-directory (expand-file-name "citekey-files")))
+     (make-directory bog-file-directory)
+     (let ((default-directory bog-file-directory))
+       (make-directory "key2000butdir"))
+     (write-region "" nil (expand-file-name "nokey.pdf" bog-file-directory))
+     (write-region "" nil (expand-file-name "one2010key.pdf" bog-file-directory))
+     (write-region "" nil (expand-file-name "two1980key.txt" bog-file-directory))
+     (should (equal (bog-all-file-citekeys)
+                    '("one2010key" "two1980key"))))))
+
+(ert-deftest bog-rename-staged-file-to-citekey-one-file ()
   (bog-tests--with-temp-dir
    (let ((bog-stage-directory (expand-file-name "stage"))
-         (bog-pdf-directory (expand-file-name "pdfs"))
+         (bog-file-directory (expand-file-name "citekey-files"))
          (citekey "name2010word"))
      (make-directory bog-stage-directory)
-     (make-directory bog-pdf-directory)
+     (make-directory bog-file-directory)
      (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
      (with-temp-buffer
        (insert (format "\n* top level\n\n** %s\n\nsome text\n"
@@ -164,24 +183,26 @@
        (org-mode)
        (show-all)
        (re-search-backward bog-citekey-format)
-       (bog-rename-staged-pdf-to-citekey))
+       (bog-rename-staged-file-to-citekey))
      (should (file-exists-p (expand-file-name
-                             (concat citekey ".pdf") bog-pdf-directory)))
+                             (concat citekey ".pdf") bog-file-directory)))
      (should-not (file-exists-p (expand-file-name
                                  (concat "one.pdf") bog-stage-directory))))))
 
-(ert-deftest bog-pdf-citekeys-multiple-variants ()
+(ert-deftest bog-file-citekeys-multiple-variants ()
   (bog-tests--with-temp-dir
-   (let* ((bog-pdf-directory (expand-file-name "pdfs"))
+   (let* ((bog-file-directory (expand-file-name "citekey-files"))
           (citekey "name2010word")
-          (variants (--map (concat citekey it ".pdf")
-                           '("" "_0" "-supplement")))
+          (variants (list (concat citekey ".pdf")
+                          (concat citekey ".txt")
+                          (concat citekey "_0.pdf")
+                          (concat citekey "-supplement.pdf")))
           found-files)
-     (make-directory bog-pdf-directory)
+     (make-directory bog-file-directory)
      (--each variants
-       (write-region "" nil (expand-file-name it bog-pdf-directory)))
-     (setq files-found (bog-citekey-pdfs citekey))
-     (should (= (length files-found) 3)))))
+       (write-region "" nil (expand-file-name it bog-file-directory)))
+     (setq files-found (bog-citekey-files citekey))
+     (should (= (length files-found) 4)))))
 
 
 ;;; BibTeX functions

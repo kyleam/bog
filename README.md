@@ -18,7 +18,7 @@ examples, see [these](http://thread.gmane.org/gmane.emacs.orgmode/78983) [thread
 
 The Bog workflow is focused around the citekey, which is the only study
 information that must be included in the notes. This unique identifier
-is used as a link to the BibTeX and PDF files.
+is used as a link to the BibTeX file and other associated files.
 
 In the example below, the citekey "name2000word" is a study heading. Bog
 expects the citekey to be the title or property of a heading. The
@@ -50,9 +50,9 @@ Many Bog functions take the citekey from the notes context. If the point
 is on a citekey (like "another1999study" above), then that citekey will
 be used. Otherwise, the citekey will be taken from the first parent
 heading that is a study.
--   `bog-find-citekey-pdf`
+-   `bog-find-citekey-file`
     
-    Open a PDF file for a citekey.
+    Open an associated file for a citekey.
 
 -   `bog-find-citekey-bib`
     
@@ -69,9 +69,9 @@ heading that is a study.
     author's last name, year, and first non-trivial word) usually contains
     enough information to make this search successful.
 
--   `bog-rename-staged-pdf-to-citekey`
+-   `bog-rename-staged-file-to-citekey`
     
-    Rename a new PDF.
+    Rename a new file.
 
 -   `bog-clean-and-rename-staged-bibs`
     
@@ -99,7 +99,7 @@ Other useful functions include
 
 Several variables determine where Bog looks for things.
 -   `bog-notes-directory`
--   `bog-pdf-directory`
+-   `bog-file-directory`
 -   `bog-bib-directory` or `bog-bib-file`
 -   `bog-stage-directory`
 
