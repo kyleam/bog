@@ -40,7 +40,7 @@
 ;; - `bog-sort-topic-headings-in-buffer'
 ;; - `bog-sort-topic-headings-in-notes'
 ;;
-;; See README (or bog-readme.org) for more information.
+;; See README for more information.
 
 ;;; Code:
 
