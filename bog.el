@@ -384,12 +384,18 @@ opened if locating a citekey from context fails."
               patterns)))
 
 ;;;###autoload
-(defun bog-rename-staged-file-to-citekey ()
+(defun bog-rename-staged-file-to-citekey (&optional no-context)
   "Rename citekey file in `bog-stage-directory' with `bog-file-renaming-func'.
+
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or using `bog-citekey-func'."
-  (interactive)
-  (let ((citekey (bog-citekey-from-notes)))
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from citekeys for all associated files. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-rename-staged-file citekey)))
 
 (defun bog-rename-staged-file (citekey)
@@ -571,15 +577,23 @@ instead of citekeys from file names in `bog-bib-directory'."
 ;;; Web
 
 ;;;###autoload
-(defun bog-search-citekey-on-web ()
+(defun bog-search-citekey-on-web (&optional no-context)
   "Open browser and perform query based for a citekey.
 
 The URL will be taken from `bog-web-search-url'.
 
 The citekey is split by groups in `bog-citekey-format' and joined by
-\"+\" to form the query string."
-  (interactive)
-  (let ((citekey (bog-citekey-from-notes)))
+\"+\" to form the query string.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys present in notes. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-open-citekey-on-web citekey)))
 
 (defun bog-open-citekey-on-web (citekey)
@@ -594,13 +608,17 @@ The citekey is split by groups in `bog-citekey-format' and joined by
 
 ;;; Notes-related
 
-(defun bog-goto-citekey-heading-in-buffer ()
+(defun bog-goto-citekey-heading-in-buffer (&optional no-context)
   "Find citekey heading in this buffer.
+
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format'."
-  (interactive)
-  (let* ((citekey (or (bog-citekey-at-point)
-                      (read-string "Enter citekey: ")))
+`bog-citekey-format'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys for headings in the current buffer. This same
+prompt will be opened if locating a citekey from context fails."
+  (interactive "P")
+  (let* ((citekey (bog-citekey-from-point-or-buffer-headings no-context))
          (pos (org-find-exact-headline-in-buffer citekey nil t)))
     (if pos
         (progn
@@ -609,16 +627,21 @@ The citekey will be taken from the text under point if it matches
           (org-show-context))
       (message "Heading for %s not found in buffer" citekey))))
 
-(defun bog-goto-citekey-heading-in-notes ()
+(defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
-All org files in `bog-notes-directory' will be searched. The
-citekey will be taken from the text under point if it matches
-`bog-citekey-format'."
-  (interactive)
-  (let* ((citekey (or (bog-citekey-at-point)
-                      (read-string "Enter citekey: ")))
-        (marker
-         (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+
+All org files in `bog-notes-directory' will be searched.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys for headings in notes. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
+         (marker
+          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))
