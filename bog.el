@@ -327,7 +327,6 @@ The citekey will be taken from the text under point if it matches
          (staged-file-names (-map 'file-name-nondirectory staged-files))
          (num-choices (length staged-file-names))
          staged-file)
-    (message "choices: %s" num-choices)
     (cond
      ((= 0 num-choices)
       (setq staged-file (org-iread-file-name "Select file to rename: ")))
