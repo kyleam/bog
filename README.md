@@ -46,10 +46,10 @@ settings can be modified.
 
 # Main features
 
-Many Bog functions take the citekey from the notes context. If the point
-is on a citekey (like "another1999study" above), then that citekey will
-be used. Otherwise, the citekey will be taken from the first parent
-heading that is a study.
+Many Bog functions take the citekey from the notes. If the point is on a
+citekey (like "another1999study" above), then that citekey will be used.
+Otherwise, the citekey will be taken from the first parent heading that
+is a study (if that makes sense for the given function).
 -   `bog-find-citekey-file`
     
     Open an associated file for a citekey.
