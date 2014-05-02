@@ -186,17 +186,6 @@ level to operate on."
   :group 'bog
   :type 'string)
 
-(defcustom bog-agenda-custom-command-key "b"
-  "Key to use for Bog notes search key in agenda dispatch.
-If nil, a custom command will not be added to Org agenda
-dispatch, but searching Bog notes through the agenda interface
-will still be available through `bog-search-notes' and
-`bog-search-notes-for-citekey'."
-  :group 'bog
-  :type '(choice
-          (const :tag "Don't display in agenda dispatch" nil)
-          (string :tag "Key for agenda dispatch")))
-
 
 ;;; Citekey methods
 
@@ -667,7 +656,8 @@ level `bog-refile-maxlevel' are considered."
   "Search notes using `org-search-view'.
 With prefix argument TODO-ONLY, only TODO entries are searched."
   (interactive "P")
-  (let ((lprops (nth 4 bog-agenda-custom-command)))
+  (let ((lprops '((org-agenda-files (bog-notes-files))
+                  (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only))))
 
@@ -676,7 +666,8 @@ With prefix argument TODO-ONLY, only TODO entries are searched."
 With prefix argument TODO-ONLY, only TODO entries are searched."
   (interactive "P")
   (let ((citekey (bog-citekey-from-notes))
-        (lprops (nth 4 bog-agenda-custom-command)))
+        (lprops '((org-agenda-files (bog-notes-files))
+                  (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only citekey))))
 
@@ -828,11 +819,6 @@ chosen."
     map)
   "Keymap for Bog.")
 
-(defvar bog-agenda-custom-command
-  `(,(or bog-agenda-custom-command-key "b") "Search Bog notes" search ""
-    ((org-agenda-files (bog-notes-files))
-     (org-agenda-text-search-extra-files nil))))
-
 ;;;###autoload
 (define-minor-mode bog-mode
   "Toggle Bog in this buffer.
@@ -847,15 +833,9 @@ ARG is omitted or nil.
   :require 'bog
   (cond
    (bog-mode
-    (bog-add-fontlock)
-    (when bog-agenda-custom-command-key
-      (add-to-list 'org-agenda-custom-commands
-                   bog-agenda-custom-command)))
+    (bog-add-fontlock))
    (t
-    (bog-remove-fontlock)
-    (when bog-agenda-custom-command
-      (setq org-agenda-custom-commands (delete bog-agenda-custom-command
-                                               org-agenda-custom-commands))))))
+    (bog-remove-fontlock))))
 
 (provide 'bog)
 
