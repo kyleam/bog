@@ -432,10 +432,10 @@ one entry per BibTeX file."
       (bog-prepare-bib-file it t bog-bib-directory))))
 
 (defun bog-prepare-bib-file (file &optional new-key new-directory)
-  (save-excursion
-    (let ((was-open (get-file-buffer file))
-          (buffer (find-file-noselect file)))
-      (with-current-buffer buffer
+  (let ((was-open (get-file-buffer file))
+        (buffer (find-file-noselect file)))
+    (with-current-buffer buffer
+      (save-excursion
         (goto-char (point-min))
         (bibtex-skip-to-valid-entry)
         (bibtex-clean-entry new-key)
@@ -447,9 +447,9 @@ one entry per BibTeX file."
           (rename-file file bib-file)
           (rename-buffer bib-file)
           (set-visited-file-name bib-file)
-          (save-buffer)))
-      (unless was-open
-        (kill-buffer buffer)))))
+          (save-buffer))))
+    (unless was-open
+      (kill-buffer buffer))))
 
 ;;;###autoload
 (defun bog-create-combined-bib ()
