@@ -13,6 +13,11 @@
 - When locating a citekey from the notes fails, functions will now
   prompt with a list of citekeys instead of giving an error.
 
+- Bog commands are now available outside of Org buffers through
+  =bog-commander=. This is based off of =projectile-commander=. The
+  custom Bog commands for the Org agenda have been removed because this
+  functionality is now available through =bog-commander=.
+
 * v0.6.0
 
 ** New features
