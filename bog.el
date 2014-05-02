@@ -273,6 +273,50 @@ year, and the first meaningful word in the title)."
   (when (equal (length text) (match-end 0))
     t))
 
+(defun bog-all-citekeys ()
+  (apply 'append
+         (-map 'bog-citekeys-in-file
+                (bog-notes-files))))
+
+(defun bog-all-heading-citekeys ()
+  (-mapcat 'bog-heading-citekeys-in-file
+           (bog-notes-files)))
+
+(defun bog-citekeys-in-file (file)
+  (let ((was-open (org-find-base-buffer-visiting file))
+        (buffer (find-file-noselect file))
+        refs)
+    (with-current-buffer buffer
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (while (re-search-forward bog-citekey-format nil t)
+            (add-to-list 'refs (match-string-no-properties 0))))))
+    (unless was-open
+      (kill-buffer buffer))
+    refs))
+
+(defun bog-heading-citekeys-in-file (file)
+  (let ((was-open (org-find-base-buffer-visiting file))
+        (buffer (find-file-noselect file))
+        citekeys)
+    (with-current-buffer buffer
+      (save-excursion
+        (setq citekeys (bog-heading-citekeys-in-buffer))))
+    (unless was-open
+      (kill-buffer buffer))
+    citekeys))
+
+(defun bog-heading-citekeys-in-buffer ()
+  (--keep it
+          (org-map-entries 'bog-get-heading-if-citekey nil 'file)))
+
+(defun bog-get-heading-if-citekey ()
+  (let ((heading (org-no-properties (org-get-heading t t))))
+    (when (bog-citekey-only-p heading)
+      heading)))
+
 
 ;;; Citekey-associated files
 
