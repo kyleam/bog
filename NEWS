@@ -6,6 +6,13 @@
 
 - Any file type (not just PDFs) can now be associated with a citekey.
 
+- In addition to =bog-find-citekey-file= and =bog-find-citekey-bib=,
+  most functions will now prompt with set of citekeys when prefix
+  argument is given. What this list is depends on the function.
+
+- When locating a citekey from the notes fails, functions will now
+  prompt with a list of citekeys instead of giving an error.
+
 * v0.6.0
 
 ** New features

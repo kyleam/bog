@@ -198,7 +198,33 @@ will still be available through `bog-search-notes' and
           (string :tag "Key for agenda dispatch")))
 
 
-;;; General utilities
+;;; Citekey methods
+
+(defmacro bog-selection-method (name context-method collection-method)
+  `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
+      (or (and no-context (bog-select-citekey (,collection-method)))
+          (,context-method)
+          (bog-select-citekey (,collection-method)))))
+
+(bog-selection-method "notes-or-files"
+                      bog-citekey-from-notes
+                      bog-all-file-citekeys)
+
+(bog-selection-method "notes-or-bibs"
+                      bog-citekey-from-notes
+                      bog-bib-citekeys)
+
+(bog-selection-method "notes-or-all"
+                      bog-citekey-from-notes
+                      bog-all-citekeys)
+
+(bog-selection-method "point-or-buffer-headings"
+                      bog-citekey-at-point
+                      bog-heading-citekeys-in-buffer)
+
+(bog-selection-method "point-or-all-headings"
+                      bog-citekey-at-point
+                      bog-all-heading-citekeys)
 
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
@@ -239,9 +265,8 @@ year, and the first meaningful word in the title)."
         (while (and (not (bog-citekey-only-p heading))
                     (org-up-heading-safe))
           (setq heading (org-no-properties (org-get-heading t t))))
-        (when (not (bog-citekey-only-p heading))
-          (error "Citekey not found"))
-        heading))))
+        (when (bog-citekey-only-p heading)
+          heading)))))
 
 (defun bog-citekey-from-property ()
   "Retrieve citekey from first parent heading that has the
@@ -253,8 +278,6 @@ year, and the first meaningful word in the title)."
         (while (and (not citekey)
                     (org-up-heading-safe))
           (setq citekey (org-entry-get (point) bog-citekey-property)))
-        (when (not citekey)
-          (error "Citekey not found"))
         citekey))))
 
 (defun bog-citekey-heading-p ()
@@ -273,19 +296,66 @@ year, and the first meaningful word in the title)."
   (when (equal (length text) (match-end 0))
     t))
 
+(defun bog-all-citekeys ()
+  (apply 'append
+         (-map 'bog-citekeys-in-file
+                (bog-notes-files))))
+
+(defun bog-all-heading-citekeys ()
+  (-mapcat 'bog-heading-citekeys-in-file
+           (bog-notes-files)))
+
+(defun bog-citekeys-in-file (file)
+  (let ((was-open (org-find-base-buffer-visiting file))
+        (buffer (find-file-noselect file))
+        refs)
+    (with-current-buffer buffer
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char (point-min))
+          (while (re-search-forward bog-citekey-format nil t)
+            (add-to-list 'refs (match-string-no-properties 0))))))
+    (unless was-open
+      (kill-buffer buffer))
+    refs))
+
+(defun bog-heading-citekeys-in-file (file)
+  (let ((was-open (org-find-base-buffer-visiting file))
+        (buffer (find-file-noselect file))
+        citekeys)
+    (with-current-buffer buffer
+      (save-excursion
+        (setq citekeys (bog-heading-citekeys-in-buffer))))
+    (unless was-open
+      (kill-buffer buffer))
+    citekeys))
+
+(defun bog-heading-citekeys-in-buffer ()
+  (--keep it
+          (org-map-entries 'bog-get-heading-if-citekey nil 'file)))
+
+(defun bog-get-heading-if-citekey ()
+  (let ((heading (org-no-properties (org-get-heading t t))))
+    (when (bog-citekey-only-p heading)
+      heading)))
+
 
 ;;; Citekey-associated files
 
 ;;;###autoload
-(defun bog-find-citekey-file (arg)
+(defun bog-find-citekey-file (&optional no-context)
   "Open citekey-associated file.
-If a prefix argument is given, a prompt will open to select from
-available citekeys. Otherwise, the citekey will be taken from the
-text under point if it matches `bog-citekey-format' or using
-`bog-citekey-func'."
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from citekeys for all associated files. This same prompt will be
+opened if locating a citekey from context fails."
   (interactive "P")
-  (let ((citekey (or (and arg (bog-select-citekey (bog-all-file-citekeys)))
-                     (bog-citekey-from-notes))))
+  (let ((citekey (bog-citekey-from-notes-or-files no-context)))
     (bog-open-citekey-file citekey)))
 
 (defun bog-open-citekey-file (citekey)
@@ -314,12 +384,18 @@ text under point if it matches `bog-citekey-format' or using
               patterns)))
 
 ;;;###autoload
-(defun bog-rename-staged-file-to-citekey ()
+(defun bog-rename-staged-file-to-citekey (&optional no-context)
   "Rename citekey file in `bog-stage-directory' with `bog-file-renaming-func'.
+
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or using `bog-citekey-func'."
-  (interactive)
-  (let ((citekey (bog-citekey-from-notes)))
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from citekeys for all associated files. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-rename-staged-file citekey)))
 
 (defun bog-rename-staged-file (citekey)
@@ -391,15 +467,18 @@ used to control the default string used in the prompt."
 ;;; BibTeX-related
 
 ;;;###autoload
-(defun bog-find-citekey-bib (arg)
+(defun bog-find-citekey-bib (&optional no-context)
   "Open BibTeX file for a citekey.
-If a prefix argument is given, a prompt will open to select from
-available citekeys. Otherwise, the citekey will be taken from the
-text under point if it matches `bog-citekey-format' or using
-`bog-citekey-func'."
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from citekeys for all BibTeX files. This same prompt will be
+opened if locating a citekey from context fails."
   (interactive "P")
-  (let ((citekey (or (and arg (bog-select-citekey (bog-bib-citekeys)))
-                     (bog-citekey-from-notes))))
+  (let ((citekey (bog-citekey-from-notes-or-bibs no-context)))
     (funcall bog-find-citekey-bib-func citekey)))
 
 (defun bog-find-citekey-bib-file (citekey)
@@ -498,15 +577,23 @@ instead of citekeys from file names in `bog-bib-directory'."
 ;;; Web
 
 ;;;###autoload
-(defun bog-search-citekey-on-web ()
+(defun bog-search-citekey-on-web (&optional no-context)
   "Open browser and perform query based for a citekey.
 
 The URL will be taken from `bog-web-search-url'.
 
 The citekey is split by groups in `bog-citekey-format' and joined by
-\"+\" to form the query string."
-  (interactive)
-  (let ((citekey (bog-citekey-from-notes)))
+\"+\" to form the query string.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the current subtree using
+`bog-citekey-func'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys present in notes. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-open-citekey-on-web citekey)))
 
 (defun bog-open-citekey-on-web (citekey)
@@ -521,13 +608,17 @@ The citekey is split by groups in `bog-citekey-format' and joined by
 
 ;;; Notes-related
 
-(defun bog-goto-citekey-heading-in-buffer ()
+(defun bog-goto-citekey-heading-in-buffer (&optional no-context)
   "Find citekey heading in this buffer.
+
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format'."
-  (interactive)
-  (let* ((citekey (or (bog-citekey-at-point)
-                      (read-string "Enter citekey: ")))
+`bog-citekey-format'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys for headings in the current buffer. This same
+prompt will be opened if locating a citekey from context fails."
+  (interactive "P")
+  (let* ((citekey (bog-citekey-from-point-or-buffer-headings no-context))
          (pos (org-find-exact-headline-in-buffer citekey nil t)))
     (if pos
         (progn
@@ -536,16 +627,21 @@ The citekey will be taken from the text under point if it matches
           (org-show-context))
       (message "Heading for %s not found in buffer" citekey))))
 
-(defun bog-goto-citekey-heading-in-notes ()
+(defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
-All org files in `bog-notes-directory' will be searched. The
-citekey will be taken from the text under point if it matches
-`bog-citekey-format'."
-  (interactive)
-  (let* ((citekey (or (bog-citekey-at-point)
-                      (read-string "Enter citekey: ")))
-        (marker
-         (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+
+All org files in `bog-notes-directory' will be searched.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys for headings in notes. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
+         (marker
+          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))

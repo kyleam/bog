@@ -145,7 +145,7 @@
     (insert  "\n* top level\n\n** second\n\n")
     (org-mode)
     (show-all)
-    (should-error (bog-citekey-from-notes))))
+    (should-not (bog-citekey-from-notes))))
 
 
 ;;; File functions
