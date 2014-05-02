@@ -483,11 +483,16 @@ occur in buffer instead of alphabetical order."
   (expand-file-name (concat citekey ".bib") bog-bib-directory))
 
 (defun bog-bib-citekeys ()
-  "Return a list citekeys for all BibTeX files in `bog-bib-directory'."
-  (-map 'file-name-base
-        (file-expand-wildcards (concat
-                                (file-name-as-directory bog-bib-directory)
-                                "*.bib"))))
+  "Return a list citekeys for all BibTeX entries.
+If `bog-bib-file' is non-nil, it returns citekeys from this file
+instead of citekeys from file names in `bog-bib-directory'."
+  (if bog-bib-file
+      (with-current-buffer (find-file-noselect bog-bib-file)
+        (-map 'car (bibtex-parse-keys)))
+    (-map 'file-name-base
+          (file-expand-wildcards (concat
+                                  (file-name-as-directory bog-bib-directory)
+                                  "*.bib")))))
 
 
 ;;; Web
