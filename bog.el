@@ -201,7 +201,7 @@ will still be available through `bog-search-notes' and
 ;;; General utilities
 
 (defun bog-select-citekey (citekeys)
-  "Prompt for citekey from CITEKEYS"
+  "Prompt for citekey from CITEKEYS."
   (org-icompleting-read "Select citekey: " citekeys))
 
 (defun bog-citekey-groups-with-delim (citekey &optional delim groups)
