@@ -730,6 +730,86 @@ Sorting is only done if the heading's level matches
   (font-lock-fontify-buffer))
 
 
+;;; Commander
+
+;;; The commander functionality is taken from projectile.
+;;; https://github.com/bbatsov/projectile
+
+(defconst bog-commander-help-buffer "*Commander Help*")
+
+(defvar bog-commander-methods nil
+  "List of file-selection methods for the `bog-commander' command.
+Each element is a list (KEY DESCRIPTION FUNCTION).
+DESCRIPTION is a one-line description of what the key selects.")
+
+;;;###autoload
+(defun bog-commander ()
+  "Execute a Bog command with a single letter.
+
+The user is prompted for a single character indicating the action
+to invoke. Press \"?\" to describe available actions.
+
+See `def-bog-commander-method' for defining new methods."
+  (interactive)
+  (message "Commander [%s]: "
+           (apply #'string (mapcar #'car bog-commander-methods)))
+  (let* ((ch (save-window-excursion
+               (select-window (minibuffer-window))
+               (read-char)))
+         (method (cl-find ch bog-commander-methods :key #'car)))
+    (cond (method
+           (funcall (cl-caddr method)))
+          (t
+           (message "No method for character: ?\\%c" ch)
+           (ding)
+           (sleep-for 1)
+           (discard-input)
+           (bog-commander)))))
+
+(defmacro def-bog-commander-method (key description &rest body)
+  "Define a new `bog-commander' method.
+
+KEY is the key the user will enter to choose this method.
+
+DESCRIPTION is a one-line sentence describing the method.
+
+BODY is a series of forms which are evaluated when the method is
+chosen."
+  (let ((method `(lambda ()
+                   ,@body)))
+    `(setq bog-commander-methods
+           (cl-sort (cons (list ,key ,description ,method)
+                          (cl-remove ,key bog-commander-methods :key #'car))
+                    #'< :key #'car))))
+
+(def-bog-commander-method ?? "Commander help buffer."
+  (ignore-errors (kill-buffer bog-commander-help-buffer))
+  (with-current-buffer (get-buffer-create bog-commander-help-buffer)
+    (insert "Bog commander methods:\n\n")
+    (loop for (key line nil) in bog-commander-methods
+          do (insert (format "%c:\t%s\n" key line)))
+    (goto-char (point-min))
+    (help-mode)
+    (display-buffer (current-buffer) t))
+  (bog-commander))
+
+(def-bog-commander-method ?b
+  "Find citekey BibTeX file."
+  (bog-find-citekey-bib t))
+
+(def-bog-commander-method ?f
+  "Find citekey file."
+  (bog-find-citekey-file t))
+
+(def-bog-commander-method ?h
+  "Find citekey heading in notes."
+  (bog-goto-citekey-heading-in-notes t))
+
+(def-bog-commander-method ?s
+  "Search Bog notes with `org-search-view'."
+  (bog-search-notes))
+
+
 ;;; Minor mode
 
 (defvar bog-mode-map
