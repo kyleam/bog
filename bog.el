@@ -186,17 +186,6 @@ level to operate on."
   :group 'bog
   :type 'string)
 
-(defcustom bog-agenda-custom-command-key "b"
-  "Key to use for Bog notes search key in agenda dispatch.
-If nil, a custom command will not be added to Org agenda
-dispatch, but searching Bog notes through the agenda interface
-will still be available through `bog-search-notes' and
-`bog-search-notes-for-citekey'."
-  :group 'bog
-  :type '(choice
-          (const :tag "Don't display in agenda dispatch" nil)
-          (string :tag "Key for agenda dispatch")))
-
 
 ;;; Citekey methods
 
@@ -667,7 +656,8 @@ level `bog-refile-maxlevel' are considered."
   "Search notes using `org-search-view'.
 With prefix argument TODO-ONLY, only TODO entries are searched."
   (interactive "P")
-  (let ((lprops (nth 4 bog-agenda-custom-command)))
+  (let ((lprops '((org-agenda-files (bog-notes-files))
+                  (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only))))
 
@@ -676,7 +666,8 @@ With prefix argument TODO-ONLY, only TODO entries are searched."
 With prefix argument TODO-ONLY, only TODO entries are searched."
   (interactive "P")
   (let ((citekey (bog-citekey-from-notes))
-        (lprops (nth 4 bog-agenda-custom-command)))
+        (lprops '((org-agenda-files (bog-notes-files))
+                  (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only citekey))))
 
@@ -730,6 +721,86 @@ Sorting is only done if the heading's level matches
   (font-lock-fontify-buffer))
 
 
+;;; Commander
+
+;;; The commander functionality is taken from projectile.
+;;; https://github.com/bbatsov/projectile
+
+(defconst bog-commander-help-buffer "*Commander Help*")
+
+(defvar bog-commander-methods nil
+  "List of file-selection methods for the `bog-commander' command.
+Each element is a list (KEY DESCRIPTION FUNCTION).
+DESCRIPTION is a one-line description of what the key selects.")
+
+;;;###autoload
+(defun bog-commander ()
+  "Execute a Bog command with a single letter.
+
+The user is prompted for a single character indicating the action
+to invoke. Press \"?\" to describe available actions.
+
+See `def-bog-commander-method' for defining new methods."
+  (interactive)
+  (message "Commander [%s]: "
+           (apply #'string (mapcar #'car bog-commander-methods)))
+  (let* ((ch (save-window-excursion
+               (select-window (minibuffer-window))
+               (read-char)))
+         (method (cl-find ch bog-commander-methods :key #'car)))
+    (cond (method
+           (funcall (cl-caddr method)))
+          (t
+           (message "No method for character: ?\\%c" ch)
+           (ding)
+           (sleep-for 1)
+           (discard-input)
+           (bog-commander)))))
+
+(defmacro def-bog-commander-method (key description &rest body)
+  "Define a new `bog-commander' method.
+
+KEY is the key the user will enter to choose this method.
+
+DESCRIPTION is a one-line sentence describing the method.
+
+BODY is a series of forms which are evaluated when the method is
+chosen."
+  (let ((method `(lambda ()
+                   ,@body)))
+    `(setq bog-commander-methods
+           (cl-sort (cons (list ,key ,description ,method)
+                          (cl-remove ,key bog-commander-methods :key #'car))
+                    #'< :key #'car))))
+
+(def-bog-commander-method ?? "Commander help buffer."
+  (ignore-errors (kill-buffer bog-commander-help-buffer))
+  (with-current-buffer (get-buffer-create bog-commander-help-buffer)
+    (insert "Bog commander methods:\n\n")
+    (loop for (key line nil) in bog-commander-methods
+          do (insert (format "%c:\t%s\n" key line)))
+    (goto-char (point-min))
+    (help-mode)
+    (display-buffer (current-buffer) t))
+  (bog-commander))
+
+(def-bog-commander-method ?b
+  "Find citekey BibTeX file."
+  (bog-find-citekey-bib t))
+
+(def-bog-commander-method ?f
+  "Find citekey file."
+  (bog-find-citekey-file t))
+
+(def-bog-commander-method ?h
+  "Find citekey heading in notes."
+  (bog-goto-citekey-heading-in-notes t))
+
+(def-bog-commander-method ?s
+  "Search Bog notes with `org-search-view'."
+  (bog-search-notes))
+
+
 ;;; Minor mode
 
 (defvar bog-mode-map
@@ -748,11 +819,6 @@ Sorting is only done if the heading's level matches
     map)
   "Keymap for Bog.")
 
-(defvar bog-agenda-custom-command
-  `(,(or bog-agenda-custom-command-key "b") "Search Bog notes" search ""
-    ((org-agenda-files (bog-notes-files))
-     (org-agenda-text-search-extra-files nil))))
-
 ;;;###autoload
 (define-minor-mode bog-mode
   "Toggle Bog in this buffer.
@@ -767,15 +833,9 @@ ARG is omitted or nil.
   :require 'bog
   (cond
    (bog-mode
-    (bog-add-fontlock)
-    (when bog-agenda-custom-command-key
-      (add-to-list 'org-agenda-custom-commands
-                   bog-agenda-custom-command)))
+    (bog-add-fontlock))
    (t
-    (bog-remove-fontlock)
-    (when bog-agenda-custom-command
-      (setq org-agenda-custom-commands (delete bog-agenda-custom-command
-                                               org-agenda-custom-commands))))))
+    (bog-remove-fontlock))))
 
 (provide 'bog)
 
