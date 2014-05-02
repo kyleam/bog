@@ -432,7 +432,7 @@ one entry per BibTeX file."
       (bog-prepare-bib-file it t bog-bib-directory))))
 
 (defun bog-prepare-bib-file (file &optional new-key new-directory)
-  (let ((was-open (get-file-buffer file))
+  (let ((was-open (find-buffer-visiting file))
         (buffer (find-file-noselect file)))
     (with-current-buffer buffer
       (save-excursion
