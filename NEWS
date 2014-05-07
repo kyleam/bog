@@ -18,6 +18,8 @@
   custom Bog commands for the Org agenda have been removed because this
   functionality is now available through =bog-commander=.
 
+- Add command =bog-citekey-tree-to-indirect-buffer=.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

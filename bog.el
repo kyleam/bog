@@ -651,6 +651,27 @@ buffer, the narrowing is removed."
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
 
+(defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
+  "Open subtree for citekey in an indirect buffer.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format'.
+
+With prefix argument NO-CONTEXT, a prompt will open to select
+from all citekeys for headings in notes. This same prompt will be
+opened if locating a citekey from context fails."
+  (interactive "P")
+  (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
+         (marker
+          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+    (if marker
+        (with-current-buffer (marker-buffer marker)
+          (save-excursion
+            (save-restriction
+              (goto-char (marker-position marker))
+              (org-tree-to-indirect-buffer))))
+      (message "Heading for %s not found in notes" citekey))))
+
 (defun bog-refile ()
   "Refile heading within notes.
 All headings from Org files in `bog-notes-directory' at or above
@@ -825,6 +846,7 @@ chosen."
       (define-key prefix-map "g" 'bog-search-citekey-on-web)
       (define-key prefix-map "h" 'bog-goto-citekey-heading-in-buffer)
       (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
+      (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
       (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
       (define-key prefix-map "s" 'bog-search-notes)
       (define-key prefix-map "w" 'bog-refile)

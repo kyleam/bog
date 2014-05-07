@@ -89,6 +89,7 @@ Other useful functions include
 
 -   `bog-goto-citekey-heading-in-buffer`
 -   `bog-goto-citekey-heading-in-notes`
+-   `bog-citekey-tree-to-indirect-buffer`
 -   `bog-refile`
 -   `bog-search-notes`
 -   `bog-search-notes-for-citekey`
