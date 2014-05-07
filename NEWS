@@ -18,6 +18,12 @@
   custom Bog commands for the Org agenda have been removed because this
   functionality is now available through =bog-commander=.
 
+** Other changes
+
+- =bog-goto-citekey-heading-in-buffer= and
+  =bog-goto-citekey-heading-in-notes= will now widen the buffer is the
+  heading is outside of the narrowed region.
+
 * v0.6.0
 
 ** New features

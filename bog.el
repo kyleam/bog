@@ -605,15 +605,21 @@ The citekey will be taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in the current buffer. This same
-prompt will be opened if locating a citekey from context fails."
+prompt will be opened if locating a citekey from context fails.
+
+If the heading is found outside any current narrowing of the
+buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-buffer-headings no-context))
          (pos (org-find-exact-headline-in-buffer citekey nil t)))
     (if pos
         (progn
-          (org-mark-ring-push)
-          (goto-char pos)
-          (org-show-context))
+         (when (or (< pos (point-min))
+                   (> pos (point-max)))
+           (widen))
+         (org-mark-ring-push)
+         (goto-char pos)
+         (org-show-context))
       (message "Heading for %s not found in buffer" citekey))))
 
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
@@ -626,7 +632,10 @@ The citekey will be taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in notes. This same prompt will be
-opened if locating a citekey from context fails."
+opened if locating a citekey from context fails.
+
+If the heading is found outside any current narrowing of the
+buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
          (marker
@@ -634,7 +643,11 @@ opened if locating a citekey from context fails."
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))
-          (goto-char (marker-position marker))
+          (let ((pos (marker-position marker)))
+            (when (or (< pos (point-min))
+                      (> pos (point-max)))
+              (widen))
+            (goto-char pos))
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
 
