@@ -625,7 +625,7 @@ buffer, the narrowing is removed."
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
 
-All org files in `bog-notes-directory' will be searched.
+All Org files in `bog-notes-directory' will be searched.
 
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format'.
