@@ -643,11 +643,10 @@ buffer, the narrowing is removed."
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))
-          (let ((pos (marker-position marker)))
-            (when (or (< pos (point-min))
-                      (> pos (point-max)))
-              (widen))
-            (goto-char pos))
+          (when (or (< marker (point-min))
+                    (> marker (point-max)))
+            (widen))
+          (goto-char marker)
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
 
@@ -668,7 +667,7 @@ opened if locating a citekey from context fails."
         (with-current-buffer (marker-buffer marker)
           (save-excursion
             (save-restriction
-              (goto-char (marker-position marker))
+              (goto-char marker)
               (org-tree-to-indirect-buffer))))
       (message "Heading for %s not found in notes" citekey))))
 
