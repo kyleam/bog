@@ -8,7 +8,8 @@
 
 Some citekeys are not highlighed until the surrounding text is altered.
 
-** ENH Function for getting all citekeys in notes
+** DONE Function for getting all citekeys in notes
+   CLOSED: [2014-05-24 Sat 21:44]
 
 Perhaps use a cache file. This could be used in
 `bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
@@ -19,7 +20,8 @@ Perhaps use a cache file. This could be used in
   to manage as project.
 - git annex: Store and sync associated PDF files using git annex.
 
-** DOC Installation instructions
+** DONE Installation instructions
+   CLOSED: [2014-05-24 Sat 21:44]
 
 * Notes
 
