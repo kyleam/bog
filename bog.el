@@ -94,19 +94,26 @@ default value of `org-bibtex-key-property'."
   :group 'bog
   :type 'string)
 
-(defcustom bog-notes-directory "~/bib"
+(defcustom bog-root-directory "~/bib"
+  "Root directory used to define default values of other Bog
+directories."
+  :group 'bog
+  :type 'string)
+
+(defcustom bog-notes-directory
+  (expand-file-name "notes" bog-root-directory)
   "Directory with Org research notes."
   :group 'bog
   :type 'string)
 
 (defcustom bog-file-directory
-  (expand-file-name "citekey-files" bog-notes-directory)
+  (expand-file-name "citekey-files" bog-root-directory)
   "Directory with citekey-associated files."
   :group 'bog
   :type 'string)
 
 (defcustom bog-stage-directory
-  (expand-file-name "stage" bog-notes-directory)
+  (expand-file-name "stage" bog-root-directory)
   "Directory to search for new files.
 `bog-rename-staged-file-to-citekey' and
 `bog-rename-staged-bib-to-citekey' will search here for files to
@@ -126,7 +133,7 @@ a single BibTeX file, `bog-bib-file', for the citekey entry."
   :type 'function)
 
 (defcustom bog-bib-directory
-  (expand-file-name "bibs" bog-notes-directory)
+  (expand-file-name "bibs" bog-root-directory)
   "The name of the directory that BibTeX files are stored in.
 This is only meaningful if `bog-find-citekey-bib-func' set to
 `bog-find-citekey-bib-file'."
