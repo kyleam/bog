@@ -40,7 +40,7 @@
 ;; - `bog-sort-topic-headings-in-buffer'
 ;; - `bog-sort-topic-headings-in-notes'
 ;;
-;; See README for more information.
+;; See README (https://github.com/kyleam/bog) for more information.
 
 ;;; Code:
 
