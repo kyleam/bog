@@ -579,6 +579,9 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in the current buffer. This same
 prompt will be opened if locating a citekey from context fails.
 
+This only works for headings that store the citekey as the
+heading title (not as a property).
+
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
@@ -605,6 +608,9 @@ The citekey will be taken from the text under point if it matches
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in notes. This same prompt will be
 opened if locating a citekey from context fails.
+
+This only works for headings that store the citekey as the
+heading title (not as a property).
 
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
