@@ -26,13 +26,7 @@
   (should (bog-citekey-p "hyphen-ok2010word")))
 
 (ert-deftest bog-citekey-p-with-other-text ()
-  (should (bog-citekey-p "name2010word more text")))
-
-(ert-deftest bog-citekey-only-p ()
-  (should (bog-citekey-only-p "name2010word"))
-  (should-not (bog-citekey-only-p "name201word"))
-  (should (bog-citekey-only-p "hyphen-ok2010word"))
-  (should-not (bog-citekey-only-p "name2010word more text")))
+  (should-not (bog-citekey-p "name2010word more text")))
 
 ;; `bog-citekey-groups-with-delim'
 

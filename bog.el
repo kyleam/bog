@@ -229,7 +229,7 @@ year, and the first meaningful word in the title)."
 (defun bog-citekey-at-point ()
   (let ((maybe-citekey (thing-at-point 'word)))
     (when (and maybe-citekey
-               (bog-citekey-only-p maybe-citekey))
+               (bog-citekey-p maybe-citekey))
       (substring-no-properties maybe-citekey))))
 
 (defun bog-citekey-from-notes ()
@@ -254,20 +254,15 @@ year, and the first meaningful word in the title)."
 
 (defun bog-citekey-from-heading-title ()
   (let ((title (org-no-properties (org-get-heading t t))))
-    (when (bog-citekey-only-p title)
+    (when (bog-citekey-p title)
       title)))
-
-(defun bog-citekey-p (text)
-  "Indicate if TEXT matches `bog-citekey-format'."
-  (when (string-match bog-citekey-format text)
-    t))
 
 (defun bog-citekey-from-property ()
   (-when-let (prop (org-entry-get (point) bog-citekey-property))
-    (when (bog-citekey-only-p prop)
+    (when (bog-citekey-p prop)
       prop)))
 
-(defun bog-citekey-only-p (text)
+(defun bog-citekey-p (text)
   "Indicate if all of TEXT matches `bog-citekey-format'."
   (string-match bog-citekey-format text)
   (when (equal (length text) (match-end 0))
