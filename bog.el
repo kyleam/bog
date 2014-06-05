@@ -263,9 +263,7 @@ year, and the first meaningful word in the title)."
       prop)))
 
 (defun bog-citekey-p (text)
-  "Indicate if all of TEXT matches `bog-citekey-format'."
-  (string-match bog-citekey-format text)
-  (when (equal (length text) (match-end 0))
+  (when (string-match-p (format "^%s$" bog-citekey-format) text)
     t))
 
 (defun bog-all-citekeys ()
