@@ -54,7 +54,7 @@
       (goto-char (point-min))
       (should (equal (bog-citekey-at-point) citekey)))))
 
-;; `bog-citekey-from-heading-title'
+;; `bog-citekey-from-tree'
 
 (ert-deftest bog-citekey-from-heading-title-current-level ()
   (let ((citekey "name2010word"))
@@ -63,7 +63,7 @@
                       citekey))
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-from-heading-title) citekey)))))
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-heading-title-in-parent ()
   (let ((citekey "name2010word"))
@@ -72,7 +72,7 @@
                       citekey))
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-from-heading-title) citekey)))))
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-heading-title-on-heading ()
   (let ((citekey "name2010word"))
@@ -82,9 +82,7 @@
       (org-mode)
       (show-all)
       (re-search-backward bog-citekey-format)
-      (should (equal (bog-citekey-from-heading-title) citekey)))))
-
-;; `bog-citekey-from-property'
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-current-level ()
   (let ((citekey "name2010word"))
@@ -94,7 +92,7 @@
               ":END:\nsome text\n")
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-from-property) citekey)))))
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-in-parent ()
   (let ((citekey "name2010word"))
@@ -105,7 +103,7 @@
               "** subhead\n\n")
       (org-mode)
       (show-all)
-      (should (equal (bog-citekey-from-property) citekey)))))
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-on-heading ()
   (let ((citekey "name2010word"))
@@ -116,7 +114,7 @@
       (org-mode)
       (show-all)
       (org-back-to-heading)
-      (should (equal (bog-citekey-from-property) citekey)))))
+      (should (equal (bog-citekey-from-tree) citekey)))))
 
 ;; `bog-citekey-from-notes'
 

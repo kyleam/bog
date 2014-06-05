@@ -73,24 +73,10 @@ settings:
   :group 'bog
   :type 'string)
 
-(defcustom bog-citekey-func 'bog-citekey-from-heading-title
-  "Function used to get citekey from study notes.
-
-By default, this is `bog-citekey-from-heading-title', which
-selects the citekey from the first parent heading whose title
-matches `bog-citekey-format'.
-
-The other option is `bog-citekey-from-property', which selects
-the citekey from the first parent that has the property
-`bog-citekey-property'."
-  :group 'bog
-  :type 'function)
-
 (defcustom bog-citekey-property "CUSTOM_ID"
   "Property name used to store citekey.
-This is only used if `bog-citekey-func' is set to
-`bog-citekey-from-property'. The default corresponds to the
-default value of `org-bibtex-key-property'."
+The default corresponds to the default value of
+`org-bibtex-key-property'."
   :group 'bog
   :type 'string)
 
@@ -249,42 +235,37 @@ year, and the first meaningful word in the title)."
 (defun bog-citekey-from-notes ()
   "Get the citekey from the context of the Org file."
   (or (bog-citekey-at-point)
-      (funcall bog-citekey-func)))
+      (bog-citekey-from-tree)))
+
+(defun bog-citekey-from-tree ()
+  "Retrieve citekey from first parent heading associated with citekey."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (let (maybe-citekey)
+        (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
+                    (org-up-heading-safe)))
+        maybe-citekey))))
+
+(defun bog-citekey-from-heading ()
+  "Retrieve citekey from current heading title."
+  (or (bog-citekey-from-heading-title)
+      (bog-citekey-from-property)))
 
 (defun bog-citekey-from-heading-title ()
-  "Retrieve citekey from first parent heading that matches
-`bog-citekey-format'."
-  (save-excursion
-    (save-restriction
-      (widen)
-      (let ((heading (org-no-properties (org-get-heading t t))))
-        (while (and (not (bog-citekey-only-p heading))
-                    (org-up-heading-safe))
-          (setq heading (org-no-properties (org-get-heading t t))))
-        (when (bog-citekey-only-p heading)
-          heading)))))
-
-(defun bog-citekey-from-property ()
-  "Retrieve citekey from first parent heading that has the
- property `bog-citekey-property'."
-  (save-excursion
-    (save-restriction
-      (widen)
-      (let ((citekey (org-entry-get (point) bog-citekey-property)))
-        (while (and (not citekey)
-                    (org-up-heading-safe))
-          (setq citekey (org-entry-get (point) bog-citekey-property)))
-        citekey))))
-
-(defun bog-citekey-heading-p ()
-  (let ((heading (org-no-properties (org-get-heading t t))))
-    (or (bog-citekey-only-p heading)
-        (org-entry-get (point) bog-citekey-property))))
+  (let ((title (org-no-properties (org-get-heading t t))))
+    (when (bog-citekey-only-p title)
+      title)))
 
 (defun bog-citekey-p (text)
   "Indicate if TEXT matches `bog-citekey-format'."
   (when (string-match bog-citekey-format text)
     t))
+
+(defun bog-citekey-from-property ()
+  (-when-let (prop (org-entry-get (point) bog-citekey-property))
+    (when (bog-citekey-only-p prop)
+      prop)))
 
 (defun bog-citekey-only-p (text)
   "Indicate if all of TEXT matches `bog-citekey-format'."
@@ -329,12 +310,7 @@ year, and the first meaningful word in the title)."
 
 (defun bog-heading-citekeys-in-buffer ()
   (--keep it
-          (org-map-entries 'bog-get-heading-if-citekey nil 'file)))
-
-(defun bog-get-heading-if-citekey ()
-  (let ((heading (org-no-properties (org-get-heading t t))))
-    (when (bog-citekey-only-p heading)
-      heading)))
+          (org-map-entries 'bog-citekey-from-heading nil 'file)))
 
 
 ;;; Citekey-associated files
@@ -344,8 +320,7 @@ year, and the first meaningful word in the title)."
   "Open citekey-associated file.
 
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the current subtree using
-`bog-citekey-func'.
+`bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all associated files. This same prompt will be
@@ -384,8 +359,7 @@ opened if locating a citekey from context fails."
   "Rename citekey file in `bog-stage-directory' with `bog-file-renaming-func'.
 
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the current subtree using
-`bog-citekey-func'.
+`bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all associated files. This same prompt will be
@@ -467,8 +441,7 @@ used to control the default string used in the prompt."
   "Open BibTeX file for a citekey.
 
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the current subtree using
-`bog-citekey-func'.
+`bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all BibTeX files. This same prompt will be
@@ -582,8 +555,7 @@ The citekey is split by groups in `bog-citekey-format' and joined by
 \"+\" to form the query string.
 
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the current subtree using
-`bog-citekey-func'.
+`bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys present in notes. This same prompt will be
@@ -733,7 +705,7 @@ Sorting is only done if the heading's level matches
 `bog-topic-heading-level' and it isn't a citekey heading."
   (let ((sorting-type (or sorting-type ?a)))
     (when (and (= (org-current-level) bog-topic-heading-level)
-               (not (bog-citekey-heading-p)))
+               (not (bog-citekey-from-heading)))
       (org-sort-entries nil sorting-type))))
 
 

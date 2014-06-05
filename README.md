@@ -110,12 +110,6 @@ The variables below are important for specifying how Bog behaves.
     
     A regular expression that defines the format used for citekeys
 
--   `bog-citekey-function`
-    
-    A function to extract a citekey from the current subtree. Use this to
-    indicate whether the citekey should be taken from the heading or
-    property.
-
 -   `bog-find-citekey-bib-function`
     
     A function to find a citekey in a BibTeX file. This determines whether
