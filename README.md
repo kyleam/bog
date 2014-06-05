@@ -20,10 +20,12 @@ The Bog workflow is focused around the citekey, which is the only study
 information that must be included in the notes. This unique identifier
 is used as a link to the BibTeX file and other associated files.
 
-In the example below, the citekey "name2000word" is a study heading. Bog
-expects the citekey to be the title or property of a heading. The
-citekey "another1999study" is a reference to another study (which may or
-may not have a subtree in this or another Org file).
+In the example below, the citekey "name2000word" is a study heading. A
+study heading is defined as a heading the has a citekey as a title or as
+the value of `bog-citekey-property`. When a citekey occurs anywhere else
+(like "another1999study" below), they are taken as a reference to
+another study (which may or may not have a subtree in this or another
+Org file).
 
     * Topic heading
     
@@ -48,8 +50,8 @@ settings can be modified.
 
 Many Bog functions take the citekey from the notes. If the point is on a
 citekey (like "another1999study" above), then that citekey will be used.
-Otherwise, the citekey will be taken from the first parent heading that
-is a study (if that makes sense for the given function).
+If this fails, many functions will try to take the citekey from the
+first parent heading that is a study heading.
 -   `bog-find-citekey-file`
     
     Open an associated file for a citekey.
