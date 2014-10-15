@@ -12,10 +12,6 @@ To enable Bog in all Org buffers, add it to `org-mode-hook`.
 
 # Workflow
 
-Many people use Org for taking research notes, and there are some really
-nice descriptions of systems people have come up with (for a few
-examples, see [these](http://thread.gmane.org/gmane.emacs.orgmode/78983) [threads](http://thread.gmane.org/gmane.emacs.orgmode/14756) on the Org mode mailing list).
-
 The Bog workflow is focused around the citekey, which is the only study
 information that must be included in the notes. This unique identifier
 is used as a link to the BibTeX file and other associated files.
@@ -129,3 +125,11 @@ Some Bog functions are useful outside of an Org buffer (e.g.,
 `bog-search-notes`). These functions are available through the
 `bog-commander` interface (based of off `projectile-commander`). This
 can be bound to a global key for quick access.
+
+# Other approaches
+
+If Bog doesn't fit your workflow, there are a good number of other
+approaches to explore. On the Org mode mailing list, there are some [nice](http://thread.gmane.org/gmane.emacs.orgmode/78983)
+[descriptions](http://thread.gmane.org/gmane.emacs.orgmode/14756) of systems people have come up with for taking research
+notes in Org. For a package that focuses on both taking research notes
+and writing research articles, Look into [Org-ref](https://github.com/jkitchin/jmax/blob/master/org/org-ref.org).
