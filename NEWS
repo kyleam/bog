@@ -20,6 +20,8 @@
 
 - Add command =bog-citekey-tree-to-indirect-buffer=.
 
+- Add command =bog-insert-heading-citekey=.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

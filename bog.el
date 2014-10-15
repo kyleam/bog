@@ -178,6 +178,16 @@ level to operate on."
   :group 'bog
   :type 'string)
 
+(defcustom bog-use-citekey-cache nil
+  "Cache list of all citekeys.
+Depending on the number of citekeys present in notes, enabling
+this can make functions that prompt with a list of all
+citekeys (or all heading citekeys) noticeably faster. However, no
+attempt is made to update the list of citekeys. To see newly
+added citekeys, clear the cache with `bog-clear-citekey-cache'."
+  :group 'bog
+  :type 'boolean)
+
 
 ;;; Citekey methods
 
@@ -270,14 +280,23 @@ year, and the first meaningful word in the title)."
   (when (string-match-p (format "^%s$" bog-citekey-format) text)
     t))
 
+(defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
-  (apply 'append
-         (-map 'bog-citekeys-in-file
-                (bog-notes-files))))
+  (or (and bog-use-citekey-cache bog--all-citekeys)
+      (setq bog--all-citekeys (apply 'append
+                                    (-map 'bog-citekeys-in-file
+                                          (bog-notes-files))))))
 
+(defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
-  (-mapcat 'bog-heading-citekeys-in-file
-           (bog-notes-files)))
+  (or (and bog-use-citekey-cache bog--all-heading-citekeys)
+      (setq bog--all-heading-citekeys (-mapcat 'bog-heading-citekeys-in-file
+                                               (bog-notes-files)))))
+
+(defun bog-clear-citekey-cache ()
+  (interactive)
+  (setq bog--all-citekeys nil
+        bog--all-heading-citekeys nil))
 
 (defun bog-citekeys-in-file (file)
   (let ((was-open (org-find-base-buffer-visiting file))
@@ -360,7 +379,10 @@ The citekey will be taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys present in notes. This same prompt will be
-opened if locating a citekey from context fails."
+opened if locating a citekey from context fails.
+
+If the citekey file prompt is slow to appear, consider enabling
+`bog-use-citekey-cache'."
   (interactive "P")
   (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-rename-staged-file citekey)))
@@ -556,7 +578,10 @@ The citekey will be taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys present in notes. This same prompt will be
-opened if locating a citekey from context fails."
+opened if locating a citekey from context fails.
+
+If the citekey file prompt is slow to appear, consider enabling
+`bog-use-citekey-cache'."
   (interactive "P")
   (let ((citekey (bog-citekey-from-notes-or-all no-context)))
     (bog-open-citekey-on-web citekey)))
@@ -613,6 +638,9 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in notes. This same prompt will be
 opened if locating a citekey from context fails.
 
+If the citekey file prompt is slow to appear, consider enabling
+`bog-use-citekey-cache'.
+
 This only works for headings that store the citekey as the
 heading title (not as a property).
 
@@ -640,7 +668,10 @@ The citekey will be taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in notes. This same prompt will be
-opened if locating a citekey from context fails."
+opened if locating a citekey from context fails.
+
+If the citekey file prompt is slow to appear, consider enabling
+`bog-use-citekey-cache'."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
          (marker
