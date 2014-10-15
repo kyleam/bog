@@ -355,7 +355,7 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from citekeys for all associated files. This same prompt will be
+from all citekeys present in notes. This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
   (let ((citekey (bog-citekey-from-notes-or-all no-context)))
