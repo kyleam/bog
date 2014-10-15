@@ -182,6 +182,11 @@ level to operate on."
 ;;; Citekey methods
 
 (defmacro bog-selection-method (name context-method collection-method)
+  "Create citekey selection function.
+Function will be named bog-citekey-from-NAME and will take one
+argument (NO-CONTEXT). If NO-CONTEXT is nil, CONTEXT-METHOD will
+be called with no arguments. If
+"
   `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
       (or (and no-context (bog-select-citekey (,collection-method)))
           (,context-method)
