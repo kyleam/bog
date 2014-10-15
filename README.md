@@ -133,4 +133,4 @@ If Bog doesn't fit your workflow, there are a good number of other
 approaches to explore. On the Org mode mailing list, there are some [nice](http://thread.gmane.org/gmane.emacs.orgmode/78983)
 [descriptions](http://thread.gmane.org/gmane.emacs.orgmode/14756) of systems people have come up with for taking research
 notes in Org. For a package that focuses on both taking research notes
-and writing research articles, Look into [Org-ref](https://github.com/jkitchin/jmax/blob/master/org/org-ref.org).
+and writing research articles, look into [Org-ref](https://github.com/jkitchin/jmax/blob/master/org/org-ref.org).
