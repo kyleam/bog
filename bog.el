@@ -81,8 +81,7 @@ The default corresponds to the default value of
   :type 'string)
 
 (defcustom bog-root-directory "~/bib"
-  "Root directory used to define default values of other Bog
-directories."
+  "Root directory for default values of other Bog directories."
   :group 'bog
   :type 'string)
 
