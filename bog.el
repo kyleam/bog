@@ -742,6 +742,17 @@ Sorting is only done if the heading's level matches
                (not (bog-citekey-from-heading)))
       (org-sort-entries nil sorting-type))))
 
+(defun bog-insert-heading-citekey (&optional current-buffer)
+  "Select a citekey to insert at point.
+By default, offer heading citekeys from all files. With prefix
+argument CURRENT-BUFFER, limit to heading citekeys from the
+current buffer."
+  (interactive "P")
+  (let ((citekey-func (if current-buffer
+                          'bog-heading-citekeys-in-buffer
+                        'bog-all-heading-citekeys)))
+    (insert (bog-select-citekey (funcall citekey-func)))))
+
 
 ;;; Font-lock
 
@@ -862,6 +873,7 @@ chosen."
       (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
       (define-key prefix-map "s" 'bog-search-notes)
       (define-key prefix-map "w" 'bog-refile)
+      (define-key prefix-map "y" 'bog-insert-heading-citekey)
       (define-key map bog-keymap-prefix prefix-map))
     map)
   "Keymap for Bog.")
