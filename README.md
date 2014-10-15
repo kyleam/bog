@@ -52,6 +52,7 @@ Many Bog functions take the citekey from the notes. If the point is on a
 citekey (like "another1999study" above), then that citekey will be used.
 If this fails, many functions will try to take the citekey from the
 first parent heading that is a study heading.
+
 -   `bog-find-citekey-file`
     
     Open an associated file for a citekey.
@@ -101,6 +102,7 @@ Other useful functions include
 # Variables
 
 Several variables determine where Bog looks for things.
+
 -   `bog-notes-directory`
 -   `bog-file-directory`
 -   `bog-bib-directory` or `bog-bib-file`
