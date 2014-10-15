@@ -329,7 +329,7 @@ opened if locating a citekey from context fails."
          (num-choices (length citekey-file-names)))
     (cond
      ((= 0 num-choices)
-      (error "No file found for %s" citekey))
+      (user-error "No file found for %s" citekey))
      ((= 1 num-choices)
       (setq citekey-file (car citekey-files)))
      (t
@@ -447,7 +447,7 @@ opened if locating a citekey from context fails."
   "Open BibTeX file of CITEKEY contained in `bog-bib-directory'."
   (let ((bib-file (bog-citekey-as-bib citekey)))
     (unless (file-exists-p bib-file)
-      (error "%s does not exist" bib-file))
+      (user-error "%s does not exist" bib-file))
     (find-file-other-window bib-file)))
 
 (defun bog-find-citekey-entry (citekey)
@@ -484,7 +484,7 @@ one entry per BibTeX file."
                (bib-file
                 (expand-file-name (concat citekey ".bib") new-directory)))
           (when (get-buffer bib-file)
-            (error "Buffer for %s already exists" bib-file))
+            (user-error "Buffer for %s already exists" bib-file))
           (rename-file file bib-file)
           (rename-buffer bib-file)
           (set-visited-file-name bib-file)
@@ -498,7 +498,7 @@ one entry per BibTeX file."
   (interactive)
   (let ((bib-buffer (get-buffer-create "*Bib*"))
         (refs (-map 'bog-citekey-as-bib (bog-collect-references))))
-    (--each refs (unless (file-exists-p it) (error "%s does not exist" it)))
+    (--each refs (unless (file-exists-p it) (user-error "%s does not exist" it)))
     (switch-to-buffer-other-window bib-buffer)
     (--each refs
       (insert "\n")
