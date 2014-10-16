@@ -253,13 +253,11 @@ year, and the first meaningful word in the title)."
 
 (defun bog-citekey-from-tree ()
   "Retrieve citekey from first parent heading associated with citekey."
-  (save-excursion
-    (save-restriction
-      (widen)
-      (let (maybe-citekey)
-        (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
-                    (org-up-heading-safe)))
-        maybe-citekey))))
+  (org-with-wide-buffer
+   (let (maybe-citekey)
+     (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
+                 (org-up-heading-safe)))
+     maybe-citekey)))
 
 (defun bog-citekey-from-heading ()
   "Retrieve citekey from current heading title."
@@ -303,12 +301,10 @@ year, and the first meaningful word in the title)."
         (buffer (find-file-noselect file))
         refs)
     (with-current-buffer buffer
-      (save-excursion
-        (save-restriction
-          (widen)
-          (goto-char (point-min))
-          (while (re-search-forward bog-citekey-format nil t)
-            (add-to-list 'refs (match-string-no-properties 0))))))
+      (org-with-wide-buffer
+       (goto-char (point-min))
+       (while (re-search-forward bog-citekey-format nil t)
+         (add-to-list 'refs (match-string-no-properties 0)))))
     (unless was-open
       (kill-buffer buffer))
     refs))
