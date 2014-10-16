@@ -4,7 +4,7 @@
 
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 ;; URL: https://github.com/kyleam/bog
-;; Keywords: BibTeX, org-mode
+;; Keywords: bib, outlines
 ;; Version: 0.6.0
 ;; Package-Requires: ((dash "2.5.0"))
 
