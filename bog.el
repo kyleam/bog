@@ -265,9 +265,9 @@ year, and the first meaningful word in the title)."
       (bog-citekey-from-property)))
 
 (defun bog-citekey-from-heading-title ()
-  (let ((title (org-no-properties (org-get-heading t t))))
-    (when (bog-citekey-p title)
-      title)))
+  (--if-let (ignore-errors (org-no-properties (org-get-heading t t)))
+      (when (bog-citekey-p it)
+        it)))
 
 (defun bog-citekey-from-property ()
   (-when-let (prop (org-entry-get (point) bog-citekey-property))
