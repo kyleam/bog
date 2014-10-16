@@ -51,7 +51,7 @@ first parent heading that is a study heading.
 
 -   `bog-find-citekey-file`
     
-    Open an associated file for a citekey.
+    Open an associated file (usually a PDF) for a citekey.
 
 -   `bog-find-citekey-bib`
     
@@ -70,7 +70,7 @@ first parent heading that is a study heading.
 
 -   `bog-rename-staged-file-to-citekey`
     
-    Rename a new file.
+    Rename a new file (usually a PDF) to be associated with a citekey.
 
 -   `bog-clean-and-rename-staged-bibs`
     
