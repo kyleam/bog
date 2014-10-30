@@ -73,6 +73,15 @@ settings:
   :group 'bog
   :type 'string)
 
+(defcustom bog-allowed-before-citekey
+  "\\(\n\\|\\s-\\|(\\|\\[\\|{\\|<\\|,\\)"
+  "Regex that specifies characters allowed before a citekey.
+This may need to be modified if you have a custom
+`bog-citekey-format' or if you tend to used a certain character
+before citekeys that isn't included above."
+  :group 'bog
+  :type 'string)
+
 (defcustom bog-citekey-property "CUSTOM_ID"
   "Property name used to store citekey.
 The default corresponds to the default value of
@@ -241,10 +250,16 @@ year, and the first meaningful word in the title)."
                groups delim)))
 
 (defun bog-citekey-at-point ()
-  (let ((maybe-citekey (thing-at-point 'word)))
-    (when (and maybe-citekey
-               (bog-citekey-p maybe-citekey))
-      (substring-no-properties maybe-citekey))))
+  "Return citekey at point.
+The citekey must have the format specified by
+`bog-citekey-format' and, if not at the beginning of the buffer,
+be preceded by a characters in `bog-allowed-before-citekey'."
+  (save-excursion
+    (unless (bobp)
+      (re-search-backward bog-allowed-before-citekey)
+      (forward-char 1))
+    (when (looking-at bog-citekey-format)
+      (match-string-no-properties 0))))
 
 (defun bog-citekey-from-notes ()
   "Get the citekey from the context of the Org file."

@@ -41,8 +41,35 @@
 
 ;; `bog-citekey-at-point'
 
-(ert-deftest bog-citekey-at-point ()
+(ert-deftest bog-citekey-at-point-bob ()
   (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert citekey)
+      (goto-char (point-min))
+      (should (equal (bog-citekey-at-point) citekey)))))
+
+(ert-deftest bog-citekey-at-point-newline ()
+  (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert "\n" citekey)
+      (should (equal (bog-citekey-at-point) citekey)))))
+
+(ert-deftest bog-citekey-at-point-parens ()
+  (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert "\n(" citekey ")")
+      (backward-char 2)
+      (should (equal (bog-citekey-at-point) citekey)))))
+
+(ert-deftest bog-citekey-at-point-spaces ()
+  (let ((citekey "name2010word"))
+    (with-temp-buffer
+      (insert "\n " citekey " ")
+      (backward-char 2)
+      (should (equal (bog-citekey-at-point) citekey)))))
+
+(ert-deftest bog-citekey-at-point-with-hyphen ()
+  (let ((citekey "hyphen-name2010word"))
     (with-temp-buffer
       (insert citekey)
       (goto-char (point-min))
