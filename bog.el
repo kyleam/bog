@@ -317,8 +317,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
       (org-mode)
       (insert-file-contents file)
       (while (re-search-forward bog-citekey-format nil t)
-        (add-to-list 'refs (match-string-no-properties 0))))
-    refs))
+        (push (match-string-no-properties 0) refs)))
+    (-distinct refs)))
 
 (defun bog-heading-citekeys-in-file (file)
   (with-temp-buffer
