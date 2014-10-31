@@ -285,9 +285,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
         it)))
 
 (defun bog-citekey-from-property ()
-  (-when-let (prop (org-entry-get (point) bog-citekey-property))
-    (when (bog-citekey-p prop)
-      prop)))
+  (--when-let (org-entry-get (point) bog-citekey-property)
+    (when (bog-citekey-p it) it)))
 
 (defun bog-citekey-p (text)
   (when (string-match-p (format "^%s$" bog-citekey-format) text)
