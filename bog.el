@@ -225,7 +225,7 @@ be called with no arguments. If
 
 (bog-selection-method "point-or-buffer-headings"
                       bog-citekey-at-point
-                      bog-heading-citekeys-in-buffer)
+                      bog-heading-citekeys-in-wide-buffer)
 
 (bog-selection-method "point-or-all-headings"
                       bog-citekey-at-point
@@ -312,30 +312,25 @@ be preceded by a characters in `bog-allowed-before-citekey'."
         bog--all-heading-citekeys nil))
 
 (defun bog-citekeys-in-file (file)
-  (let ((was-open (org-find-base-buffer-visiting file))
-        (buffer (find-file-noselect file))
-        refs)
-    (with-current-buffer buffer
-      (org-with-wide-buffer
-       (goto-char (point-min))
-       (while (re-search-forward bog-citekey-format nil t)
-         (add-to-list 'refs (match-string-no-properties 0)))))
-    (unless was-open
-      (kill-buffer buffer))
+  (let (refs)
+    (with-temp-buffer
+      (org-mode)
+      (insert-file-contents file)
+      (while (re-search-forward bog-citekey-format nil t)
+        (add-to-list 'refs (match-string-no-properties 0))))
     refs))
 
 (defun bog-heading-citekeys-in-file (file)
-  (let ((was-open (org-find-base-buffer-visiting file))
-        (buffer (find-file-noselect file))
-        citekeys)
-    (with-current-buffer buffer
-      (save-excursion
-        (setq citekeys (bog-heading-citekeys-in-buffer))))
-    (unless was-open
-      (kill-buffer buffer))
-    citekeys))
+  (with-temp-buffer
+    (org-mode)
+    (insert-file-contents file)
+    (setq citekeys (bog-heading-citekeys-in-buffer))))
 
 (defun bog-heading-citekeys-in-buffer ()
+  (--keep it
+          (org-map-entries 'bog-citekey-from-heading)))
+
+(defun bog-heading-citekeys-in-wide-buffer ()
   (--keep it
           (org-map-entries 'bog-citekey-from-heading nil 'file)))
 
@@ -510,24 +505,24 @@ one entry per BibTeX file."
       (bog-prepare-bib-file it t bog-bib-directory))))
 
 (defun bog-prepare-bib-file (file &optional new-key new-directory)
-  (let ((was-open (find-buffer-visiting file))
-        (buffer (find-file-noselect file)))
-    (with-current-buffer buffer
-      (save-excursion
-        (goto-char (point-min))
-        (bibtex-skip-to-valid-entry)
-        (bibtex-clean-entry new-key)
-        (let* ((citekey (bibtex-key-in-head))
-               (bib-file
-                (expand-file-name (concat citekey ".bib") new-directory)))
-          (when (get-buffer bib-file)
-            (user-error "Buffer for %s already exists" bib-file))
-          (rename-file file bib-file)
-          (rename-buffer bib-file)
-          (set-visited-file-name bib-file)
-          (save-buffer))))
-    (unless was-open
-      (kill-buffer buffer))))
+  (let (bib-file)
+    (with-temp-buffer
+      (bibtex-mode)
+      (insert-file-contents file)
+      (bibtex-skip-to-valid-entry)
+      (bibtex-clean-entry new-key)
+      (setq bib-file (expand-file-name (concat (bibtex-key-in-head) ".bib")
+                                       new-directory))
+      (write-file bib-file))
+    ;; If a buffer was visiting the original bib file, point it to the
+    ;; new file.
+    (--when-let (find-buffer-visiting file)
+      (with-current-buffer it
+        (when (get-buffer bib-file)
+          (user-error "Buffer for %s already exists" bib-file))
+        (rename-buffer bib-file)
+        (set-visited-file-name bib-file nil t)))
+    (delete-file file)))
 
 ;;;###autoload
 (defun bog-create-combined-bib ()
@@ -565,7 +560,9 @@ occur in buffer instead of alphabetical order."
 If `bog-bib-file' is non-nil, it returns citekeys from this file
 instead of citekeys from file names in `bog-bib-directory'."
   (if bog-bib-file
-      (with-current-buffer (find-file-noselect bog-bib-file)
+      (with-temp-buffer
+        (bibtex-mode)
+        (insert-file-contents bog-bib-file)
         (-map 'car (bibtex-parse-keys)))
     (-map 'file-name-base
           (file-expand-wildcards (concat
@@ -760,7 +757,7 @@ argument CURRENT-BUFFER, limit to heading citekeys from the
 current buffer."
   (interactive "P")
   (let ((citekey-func (if current-buffer
-                          'bog-heading-citekeys-in-buffer
+                          'bog-heading-citekeys-in-wide-buffer
                         'bog-all-heading-citekeys)))
     (insert (bog-select-citekey (funcall citekey-func)))))
 
