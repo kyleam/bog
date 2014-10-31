@@ -280,9 +280,9 @@ be preceded by a characters in `bog-allowed-before-citekey'."
       (bog-citekey-from-property)))
 
 (defun bog-citekey-from-heading-title ()
-  (--if-let (ignore-errors (org-no-properties (org-get-heading t t)))
-      (when (bog-citekey-p it)
-        it)))
+  (unless (org-before-first-heading-p)
+    (let ((heading (org-no-properties (org-get-heading t t))))
+      (when (bog-citekey-p heading) heading))))
 
 (defun bog-citekey-from-property ()
   (--when-let (org-entry-get (point) bog-citekey-property)
