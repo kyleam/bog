@@ -386,8 +386,7 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
-    (bog-rename-staged-file citekey)))
+  (bog-rename-staged-file (bog-citekey-from-notes-or-all no-context)))
 
 (defun bog-rename-staged-file (citekey)
   (let* ((staged-files (bog-staged-files))
@@ -464,8 +463,8 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all BibTeX files. This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes-or-bibs no-context)))
-    (funcall bog-find-citekey-bib-func citekey)))
+  (funcall bog-find-citekey-bib-func
+           (bog-citekey-from-notes-or-bibs no-context)))
 
 (defun bog-find-citekey-bib-file (citekey)
   "Open BibTeX file of CITEKEY contained in `bog-bib-directory'."
@@ -585,17 +584,14 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes-or-all no-context)))
-    (bog-open-citekey-on-web citekey)))
+  (bog-open-citekey-on-web (bog-citekey-from-notes-or-all no-context)))
 
 (defun bog-open-citekey-on-web (citekey)
-  (let ((url (bog-citekey-as-search-url citekey)))
-    (browse-url url)))
+  (browse-url (bog-citekey-as-search-url citekey)))
 
 (defun bog-citekey-as-search-url (citekey)
   "Return URL to use for search."
-  (let ((query (bog-citekey-groups-with-delim citekey "+")))
-    (format bog-web-search-url query)))
+  (format bog-web-search-url (bog-citekey-groups-with-delim citekey "+")))
 
 
 ;;; Notes-related
