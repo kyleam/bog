@@ -355,16 +355,13 @@ opened if locating a citekey from context fails."
          (citekey-files (bog-citekey-files citekey))
          (citekey-file-names (-map 'file-name-nondirectory citekey-files))
          (num-choices (length citekey-file-names)))
-    (cond
-     ((= 0 num-choices)
-      (user-error "No file found for %s" citekey))
-     ((= 1 num-choices)
-      (setq citekey-file (car citekey-files)))
-     (t
-      (setq citekey-file
-            (expand-file-name (org-icompleting-read "Select file: "
-                                                    citekey-file-names)
-                              bog-file-directory))))
+    (case num-choices
+      (0 (user-error "No file found for %s" citekey))
+      (1 (setq citekey-file (car citekey-files)))
+      (t (setq citekey-file (expand-file-name
+                             (org-icompleting-read "Select file: "
+                                                   citekey-file-names)
+                             bog-file-directory))))
     (org-open-file citekey-file)))
 
 (defun bog-citekey-files (citekey)
@@ -397,17 +394,13 @@ If the citekey file prompt is slow to appear, consider enabling
          (staged-file-names (-map 'file-name-nondirectory staged-files))
          (num-choices (length staged-file-names))
          staged-file)
-    (cond
-     ((= 0 num-choices)
-      (setq staged-file (org-iread-file-name "Select file to rename: ")))
-     ((= 1 num-choices)
-      (setq staged-file (car staged-files)))
-     (t
-      (setq staged-file
-            (expand-file-name
-             (org-icompleting-read "Select file to rename: "
-                                   staged-file-names)
-             bog-stage-directory))))
+    (case num-choices
+      (0 (setq staged-file (org-iread-file-name "Select file to rename: ")))
+      (1 (setq staged-file (car staged-files)))
+      (t (setq staged-file (expand-file-name
+                            (org-icompleting-read "Select file to rename: "
+                                                  staged-file-names)
+                            bog-stage-directory))))
     (message "Renamed %s to %s" staged-file
              (funcall bog-file-renaming-func staged-file citekey))))
 
