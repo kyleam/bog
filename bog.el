@@ -246,7 +246,7 @@ year, and the first meaningful word in the title)."
   (let ((groups (or groups '(1 2 3)))
         (delim (or delim " ")))
     (string-match bog-citekey-format citekey)
-    (mapconcat #'(lambda (g) (match-string-no-properties g citekey))
+    (mapconcat (lambda (g) (match-string-no-properties g citekey))
                groups delim)))
 
 (defun bog-citekey-at-point ()
@@ -721,14 +721,14 @@ SORTING-TYPE is a character passed to `org-sort-entries'. If nil,
 ?a is used. The level to sort is determined by
 `bog-topic-heading-level'."
   (interactive)
-  (org-map-entries '(lambda () (bog-sort-if-topic-header sorting-type))))
+  (org-map-entries (lambda () (bog-sort-if-topic-header sorting-type))))
 
 (defun bog-sort-topic-headings-in-notes (&optional sorting-type)
   "Sort topic headings in notes.
 Unlike `bog-sort-topic-headings-in-buffer', sort topic headings
 in all Bog notes."
   (interactive)
-  (org-map-entries '(lambda ()  (bog-sort-if-topic-header sorting-type))
+  (org-map-entries (lambda ()  (bog-sort-if-topic-header sorting-type))
                    nil (bog-notes-files)))
 
 (defun bog-sort-if-topic-header (sorting-type)
