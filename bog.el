@@ -693,9 +693,15 @@ With prefix argument TODO-ONLY, only TODO entries are searched."
 
 (defun bog-search-notes-for-citekey (&optional todo-only)
   "Search notes for citekey using `org-search-view'.
-With prefix argument TODO-ONLY, only TODO entries are searched."
+
+With prefix argument TODO-ONLY, only TODO entries are searched.
+
+The citekey will be taken from the text under point if it matches
+`bog-citekey-format' or from the current tree. If a citekey is
+not found, a prompt will open to select from all citekeys present
+in notes."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes))
+  (let ((citekey (bog-citekey-from-notes-or-all nil))
         (lprops '((org-agenda-files (bog-notes-files))
                   (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
