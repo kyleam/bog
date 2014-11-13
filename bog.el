@@ -682,14 +682,16 @@ level `bog-refile-maxlevel' are considered."
    (concat (file-name-as-directory bog-notes-directory)
            "*.org")))
 
-(defun bog-search-notes (&optional todo-only)
+(defun bog-search-notes (&optional todo-only string)
   "Search notes using `org-search-view'.
-With prefix argument TODO-ONLY, only TODO entries are searched."
+With prefix argument TODO-ONLY, only TODO entries are searched.
+If STRING is non-nil, this will be used as the search
+term (instead of prompting the user for one)."
   (interactive "P")
   (let ((lprops '((org-agenda-files (bog-notes-files))
                   (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
-    (org-let lprops '(org-search-view todo-only))))
+    (org-let lprops '(org-search-view todo-only string))))
 
 (defun bog-search-notes-for-citekey (&optional todo-only)
   "Search notes for citekey using `org-search-view'.
@@ -701,11 +703,7 @@ The citekey will be taken from the text under point if it matches
 not found, a prompt will open to select from all citekeys present
 in notes."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes-or-all nil))
-        (lprops '((org-agenda-files (bog-notes-files))
-                  (org-agenda-text-search-extra-files nil))))
-    (put 'org-agenda-redo-command 'org-lprops lprops)
-    (org-let lprops '(org-search-view todo-only citekey))))
+  (bog-search-notes todo-only (bog-citekey-from-notes-or-all nil)))
 
 (defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
   "Sort topic headings in this buffer.
