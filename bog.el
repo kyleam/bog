@@ -132,8 +132,7 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   "Characters allowed to follow the citekey in file names.
 When `bog-find-citekey-file' is run on <citekey>, it will find
 files with the format <citekey>.* and <citekey><sep>*.<ext>,
-where <sep> is one of the characters in
-`bog-citekey-file-name-separators'.")
+where <sep> is one of these characters.")
 
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
   "Function used to rename staged files.
