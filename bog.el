@@ -104,11 +104,12 @@ rename."
 (defcustom bog-find-citekey-bib-func 'bog-find-citekey-bib-file
   "Function used to find BibTeX entry for citekey.
 
-Default is `bog-find-citekey-bib-file' that locates single entry
-BibTeX files in `bog-bib-directory'.
+Default is `bog-find-citekey-bib-file', which locates single
+entry BibTeX files in `bog-bib-directory'.
 
-The other option is `bog-find-citekey-entry' that searches within
-a single BibTeX file, `bog-bib-file', for the citekey entry."
+The other option is `bog-find-citekey-entry', which searches
+within a single BibTeX file, `bog-bib-file', for the citekey
+entry."
   :group 'bog
   :type 'function)
 
