@@ -461,6 +461,9 @@ used to control the default string used in the prompt."
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
+The variable `bog-find-citekey-bib-func' determines how the
+citekey is found.
+
 With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all BibTeX files. This same prompt will be
 opened if locating a citekey from context fails."
