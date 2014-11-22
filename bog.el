@@ -485,8 +485,8 @@ opened if locating a citekey from context fails."
   "Clean and rename BibTeX files in `bog-stage-directory'.
 
 New BibTeX files are searched for in `bog-stage-directory', and
-`bog-prepare-bib-file' will be run one each file before it is
-moved to `bog-bib-directory'/<citekey>.bib.
+`bibtex-clean-entry' will be run one each file before it is moved
+to `bog-bib-directory'/<citekey>.bib.
 
 This function is only useful if you use the non-standard setup of
 one entry per BibTeX file."
@@ -495,9 +495,9 @@ one entry per BibTeX file."
          (file-expand-wildcards
           (concat (file-name-as-directory bog-stage-directory) "*.bib"))))
     (--each staged
-      (bog-prepare-bib-file it t bog-bib-directory))))
+      (bog--prepare-bib-file it t bog-bib-directory))))
 
-(defun bog-prepare-bib-file (file &optional new-key new-directory)
+(defun bog--prepare-bib-file (file &optional new-key new-directory)
   (let (bib-file)
     (with-temp-buffer
       (bibtex-mode)

@@ -226,9 +226,9 @@
 
 ;;; BibTeX functions
 
-;; `bog-prepare-bib-file'
+;; `bog--prepare-bib-file'
 
-(ert-deftest bog-prepare-bib-file ()
+(ert-deftest bog--prepare-bib-file ()
   (bog-tests--with-temp-dir
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
@@ -243,14 +243,14 @@
                 "\n}")
         (save-buffer))
       (kill-buffer (get-file-buffer temp-file))
-      (bog-prepare-bib-file temp-file)
+      (bog--prepare-bib-file temp-file)
       (should-not (file-exists-p temp-file))
       (let* ((new-file (concat citekey ".bib"))
              (new-buffer (get-file-buffer new-file)))
         (should-not new-buffer)
         (delete-file new-file)))))
 
-(ert-deftest bog-prepare-bib-file-was-open ()
+(ert-deftest bog--prepare-bib-file-was-open ()
   (bog-tests--with-temp-dir
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
@@ -264,7 +264,7 @@
                 "year = 2009,\n"
                 "\n}")
         (save-buffer))
-      (bog-prepare-bib-file temp-file)
+      (bog--prepare-bib-file temp-file)
       (should-not (file-exists-p temp-file))
       (let* ((new-file (concat citekey ".bib"))
              (new-buffer (get-file-buffer new-file)))
