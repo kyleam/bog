@@ -597,7 +597,7 @@ If the citekey file prompt is slow to appear, consider enabling
   (browse-url (bog-citekey-as-search-url citekey)))
 
 (defun bog-citekey-as-search-url (citekey)
-  "Return URL to use for search."
+  "Return URL to use for CITEKEY search."
   (format bog-web-search-url (bog-citekey-groups-with-delim citekey "+")))
 
 
