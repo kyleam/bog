@@ -194,6 +194,10 @@ be called with no arguments. If CONTEXT-METHOD returns nil or if
 NO-CONTEXT is non-nil, the user will be prompted with citekeys
 gathered by COLLECTION-METHOD."
   `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
+     ,(format "Select citekey with `%s', falling back on `%s'.
+If NO-CONTEXT is non-nil, immediately fall back."
+              (symbol-name context-method)
+              (symbol-name collection-method))
       (or (and no-context (bog-select-citekey (,collection-method)))
           (,context-method)
           (bog-select-citekey (,collection-method)))))
