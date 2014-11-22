@@ -343,9 +343,9 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all associated files. This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
-  (bog-open-citekey-file (bog-citekey-from-notes-or-files no-context)))
+  (bog--find-citekey-file (bog-citekey-from-notes-or-files no-context)))
 
-(defun bog-open-citekey-file (citekey)
+(defun bog--find-citekey-file (citekey)
   (let* (citekey-file
          (citekey-files (bog-citekey-files citekey))
          (citekey-file-names (-map 'file-name-nondirectory citekey-files))
@@ -384,9 +384,9 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (bog-rename-staged-file (bog-citekey-from-notes-or-all no-context)))
+  (bog--rename-staged-file-to-citekey (bog-citekey-from-notes-or-all no-context)))
 
-(defun bog-rename-staged-file (citekey)
+(defun bog--rename-staged-file-to-citekey (citekey)
   (let* ((staged-files (bog-staged-files))
          (staged-file-names (-map 'file-name-nondirectory staged-files))
          (num-choices (length staged-file-names))
@@ -587,9 +587,9 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (bog-open-citekey-on-web (bog-citekey-from-notes-or-all no-context)))
+  (bog--search-citekey-on-web (bog-citekey-from-notes-or-all no-context)))
 
-(defun bog-open-citekey-on-web (citekey)
+(defun bog--search-citekey-on-web (citekey)
   (browse-url (bog-citekey-as-search-url citekey)))
 
 (defun bog-citekey-as-search-url (citekey)
