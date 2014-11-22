@@ -333,8 +333,7 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all associated files. This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
-  (let ((citekey (bog-citekey-from-notes-or-files no-context)))
-    (bog-open-citekey-file citekey)))
+  (bog-open-citekey-file (bog-citekey-from-notes-or-files no-context)))
 
 (defun bog-open-citekey-file (citekey)
   (let* (citekey-file
