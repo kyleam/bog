@@ -266,20 +266,24 @@ be preceded by a characters in `bog-allowed-before-citekey'."
       (bog-citekey-from-property)))
 
 (defun bog-citekey-from-heading-title ()
+  "Retrieve citekey from heading title."
   (unless (org-before-first-heading-p)
     (let ((heading (org-no-properties (org-get-heading t t))))
       (when (bog-citekey-p heading) heading))))
 
 (defun bog-citekey-from-property ()
+  "Retrieve citekey from `bog-citekey-property'."
   (--when-let (org-entry-get (point) bog-citekey-property)
     (when (bog-citekey-p it) it)))
 
 (defun bog-citekey-p (text)
+  "Does TEXT match `bog-citekey-format'?"
   (when (string-match-p (format "^%s$" bog-citekey-format) text)
     t))
 
 (defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
+  "Return all citekeys in `bog-notes-files'."
   (or (and bog-use-citekey-cache bog--all-citekeys)
       (setq bog--all-citekeys (apply 'append
                                     (-map 'bog-citekeys-in-file
@@ -287,16 +291,19 @@ be preceded by a characters in `bog-allowed-before-citekey'."
 
 (defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
+  "Return all citekeys in headings of `bog-notes-files'."
   (or (and bog-use-citekey-cache bog--all-heading-citekeys)
       (setq bog--all-heading-citekeys (-mapcat 'bog-heading-citekeys-in-file
                                                (bog-notes-files)))))
 
 (defun bog-clear-citekey-cache ()
+  "Clear cache of citekeys contained in `bog-notes-files'."
   (interactive)
   (setq bog--all-citekeys nil
         bog--all-heading-citekeys nil))
 
 (defun bog-citekeys-in-file (file)
+  "Return all citekeys in FILE."
   (let (refs)
     (with-temp-buffer
       (org-mode)
@@ -306,16 +313,19 @@ be preceded by a characters in `bog-allowed-before-citekey'."
     (-distinct refs)))
 
 (defun bog-heading-citekeys-in-file (file)
+  "Return all citekeys in headings of FILE."
   (with-temp-buffer
     (org-mode)
     (insert-file-contents file)
     (setq citekeys (bog-heading-citekeys-in-buffer))))
 
 (defun bog-heading-citekeys-in-buffer ()
+  "Return all citekeys in current buffer."
   (--keep it
           (org-map-entries 'bog-citekey-from-heading)))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
+  "Return all citekeys in current buffer, without any narrowing."
   (--keep it
           (org-map-entries 'bog-citekey-from-heading nil 'file)))
 
@@ -350,6 +360,9 @@ opened if locating a citekey from context fails."
     (org-open-file citekey-file)))
 
 (defun bog-citekey-files (citekey)
+  "Return files in `bog-file-directory' associated with CITEKEY.
+These should be named CITEKEY<sep>*.<ext>, where <sep> is a
+character in `bog-citekey-file-name-separators'."
   (let* ((patterns (--map (concat it "*") bog-citekey-file-name-separators))
          (patterns (cons ".*" patterns)))
     (--mapcat (file-expand-wildcards
@@ -413,6 +426,7 @@ used to control the default string used in the prompt."
     citekey-file))
 
 (defun bog-citekey-as-file (citekey ext)
+  "Return file name `bog-file-directory'/CITEKEY.<ext>."
   (expand-file-name (concat citekey "." ext) bog-file-directory))
 
 (defun bog-all-file-citekeys ()
@@ -420,16 +434,19 @@ used to control the default string used in the prompt."
   (-distinct (-keep 'bog-file-citekey (bog-all-citekey-files))))
 
 (defun bog-file-citekey (file)
+  "Return leading citekey part from base name of FILE."
   (let ((fname (file-name-base file)))
     (when (string-match (concat "^" bog-citekey-format) fname)
       (match-string 0 fname))))
 
 (defun bog-all-citekey-files ()
+  "Return list of all files in `bog-file-directory'."
   (-remove 'file-directory-p
            (directory-files bog-file-directory
                             t directory-files-no-dot-files-regexp)))
 
 (defun bog-staged-files ()
+  "Return files in `bog-stage-directory'."
   (-remove 'file-directory-p
            (directory-files bog-stage-directory
                             t directory-files-no-dot-files-regexp)))
@@ -531,6 +548,7 @@ alphabetically."
       refs)))
 
 (defun bog-citekey-as-bib (citekey)
+  "Return file name `bog-bib-directory'/CITEKEY.bib."
   (expand-file-name (concat citekey ".bib") bog-bib-directory))
 
 (defun bog-bib-citekeys ()
@@ -677,6 +695,7 @@ level `bog-refile-maxlevel' are considered."
     (org-refile)))
 
 (defun bog-notes-files ()
+  "Return Org files in `bog-notes-files'."
   (file-expand-wildcards
    (concat (file-name-as-directory bog-notes-directory)
            "*.org")))
