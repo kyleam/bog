@@ -263,7 +263,7 @@ be preceded by a characters in `bog-allowed-before-citekey'."
      maybe-citekey)))
 
 (defun bog-citekey-from-heading ()
-  "Retrieve citekey from current heading title."
+  "Retrieve citekey from current heading title or property."
   (or (bog-citekey-from-heading-title)
       (bog-citekey-from-property)))
 
