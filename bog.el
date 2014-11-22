@@ -191,8 +191,9 @@ added citekeys, clear the cache with `bog-clear-citekey-cache'."
   "Create citekey selection function.
 Function will be named bog-citekey-from-NAME and will take one
 argument (NO-CONTEXT). If NO-CONTEXT is nil, CONTEXT-METHOD will
-be called with no arguments. If
-"
+be called with no arguments. If CONTEXT-METHOD returns nil or if
+NO-CONTEXT is non-nil, the user will be prompted with citekeys
+gathered by COLLECTION-METHOD."
   `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
       (or (and no-context (bog-select-citekey (,collection-method)))
           (,context-method)
