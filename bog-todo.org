@@ -1,6 +1,6 @@
 #+typ_todo: BUG(b) ENH(e) DOC(d) | DONE(n) CANCELED(c@)
 #+tags: maybe
-
+#+startup: nologdone
 
 * General
 
@@ -9,7 +9,6 @@
 Some citekeys are not highlighed until the surrounding text is altered.
 
 ** DONE Function for getting all citekeys in notes
-   CLOSED: [2014-05-24 Sat 21:44]
 
 Perhaps use a cache file. This could be used in
 `bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
@@ -21,7 +20,6 @@ Perhaps use a cache file. This could be used in
 - git annex: Store and sync associated PDF files using git annex.
 
 ** DONE Installation instructions
-   CLOSED: [2014-05-24 Sat 21:44]
 
 * Notes
 
@@ -46,7 +44,6 @@ Default could be "*.tex".
 * PDF files
 
 ** DONE Generalize PDF functions in bog
-   CLOSED: [2014-04-26 Sat 17:01]
 
 Replace bog-find-citekey-pdf with bog-find-citekey-file. The extensions
 that will be considered could be customized. Rebind this to "f".
@@ -55,7 +52,6 @@ bog-rename-staged-file-to-citekey and could use the same customized
 extensions (or maybe just take the extension from the original file).
 
 ** DONE Use `org-file-apps' instead of `bog-pdf-opener'
-   CLOSED: [2014-04-02 Wed 23:30]
 
 * Testing
 
@@ -69,49 +65,38 @@ I'm thinking mainly of temporary Org buffers.
 
 ** v0.6.0
 *** CANCELED Switch from obsolete `flet' to `noflet'
-    CLOSED: [2014-02-12 Wed 00:50]
     - State "CANCELED"   from "ENH"        [2014-02-12 Wed 00:50] \\
       Removed `flet`, but with set up of `bog-citekey-action', a replacement
       funciton can be passed instead of using `noflet`.
 
 *** DONE Map basename to full name for PDF rename
-   CLOSED: [2014-02-15 Sat 15:07]
 
 When more than one file in staged, completing read prompts with full
 paths, which is inconvenient if using default completing read function.
 
 *** DONE Better handling of multiple PDFs
-   CLOSED: [2014-03-04 Tue 00:49]
 
 If multiple PDFs for a citekey, complete read.
 
 *** DONE Use a stage for new BibTeX files
-   CLOSED: [2014-02-15 Sat 15:06]
 
 Avoid filtering all bib file names.
 
 *** DONE [#A] Make `bog-find-citekey-bib' compatible with a single BibTeX file
-    CLOSED: [2014-02-07 Fri 01:16]
 
 *** DONE Refiling for just bib notes
-   CLOSED: [2014-02-16 Sun 00:40]
 
 Redefine org refile targets.
 
 *** DONE [#A] Allow citekeys to be properties instead of headings
-    CLOSED: [2014-02-06 Thu 00:31]
 
 *** DONE Suggest keybindings
-    CLOSED: [2014-02-08 Sat 02:37]
 
 *** DONE Describe BibTeX autokey settings for `bog-citekey-format'
-    CLOSED: [2014-02-08 Sat 00:32]
 
 *** CANCELED Citekey selection if locating fails
-    CLOSED: [2014-03-16 Sun 17:59]
     - State "CANCELED"   from "ENH"        [2014-03-16 Sun 17:59] \\
       For now, I will stick to issuing an error message if no citekey is
       found, and only prompting if a prefix argument is given.
 
 *** DONE [#A] Add README
-    CLOSED: [2014-02-03 Mon 01:53]
