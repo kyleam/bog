@@ -106,6 +106,7 @@ Other useful functions include
 - =bog-sort-topic-headings-in-buffer=
 - =bog-sort-topic-headings-in-notes=
 - =bog-insert-heading-citekey=
+- =bog-open-first-citekey-link=
 
 * Variables
 
