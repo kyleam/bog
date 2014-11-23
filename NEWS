@@ -18,9 +18,12 @@
   custom Bog commands for the Org agenda have been removed because this
   functionality is now available through =bog-commander=.
 
-- Add command =bog-citekey-tree-to-indirect-buffer=.
+- New command =bog-citekey-tree-to-indirect-buffer= opens the subtree
+  for a citekey in an indirect buffer. The citekey is either taken from
+  at point or selected from all heading citekeys.
 
-- Add command =bog-insert-heading-citekey=.
+- New command =bog-insert-heading-citekey= prompts with all heading
+  citekeys and inserts the selected one at point.
 
 ** Other changes
 
