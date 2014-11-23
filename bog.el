@@ -771,10 +771,7 @@ current buffer."
 ;;; Font-lock
 
 (defface bog-citekey-face
-  '((((class color) (background dark))
-     (:bold t))
-    (((class color) (background light))
-     (:bold t)))
+  '((t (:inherit org-link :underline nil)))
   "Face used to highlight text that matches `bog-citekey-format'.")
 
 (defun bog-non-heading-citekey-p (limit)
