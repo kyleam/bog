@@ -774,19 +774,11 @@ current buffer."
   '((t (:inherit org-link :underline nil)))
   "Face used to highlight text that matches `bog-citekey-format'.")
 
-(defun bog-non-heading-citekey-p (limit)
-  (and (re-search-forward bog-citekey-format limit t)
-       (not (org-at-heading-p))))
-
-(defun bog-add-fontlock ()
-  (font-lock-add-keywords nil
-                          '((bog-non-heading-citekey-p . 'bog-citekey-face)))
-  (font-lock-fontify-buffer))
-
-(defun bog-remove-fontlock ()
-  (font-lock-remove-keywords nil
-                             '((bog-non-heading-citekey-p . 'bog-citekey-face)))
-  (font-lock-fontify-buffer))
+(defun bog-fontify-non-heading-citekeys (limit)
+  (while (re-search-forward bog-citekey-format limit t)
+    (unless (save-match-data (org-at-heading-p))
+      (add-text-properties (match-beginning 0) (match-end 0)
+                           '(face bog-citekey-face)))))
 
 
 ;;; Commander
@@ -903,9 +895,11 @@ ARG is omitted or nil.
   :require 'bog
   (cond
    (bog-mode
-    (bog-add-fontlock))
+    (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+    (font-lock-fontify-buffer))
    (t
-    (bog-remove-fontlock))))
+    (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+    (font-lock-fontify-buffer))))
 
 (provide 'bog)
 

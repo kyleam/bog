@@ -4,7 +4,7 @@
 
 * General
 
-** BUG Inconsistent face highlighting
+** DONE Inconsistent face highlighting
 
 Some citekeys are not highlighed until the surrounding text is altered.
 
