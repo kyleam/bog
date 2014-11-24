@@ -657,8 +657,7 @@ If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker
-          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+         (marker (bog--find-exact-heading-in-notes citekey)))
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))
@@ -668,6 +667,14 @@ buffer, the narrowing is removed."
           (goto-char marker)
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
+
+(defun bog--find-exact-heading-in-notes (heading)
+  "Return the marker of HEADING in Bog notes.
+If the current buffer is a Bog notes file, try to find the
+heading there first."
+  (or (when (member (buffer-file-name) (bog-notes-files))
+        (org-find-exact-headline-in-buffer heading))
+      (org-find-exact-heading-in-directory heading bog-notes-directory)))
 
 (defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
   "Open subtree for citekey in an indirect buffer.
@@ -683,8 +690,7 @@ If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker
-          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+         (marker (bog--find-exact-heading-in-notes citekey)))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (save-excursion
@@ -778,8 +784,7 @@ from all citekeys for headings in notes. This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker
-          (org-find-exact-heading-in-directory citekey bog-notes-directory)))
+         (marker (bog--find-exact-heading-in-notes citekey)))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (org-with-wide-buffer
