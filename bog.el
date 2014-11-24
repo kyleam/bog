@@ -1,6 +1,6 @@
 ;;; bog.el --- Extensions for research notes in Org mode
 
-;; Copyright (C) 2013 Kyle Meyer <kyle@kyleam.com>
+;; Copyright (C) 2013-2014 Kyle Meyer <kyle@kyleam.com>
 
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 ;; URL: https://github.com/kyleam/bog
