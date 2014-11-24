@@ -1,3 +1,4 @@
+# -*- mode: org -*-
 #+typ_todo: BUG(b) ENH(e) DOC(d) | DONE(n) CANCELED(c@)
 #+tags: maybe
 #+startup: nologdone
