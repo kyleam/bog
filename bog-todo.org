@@ -57,7 +57,7 @@ extensions (or maybe just take the extension from the original file).
 
 ** ENH Ability to run tests from makefile
 
-** ENH Put some of the common setup in macros
+** DONE Put some of the common setup in macros
 
 I'm thinking mainly of temporary Org buffers.
 

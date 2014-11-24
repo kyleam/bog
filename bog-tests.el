@@ -34,6 +34,33 @@
            (let ((default-directory ,dir)) ,@body)
          (delete-directory ,dir t)))))
 
+;; Modified from org-tests.el.
+(defmacro bog-tests--with-temp-text (text &rest body)
+  "Run body in a temporary buffer with Org-mode buffer.
+Insert TEXT in buffer.
+
+If string \"<citekey>\" appears in TEXT, replace it with the
+value of the variable `citekey'.
+
+If the string \"<point>\" appears in TEXT then remove it and
+place the point there before running BODY, otherwise place the
+point at the beginning of the inserted text."
+  (declare (indent 1))
+  `(let* ((inside-text (if (stringp ,text) ,text (eval ,text)))
+          (is-citekey (string-match "<citekey>" inside-text)))
+     (when (and is-citekey citekey)
+       (setq inside-text (replace-match citekey nil nil inside-text)))
+     (with-temp-buffer
+       (org-mode)
+       (let ((point (string-match "<point>" inside-text)))
+         (if point
+             (progn
+               (insert (replace-match "" nil nil inside-text))
+               (goto-char (1+ (match-beginning 0))))
+           (insert inside-text)
+           (goto-char (point-min))))
+       ,@body)))
+
 
 ;;; Citekey functions
 
@@ -101,91 +128,118 @@
 
 (ert-deftest bog-citekey-from-heading-title-current-level ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert (format "\n* top level\n\n** %s\n\nsome text\n"
-                      citekey))
-      (org-mode)
-      (show-all)
+    (bog-tests--with-temp-text
+        "
+* top level
+** <citekey>
+some text
+<point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-heading-title-in-parent ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert (format "\n* top level\n\n** %s\n\n*** subheading\n\nsome text\n"
-                      citekey))
-      (org-mode)
-      (show-all)
+    (bog-tests--with-temp-text
+        "
+* top level
+** <citekey>
+*** subheading
+some text
+<point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-heading-title-on-heading ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert (format "\n* top level\n\n** %s\n\nsome text\n"
-                      citekey))
-      (org-mode)
-      (show-all)
-      (re-search-backward bog-citekey-format)
+    (bog-tests--with-temp-text
+        "
+* top level
+** <citekey><point>
+some text"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-current-level ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert "\n* top level\n\n** subhead\n"
-              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
-              ":END:\nsome text\n")
-      (org-mode)
-      (show-all)
+    (bog-tests--with-temp-text
+        "
+* top level
+** subhead
+   :PROPERTIES:
+   :CUSTOM_ID: <citekey>
+   :END:
+
+some text<point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-in-parent ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert "\n* top level\n"
-              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
-              ":END:\nsome text\n"
-              "** subhead\n\n")
-      (org-mode)
-      (show-all)
+    (bog-tests--with-temp-text
+        "
+* top level
+  :PROPERTIES:
+  :CUSTOM_ID: <citekey>
+  :END:
+
+some text
+
+** subhead
+<point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 (ert-deftest bog-citekey-from-property-on-heading ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert "\n* top level\n\n** subhead\n"
-              (format  ":PROPERTIES:\n:CUSTOM_ID: %s\n" citekey)
-              ":END:\nsome text\n")
-      (org-mode)
-      (show-all)
-      (org-back-to-heading)
+    (bog-tests--with-temp-text
+        "
+* top level
+** <point>subhead
+   :PROPERTIES:
+   :CUSTOM_ID: <citekey>
+   :END:
+some text"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
 ;; `bog-citekey-from-notes'
 
 (ert-deftest bog-citekey-from-notes-on-heading ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert (format "\n* top level\n\n** %s\n\nsome text\n"
-                      citekey))
-      (org-mode)
-      (show-all)
-      (re-search-backward bog-citekey-format)
+    (bog-tests--with-temp-text
+        "
+* top level
+** <point><citekey>
+some text"
       (should (equal (bog-citekey-from-notes) citekey)))))
 
-(ert-deftest bog-citekey-from-notes-on-in-text-citekey ()
+(ert-deftest bog-citekey-from-notes-before-text-citekey ()
   (let ((citekey "name2010word"))
-    (with-temp-buffer
-      (insert (format "\n* top level\n\n** other2000key\n\nsome text and %s\n"
-                      citekey))
-      (org-mode)
-      (show-all)
-      (re-search-backward bog-citekey-format)
+    (bog-tests--with-temp-text
+        "
+* top level
+** other2000key
+some text and <point><citekey>"
+      (should (equal (bog-citekey-from-notes) citekey)))))
+
+(ert-deftest bog-citekey-from-notes-after-text-citekey ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+* top level
+** other2000key
+some text and <citekey><point>"
+      (should (equal (bog-citekey-from-notes) citekey)))))
+
+(ert-deftest bog-citekey-from-notes-on-text-citekey ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+* top level
+** other2000key
+some text and <point><citekey>"
+      (forward-char)
       (should (equal (bog-citekey-from-notes) citekey)))))
 
 (ert-deftest bog-citekey-from-notes-no-citekey ()
-  (with-temp-buffer
-    (insert  "\n* top level\n\n** second\n\n")
-    (org-mode)
-    (show-all)
+  (bog-tests--with-temp-text
+      "
+* top level
+** second"
     (should-not (bog-citekey-from-notes))))
 
 
@@ -218,12 +272,11 @@
      (make-directory bog-stage-directory)
      (make-directory bog-file-directory)
      (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
-     (with-temp-buffer
-       (insert (format "\n* top level\n\n** %s\n\nsome text\n"
-                       citekey))
-       (org-mode)
-       (show-all)
-       (re-search-backward bog-citekey-format)
+     (bog-tests--with-temp-text
+         "
+* top level
+** <point><citekey>
+some text"
        (bog-rename-staged-file-to-citekey))
      (should (file-exists-p (expand-file-name
                              (concat citekey ".pdf") bog-file-directory)))
@@ -305,19 +358,18 @@
 ;; `bog-sort-topic-headings-in-buffer'
 
 (ert-deftest bog-sort-topic-headings-in-buffer ()
-  (with-temp-buffer
+  (bog-tests--with-temp-text
+      "
+* topic heading
+** zoo2000key
+** apple2000key
+
+* another topic heading
+** orange2000key
+** banana2000key
+** yogurt2000key"
     (let ((bog-topic-heading-level 1))
-      (insert  "\n* topic heading\n\n"
-               "** zoo2000key\n\nsome text\n\n"
-               "** apple2000key\n\nsome text\n"
-               "* another topic heading\n\n"
-               "** orange2000key\n\nsome text\n\n"
-               "** banana2000key\n\nsome text\n"
-               "** yogurt2000key\n\nsome text\n")
-      (org-mode)
-      (show-all)
       (bog-sort-topic-headings-in-buffer)
-      (goto-char 0)
       (outline-next-visible-heading 2)
       (should (equal (org-no-properties (org-get-heading t t))
                      "apple2000key"))
@@ -326,19 +378,17 @@
                      "banana2000key")))))
 
 (ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-heading ()
-  (with-temp-buffer
+  (bog-tests--with-temp-text
+      "
+* topic heading
+** zoo2000key
+** apple2000key
+* citekey2000heading
+** orange2000key
+** banana2000key
+** yogurt2000key"
     (let ((bog-topic-heading-level 1))
-      (insert  "\n* topic heading\n\n"
-               "** zoo2000key\n\nsome text\n\n"
-               "** apple2000key\n\nsome text\n"
-               "* citekey2000heading\n\n"
-               "** orange2000key\n\nsome text\n\n"
-               "** banana2000key\n\nsome text\n"
-               "** yogurt2000key\n\nsome text\n")
-      (org-mode)
-      (show-all)
       (bog-sort-topic-headings-in-buffer)
-      (goto-char 0)
       (outline-next-visible-heading 2)
       (should (equal (org-no-properties (org-get-heading t t))
                      "apple2000key"))
@@ -347,22 +397,21 @@
                      "orange2000key")))))
 
 (ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-property ()
-  (with-temp-buffer
+  (bog-tests--with-temp-text
+      (format  "
+* topic heading
+** zoo2000key
+** apple2000key
+* non-topic heading
+  :PROPERTIES:
+  :%s: citekey2000prop
+  :END:
+** orange2000key
+** banana2000key
+** yogurt2000key"
+               bog-citekey-property)
     (let ((bog-topic-heading-level 1))
-      (insert  "\n* topic heading\n\n"
-               "** zoo2000key\n\nsome text\n\n"
-               "** apple2000key\n\nsome text\n"
-               "* non-topic heading\n"
-               " :PROPERTIES:\n"
-               (format " :%s: citekey2000prop\n" bog-citekey-property)
-               " :END:\n"
-               "** orange2000key\n\nsome text\n\n"
-               "** banana2000key\n\nsome text\n"
-               "** yogurt2000key\n\nsome text\n")
-      (org-mode)
-      (show-all)
       (bog-sort-topic-headings-in-buffer)
-      (goto-char 0)
       (outline-next-visible-heading 2)
       (should (equal (org-no-properties (org-get-heading t t))
                      "apple2000key"))
@@ -371,19 +420,18 @@
                      "orange2000key")))))
 
 (ert-deftest bog-sort-topic-headings-in-buffer-passed-sorting-type ()
-  (with-temp-buffer
+  (bog-tests--with-temp-text
+      "
+* topic heading
+** zoo2000key
+** apple2000key
+
+* another topic heading
+** orange2000key
+** banana2000key
+** yogurt2000key"
     (let ((bog-topic-heading-level 1))
-      (insert  "\n* topic heading\n\n"
-               "** zoo2000key\n\nsome text\n\n"
-               "** apple2000key\n\nsome text\n"
-               "* another topic heading\n\n"
-               "** orange2000key\n\nsome text\n\n"
-               "** banana2000key\n\nsome text\n"
-               "** yogurt2000key\n\nsome text\n")
-      (org-mode)
-      (show-all)
       (bog-sort-topic-headings-in-buffer ?n)
-      (goto-char 0)
       (outline-next-visible-heading 2)
       (should (equal (org-no-properties (org-get-heading t t))
                      "zoo2000key"))
