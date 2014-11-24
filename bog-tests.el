@@ -22,6 +22,7 @@
 (require 'ert)
 (require 'org)
 (require 'dash)
+(require 'cl)
 (require 'bog)
 
 ;; Modified from magit-tests.el.
