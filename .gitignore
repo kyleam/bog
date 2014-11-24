@@ -1,1 +1,5 @@
 /bog-autoloads.el
+
+# Needed for `make test`
+.downloads
+dash.el
