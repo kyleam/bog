@@ -262,7 +262,10 @@ be preceded by a characters in `bog-allowed-before-citekey'."
   (org-with-wide-buffer
    (let (maybe-citekey)
      (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
-                 (org-up-heading-safe)))
+                 ;; This isn't actually safe in Org mode <= 8.2.10.
+                 ;; Fixed in Org mode commit
+                 ;; 9ba9f916e87297d863c197cb87199adbb39da894.
+                 (ignore-errors (org-up-heading-safe))))
      maybe-citekey)))
 
 (defun bog-citekey-from-heading ()
