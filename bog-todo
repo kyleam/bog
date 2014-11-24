@@ -56,7 +56,7 @@ extensions (or maybe just take the extension from the original file).
 
 * Testing
 
-** ENH Ability to run tests from makefile
+** DONE Ability to run tests from makefile
 
 ** DONE Put some of the common setup in macros
 
