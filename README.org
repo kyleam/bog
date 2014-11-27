@@ -2,6 +2,8 @@
 #+options: toc:nil
 #+startup: showall
 
+[[https://travis-ci.org/kyleam/bog][https://travis-ci.org/kyleam/bog.svg]]
+
 Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. It adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
