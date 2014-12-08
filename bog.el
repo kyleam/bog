@@ -835,20 +835,11 @@ to invoke.  Press \"?\" to describe available actions.
 
 See `def-bog-commander-method' for defining new methods."
   (interactive)
-  (message "Commander [%s]: "
-           (apply #'string (mapcar #'car bog-commander-methods)))
-  (let* ((ch (save-window-excursion
-               (select-window (minibuffer-window))
-               (read-char)))
-         (method (cl-find ch bog-commander-methods :key #'car)))
-    (cond (method
-           (funcall (cl-caddr method)))
-          (t
-           (message "No method for character: ?\\%c" ch)
-           (ding)
-           (sleep-for 1)
-           (discard-input)
-           (bog-commander)))))
+  (-let* ((choices (-map #'car bog-commander-methods))
+          (prompt (concat "Commander [" choices "]: "))
+          (ch (read-char-choice prompt choices))
+          ((_ _ fn) (assq ch bog-commander-methods)))
+    (funcall fn))  )
 
 (defmacro def-bog-commander-method (key description &rest body)
   "Define a new `bog-commander' method.
@@ -862,9 +853,9 @@ chosen."
   (let ((method `(lambda ()
                    ,@body)))
     `(setq bog-commander-methods
-           (cl-sort (cons (list ,key ,description ,method)
-                          (cl-remove ,key bog-commander-methods :key #'car))
-                    #'< :key #'car))))
+           (--sort (< (car it) (car other))
+                   (cons (list ,key ,description ,method)
+                         (assq-delete-all ,key bog-commander-methods))))))
 
 (def-bog-commander-method ?? "Commander help buffer."
   (ignore-errors (kill-buffer bog-commander-help-buffer))
