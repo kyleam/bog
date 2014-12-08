@@ -110,6 +110,9 @@ Other useful functions include
 - =bog-insert-heading-citekey=
 - =bog-open-first-citekey-link=
 
+You can try out many of the commands in
+[[file:example/notes/org-mode-pubs.org][example/notes/org-mode-pubs.org]].
+
 * Variables
 
 Several variables determine where Bog looks for things.

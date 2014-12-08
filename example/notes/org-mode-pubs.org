@@ -1,0 +1,87 @@
+#+startup: showall
+
+Before you start, tell Bog where things are.
+
+#+begin_src emacs-lisp :results silent
+  (setq bog-notes-directory (expand-file-name "./")
+        bog-bib-directory (expand-file-name "../bibs")
+        bog-file-directory (expand-file-name "../citekey-files")
+        bog-stage-directory) (expand-file-name "../stage")
+#+end_src
+
+Now start Bog with =M-x bog-mode= or
+
+#+begin_src emacs-lisp :results silent
+  (bog-mode 1)
+#+end_src
+
+The rest of this file is an example of how notes can be structured.
+
+------------------------------------------------------------------------
+
+* Books
+
+** dominik2010org
+
+The Org Mode 7 Reference Manual - Organize your life with GNU Emacs
+
+http://dl.acm.org/citation.cfm?id=1952135
+
+The BibTeX files are stored in =bog-bib-directory=.  You can open the
+file for the current heading with =bog-find-citekey-bib= (=C-c " b=).
+
+* Reproducible research
+
+** hinsen2011data
+
+A data and code model for reproducible research and executable papers
+
+doi:10.1016/j.procs.2011.04.061
+
+A new BibTeX file for this citekey has been downloaded to
+=bog-stage-directory=.  To prepare this file (and any other BibTeX
+file in that directory), run =bog-clean-and-rename-staged-bibs=.
+
+The BibTeX mode settings below make the automatically generated
+citekey match Bog's citekey format.
+
+#+begin_src emacs-lisp :results silent
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-titleword-length nil
+        bibtex-autokey-titlewords-stretch 0
+        bibtex-autokey-titlewords 1
+        bibtex-autokey-year-title-separator "")
+#+end_src
+
+** TODO schulte2011active
+
+Active documents with Org-mode
+
+doi:10.1109/MCSE.2011.41
+
+A file associated with this citekey has been downloaded to
+=bog-stage-directory=.  To associate that file with this heading, run
+=bog-rename-staged-file-to-citekey= (=C-c " r=).
+
+That file is now stored in =bog-file-directory= and can be opened with
+=bog-find-citekey-file= (=C-c " f=).
+
+** schulte2012multi
+
+A multi-language computing environment for literate programming and
+reproducible research
+
+http://www.jstatsoft.org/v46/i03
+
+After a title and URL (neither of which are necessary), there will
+usually be notes about the paper.  To refer to another study, just
+insert the citekey name, such as dominik2010org.  This is just normal
+text, but many Bog commands treat it as special.  Put your point on
+dominik2010org, and run =bog-open-first-citekey-link= (=C-c " l=).
+
+Notes do not have to be limited to a single file.  name1990word is a
+study in another notes file.  Place the point on name1990word and run
+=bog-goto-citekey-heading-in-notes= (=C-c " H=) to jump to that
+heading.
+
+Look at the other commands by pressing =C-c " C-h=.
