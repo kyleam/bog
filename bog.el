@@ -713,9 +713,12 @@ level `bog-refile-maxlevel' are considered."
 
 (defun bog-notes-files ()
   "Return Org files in `bog-notes-directory'"
-  (file-expand-wildcards
-   (concat (file-name-as-directory bog-notes-directory)
-           "*.org")))
+  (--remove (let ((base-name (file-name-nondirectory it)))
+              (or (string-prefix-p "." base-name)
+                  (auto-save-file-name-p base-name)))
+   (file-expand-wildcards
+    (concat (file-name-as-directory bog-notes-directory)
+            "*.org"))))
 
 (defun bog-search-notes (&optional todo-only string)
   "Search notes using `org-search-view'.
