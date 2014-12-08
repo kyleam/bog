@@ -712,7 +712,7 @@ level `bog-refile-maxlevel' are considered."
     (org-refile)))
 
 (defun bog-notes-files ()
-  "Return Org files in `bog-notes-files'."
+  "Return Org files in `bog-notes-directory'"
   (file-expand-wildcards
    (concat (file-name-as-directory bog-notes-directory)
            "*.org")))
