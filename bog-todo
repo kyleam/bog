@@ -26,7 +26,11 @@ Perhaps use a cache file.  This could be used in
 
 ** ENH Find in-text citekeys that don't have a header
 
-** ENH Check for duplicate citekeys headings
+** CANCELED Check for duplicate citekeys headings
+   :LOGBOOK:
+   - State "CANCELED"   from "ENH"        [2014-12-07 Sun 20:31] \\
+     This is easy enough to do with bog-search or grepping.
+   :END:
 
 ** ENH Make bog-goto functions work when citekey is property
 
