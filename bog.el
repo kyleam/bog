@@ -24,8 +24,8 @@
 ;;; Commentary:
 ;;
 ;; Bog provides a few convenience functions for taking research notes in
-;; Org mode. Many of these commands center around a citekey, the unique
-;; identifier for a study. See the README
+;; Org mode.  Many of these commands center around a citekey, the unique
+;; identifier for a study.  See the README
 ;; (https://github.com/kyleam/bog) for more information.
 
 ;;; Code:
@@ -137,7 +137,7 @@ where <sep> is one of these characters.")
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
   "Function used to rename staged files.
 This function should accept a file name and a citekey as
-arguments and return the name of the final file. Currently the
+arguments and return the name of the final file.  Currently the
 only built-in function is `bog-file-ask-on-conflict'.")
 
 (defcustom bog-file-secondary-name "-supplement"
@@ -177,8 +177,8 @@ level to operate on."
   "Cache list of all citekeys.
 Depending on the number of citekeys present in notes, enabling
 this can make functions that prompt with a list of all
-citekeys (or all heading citekeys) noticeably faster. However, no
-attempt is made to update the list of citekeys. To see newly
+citekeys (or all heading citekeys) noticeably faster.  However,
+no attempt is made to update the list of citekeys.  To see newly
 added citekeys, clear the cache with `bog-clear-citekey-cache'."
   :group 'bog
   :type 'boolean)
@@ -189,8 +189,8 @@ added citekeys, clear the cache with `bog-clear-citekey-cache'."
 (defmacro bog-selection-method (name context-method collection-method)
   "Create citekey selection function.
 Function will be named bog-citekey-from-NAME and will take one
-argument (NO-CONTEXT). If NO-CONTEXT is nil, CONTEXT-METHOD will
-be called with no arguments. If CONTEXT-METHOD returns nil or if
+argument (NO-CONTEXT).  If NO-CONTEXT is nil, CONTEXT-METHOD will
+be called with no arguments.  If CONTEXT-METHOD returns nil or if
 NO-CONTEXT is non-nil, the user will be prompted with citekeys
 gathered by COLLECTION-METHOD."
   `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
@@ -348,7 +348,7 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from citekeys for all associated files. This same prompt will be
+from citekeys for all associated files.  This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
   (bog--find-citekey-file (bog-citekey-from-notes-or-files no-context)))
@@ -386,7 +386,7 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys present in notes. This same prompt will be
+from all citekeys present in notes.  This same prompt will be
 opened if locating a citekey from context fails.
 
 If the citekey file prompt is slow to appear, consider enabling
@@ -412,8 +412,8 @@ If the citekey file prompt is slow to appear, consider enabling
 (defun bog-file-ask-on-conflict (staged-file citekey)
   "Rename citekey file, prompting for a new name if it already exists.
 STAGED-FILE will be renamed to <citekey>.<ext> within
-`bog-file-directory'. If this file already exists, the user will
-be prompted for another name. `bog-file-secondary-name' can be
+`bog-file-directory'.  If this file already exists, the user will
+be prompted for another name.  `bog-file-secondary-name' can be
 used to control the default string used in the prompt."
   (let* ((ext (file-name-extension staged-file))
          (citekey-file (bog-citekey-as-file citekey ext)))
@@ -426,7 +426,7 @@ used to control the default string used in the prompt."
                                     ext))))
          (setq new-file-name
                (read-string
-                (format "File %s already exists. Name to use instead: "
+                (format "File %s already exists.  Name to use instead: "
                         citekey-file)
                 new-file-name nil nil '(new-file-name)))
          (setq citekey-file (expand-file-name new-file-name bog-file-directory))
@@ -473,7 +473,7 @@ The variable `bog-find-citekey-bib-func' determines how the
 citekey is found.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from citekeys for all BibTeX files. This same prompt will be
+from citekeys for all BibTeX files.  This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
   (funcall bog-find-citekey-bib-func
@@ -592,7 +592,7 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys present in notes. This same prompt will be
+from all citekeys present in notes.  This same prompt will be
 opened if locating a citekey from context fails.
 
 If the citekey file prompt is slow to appear, consider enabling
@@ -617,7 +617,7 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format'.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys for headings in the current buffer. This same
+from all citekeys for headings in the current buffer.  This same
 prompt will be opened if locating a citekey from context fails.
 
 This only works for headings that store the citekey as the
@@ -647,8 +647,8 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format'.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys for headings in notes. This same prompt will be
-opened if locating a citekey from context fails.
+from all citekeys for headings in notes.  This same prompt will
+be opened if locating a citekey from context fails.
 
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'.
@@ -686,8 +686,8 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format'.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys for headings in notes. This same prompt will be
-opened if locating a citekey from context fails.
+from all citekeys for headings in notes.  This same prompt will
+be opened if locating a citekey from context fails.
 
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
@@ -734,7 +734,7 @@ term (instead of prompting the user for one)."
 With prefix argument TODO-ONLY, only TODO entries are searched.
 
 The citekey will be taken from the text under point if it matches
-`bog-citekey-format' or from the current tree. If a citekey is
+`bog-citekey-format' or from the current tree.  If a citekey is
 not found, a prompt will open to select from all citekeys present
 in notes."
   (interactive "P")
@@ -742,8 +742,8 @@ in notes."
 
 (defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
   "Sort topic headings in this buffer.
-SORTING-TYPE is a character passed to `org-sort-entries'. If nil,
-?a is used. The level to sort is determined by
+SORTING-TYPE is a character passed to `org-sort-entries'.  If
+nil, ?a is used.  The level to sort is determined by
 `bog-topic-heading-level'."
   (interactive)
   (org-map-entries (lambda () (bog-sort-if-topic-header sorting-type))))
@@ -767,7 +767,7 @@ Sorting is only done if the heading's level matches
 
 (defun bog-insert-heading-citekey (&optional current-buffer)
   "Select a citekey to insert at point.
-By default, offer heading citekeys from all files. With prefix
+By default, offer heading citekeys from all files.  With prefix
 argument CURRENT-BUFFER, limit to heading citekeys from the
 current buffer."
   (interactive "P")
@@ -783,8 +783,8 @@ The citekey will be taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
 
 With prefix argument NO-CONTEXT, a prompt will open to select
-from all citekeys for headings in notes. This same prompt will be
-opened if locating a citekey from context fails."
+from all citekeys for headings in notes.  This same prompt will
+be opened if locating a citekey from context fails."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
          (marker (bog--find-exact-heading-in-notes citekey)))
@@ -828,7 +828,7 @@ DESCRIPTION is a one-line description of what the key selects.")
   "Execute a Bog command with a single letter.
 
 The user is prompted for a single character indicating the action
-to invoke. Press \"?\" to describe available actions.
+to invoke.  Press \"?\" to describe available actions.
 
 See `def-bog-commander-method' for defining new methods."
   (interactive)
@@ -916,8 +916,8 @@ chosen."
 (define-minor-mode bog-mode
   "Toggle Bog in this buffer.
 With a prefix argument ARG, enable `bog-mode' if ARG is positive,
-and disable it otherwise. If called from Lisp, enable the mode if
-ARG is omitted or nil.
+and disable it otherwise.  If called from Lisp, enable the mode
+if ARG is omitted or nil.
 
 \\{bog-mode-map}"
   :keymap bog-mode-map

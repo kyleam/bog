@@ -8,27 +8,27 @@
 
 - In addition to =bog-find-citekey-file= and =bog-find-citekey-bib=,
   most functions will now prompt with set of citekeys when prefix
-  argument is given. What this list is depends on the function.
+  argument is given.  What this list is depends on the function.
 
 - When locating a citekey from the notes fails, functions will now
   prompt with a list of citekeys instead of giving an error.
 
 - Bog commands are now available outside of Org buffers through
-  =bog-commander=. This is based off of =projectile-commander=. The
-  custom Bog commands for the Org agenda have been removed because this
-  functionality is now available through =bog-commander=.
+  =bog-commander=.  This is based off of =projectile-commander=.  The
+  custom Bog commands for the Org agenda have been removed because
+  this functionality is now available through =bog-commander=.
 
 - New command =bog-citekey-tree-to-indirect-buffer= opens the subtree
-  for a citekey in an indirect buffer. The citekey is either taken from
+  for a citekey in an indirect buffer.  The citekey is either taken from
   at point or selected from all heading citekeys.
 
 - New command =bog-insert-heading-citekey= prompts with all heading
   citekeys and inserts the selected one at point.
 
 - New command =bog-open-first-citekey-link= opens the first link found
-  under the subtree of a citekey. This is particularly useful if you
+  under the subtree of a citekey.  This is particularly useful if you
   place the main link for the study (usually a DOI link) as the first
-  link in the citekey's subtree. The citekey is either taken from at
+  link in the citekey's subtree.  The citekey is either taken from at
   point or selected from all heading citekeys.
 
 ** Other changes

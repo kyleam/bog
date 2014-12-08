@@ -11,7 +11,7 @@ Some citekeys are not highlighed until the surrounding text is altered.
 
 ** DONE Function for getting all citekeys in notes
 
-Perhaps use a cache file. This could be used in
+Perhaps use a cache file.  This could be used in
 `bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
 
 ** DOC Mention useful tools
@@ -46,8 +46,8 @@ Default could be "*.tex".
 
 ** DONE Generalize PDF functions in bog
 
-Replace bog-find-citekey-pdf with bog-find-citekey-file. The extensions
-that will be considered could be customized. Rebind this to "f".
+Replace bog-find-citekey-pdf with bog-find-citekey-file.  The extensions
+that will be considered could be customized.  Rebind this to "f".
 bog-rename-staged-pdf-to-citekey would be
 bog-rename-staged-file-to-citekey and could use the same customized
 extensions (or maybe just take the extension from the original file).

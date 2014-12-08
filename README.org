@@ -5,7 +5,7 @@
 [[https://travis-ci.org/kyleam/bog][https://travis-ci.org/kyleam/bog.svg]]
 [[http://melpa.org/#/bog][http://melpa.org/packages/bog-badge.svg]]
 
-Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]]. It adds a few
+Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]].  It adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
 
@@ -22,13 +22,13 @@ To enable Bog in all Org buffers, add it to =org-mode-hook=.
 * Workflow
 
 The Bog workflow is focused around the citekey, which is the only study
-information that must be included in the notes. This unique identifier
+information that must be included in the notes.  This unique identifier
 is used as a link to the BibTeX file and other associated files.
 
-In the example below, the citekey "name2000word" is a study heading. A
+In the example below, the citekey "name2000word" is a study heading.  A
 study heading is defined as a heading the has a citekey as a title or as
-the value of =bog-citekey-property=. When a citekey occurs anywhere else
-(like "another1999study" below), they are taken as a reference to
+the value of =bog-citekey-property=.  When a citekey occurs anywhere
+else (like "another1999study" below), they are taken as a reference to
 another study (which may or may not have a subtree in this or another
 Org file).
 
@@ -44,7 +44,7 @@ Org file).
 #+end_example
 
 The default format for the citekey is the first author's last name, the
-year, and then the first non-trivial word. To have BibTeX mode
+year, and then the first non-trivial word.  To have BibTeX mode
 automatically generate a key of this format, the =bibtex-autokey-*=
 settings can be modified.
 
@@ -58,10 +58,10 @@ settings can be modified.
 
 * Main features
 
-Many Bog functions take the citekey from the notes. If the point is on a
-citekey (like "another1999study" above), then that citekey will be used.
-If this fails, many functions will try to take the citekey from the
-first parent heading that is a study heading.
+Many Bog functions take the citekey from the notes.  If the point is on
+a citekey (like "another1999study" above), then that citekey will be
+used.  If this fails, many functions will try to take the citekey from
+the first parent heading that is a study heading.
 
 - =bog-find-citekey-file=
 
@@ -77,9 +77,9 @@ first parent heading that is a study heading.
 
 - =bog-search-citekey-on-web=
 
-  Search Google Scholar for a citekey. The default citekey format (first
-  author's last name, year, and first non-trivial word) usually contains
-  enough information to make this search successful.
+  Search Google Scholar for a citekey.  The default citekey format
+  (first author's last name, year, and first non-trivial word) usually
+  contains enough information to make this search successful.
 
 - =bog-rename-staged-file-to-citekey=
 
@@ -87,14 +87,14 @@ first parent heading that is a study heading.
 
 - =bog-clean-and-rename-staged-bibs=
 
-  Rename new BibTeX files. If a separate BibTeX file is used for each
+  Rename new BibTeX files.  If a separate BibTeX file is used for each
   citekey, this function can be used to rename all new BibTeX files.
   =bibtex-clean-entry= is used to clean the entry and autogenerate the
   key.
 
 - =bog-create-combined-bib=
 
-  Generate a combined BibTeX file for all citekeys in buffer. This is
+  Generate a combined BibTeX file for all citekeys in buffer.  This is
   useful if single-entry BibTeX files are used.
 
 Other useful functions include
@@ -127,24 +127,24 @@ The variables below are important for specifying how Bog behaves.
 
 - =bog-find-citekey-bib-function=
 
-  A function to find a citekey in a BibTeX file. This determines whether
-  a directory of single-entry BibTeX files or a single BibTeX file is
-  used.
+  A function to find a citekey in a BibTeX file.  This determines
+  whether a directory of single-entry BibTeX files or a single BibTeX
+  file is used.
 
 * Keybindings
 
-A keymap is defined for Bog under the prefix =C-c "​=. If you prefer
+A keymap is defined for Bog under the prefix =C-c "​=.  If you prefer
 something else (like =C-c b=), set =bog-keymap-prefix=.
 
 Some Bog functions are useful outside of an Org buffer (e.g.,
-=bog-search-notes=). These functions are available through the
-=bog-commander= interface (based of off =projectile-commander=). This
+=bog-search-notes=).  These functions are available through the
+=bog-commander= interface (based of off =projectile-commander=).  This
 can be bound to a global key for quick access.
 
 * Other approaches
 
 If Bog doesn't fit your workflow, there are a good number of other
-approaches to explore. On the Org mode mailing list, there are some [[http://thread.gmane.org/gmane.emacs.orgmode/78983][nice]]
-[[http://thread.gmane.org/gmane.emacs.orgmode/14756][descriptions]] of systems people have come up with for taking research
-notes in Org. For a package that focuses on both taking research notes
-and writing research articles, look into [[https://github.com/jkitchin/jmax/blob/master/org/org-ref.org][Org-ref]].
+approaches to explore.  On the Org mode mailing list, there are some
+[[http://thread.gmane.org/gmane.emacs.orgmode/78983][nice]] [[http://thread.gmane.org/gmane.emacs.orgmode/14756][descriptions]] of systems people have come up with for taking
+research notes in Org.  For a package that focuses on both taking
+research notes and writing research articles, look into [[https://github.com/jkitchin/jmax/blob/master/org/org-ref.org][Org-ref]].
