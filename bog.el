@@ -80,7 +80,7 @@ The default corresponds to the default value of
   :group 'bog
   :type 'string)
 
-(defcustom bog-notes-directory
+(defcustom bog-note-directory
   (expand-file-name "notes/" bog-root-directory)
   "Directory with Org research notes."
   :group 'bog
@@ -175,8 +175,8 @@ level to operate on."
 
 (defcustom bog-use-citekey-cache nil
   "Cache list of all citekeys.
-Depending on the number of citekeys present in notes, enabling
-this can make functions that prompt with a list of all
+Depending on the number of citekeys present in your notes,
+enabling this can make functions that prompt with a list of all
 citekeys (or all heading citekeys) noticeably faster.  However,
 no attempt is made to update the list of citekeys.  To see newly
 added citekeys, clear the cache with `bog-clear-citekey-cache'."
@@ -291,21 +291,21 @@ be preceded by a characters in `bog-allowed-before-citekey'."
 
 (defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
-  "Return all citekeys in `bog-notes-files'."
+  "Return all citekeys in notes."
   (or (and bog-use-citekey-cache bog--all-citekeys)
       (setq bog--all-citekeys (apply 'append
                                     (-map 'bog-citekeys-in-file
-                                          (bog-notes-files))))))
+                                          (bog-notes))))))
 
 (defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
-  "Return all citekeys in headings of `bog-notes-files'."
+  "Return all citekeys in headings of notes."
   (or (and bog-use-citekey-cache bog--all-heading-citekeys)
       (setq bog--all-heading-citekeys (-mapcat 'bog-heading-citekeys-in-file
-                                               (bog-notes-files)))))
+                                               (bog-notes)))))
 
 (defun bog-clear-citekey-cache ()
-  "Clear cache of citekeys contained in `bog-notes-files'."
+  "Clear cache of citekeys contained in notes."
   (interactive)
   (setq bog--all-citekeys nil
         bog--all-heading-citekeys nil))
@@ -641,8 +641,6 @@ buffer, the narrowing is removed."
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
 
-All Org files in `bog-notes-directory' will be searched.
-
 The citekey will be taken from the text under point if it matches
 `bog-citekey-format'.
 
@@ -672,12 +670,12 @@ buffer, the narrowing is removed."
       (message "Heading for %s not found in notes" citekey))))
 
 (defun bog--find-exact-heading-in-notes (heading)
-  "Return the marker of HEADING in Bog notes.
-If the current buffer is a Bog notes file, try to find the
-heading there first."
-  (or (when (member (buffer-file-name) (bog-notes-files))
+  "Return the marker of HEADING in notes.
+If the current buffer is a note file, try to find the heading
+there first."
+  (or (when (member (buffer-file-name) (bog-notes))
         (org-find-exact-headline-in-buffer heading))
-      (org-find-exact-heading-in-directory heading bog-notes-directory)))
+      (org-find-exact-heading-in-directory heading bog-note-directory)))
 
 (defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
   "Open subtree for citekey in an indirect buffer.
@@ -704,20 +702,20 @@ If the citekey file prompt is slow to appear, consider enabling
 
 (defun bog-refile ()
   "Refile heading within notes.
-All headings from Org files in `bog-notes-directory' at or above
+All headings from Org files in `bog-note-directory' at or above
 level `bog-refile-maxlevel' are considered."
   (interactive)
-  (let ((org-refile-targets `((,(bog-notes-files)
+  (let ((org-refile-targets `((,(bog-notes)
                                :maxlevel . ,bog-refile-maxlevel))))
     (org-refile)))
 
-(defun bog-notes-files ()
-  "Return Org files in `bog-notes-directory'"
+(defun bog-notes ()
+  "Return Org files in `bog-note-directory'."
   (--remove (let ((base-name (file-name-nondirectory it)))
               (or (string-prefix-p "." base-name)
                   (auto-save-file-name-p base-name)))
    (file-expand-wildcards
-    (concat (file-name-as-directory bog-notes-directory)
+    (concat (file-name-as-directory bog-note-directory)
             "*.org"))))
 
 (defun bog-search-notes (&optional todo-only string)
@@ -726,7 +724,7 @@ With prefix argument TODO-ONLY, only TODO entries are searched.
 If STRING is non-nil, this will be used as the search
 term (instead of prompting the user for one)."
   (interactive "P")
-  (let ((lprops '((org-agenda-files (bog-notes-files))
+  (let ((lprops '((org-agenda-files (bog-notes))
                   (org-agenda-text-search-extra-files nil))))
     (put 'org-agenda-redo-command 'org-lprops lprops)
     (org-let lprops '(org-search-view todo-only string))))
@@ -754,10 +752,10 @@ nil, ?a is used.  The level to sort is determined by
 (defun bog-sort-topic-headings-in-notes (&optional sorting-type)
   "Sort topic headings in notes.
 Unlike `bog-sort-topic-headings-in-buffer', sort topic headings
-in all Bog notes."
+in all notes."
   (interactive)
   (org-map-entries (lambda ()  (bog-sort-if-topic-header sorting-type))
-                   nil (bog-notes-files)))
+                   nil (bog-notes)))
 
 (defun bog-sort-if-topic-header (sorting-type)
   "Sort heading with `org-sort-entries' according to SORTING-TYPE.
@@ -881,7 +879,7 @@ chosen."
   (bog-goto-citekey-heading-in-notes t))
 
 (def-bog-commander-method ?s
-  "Search Bog notes with `org-search-view'."
+  "Search notes with `org-search-view'."
   (bog-search-notes))
 
 

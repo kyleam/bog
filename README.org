@@ -117,7 +117,7 @@ You can try out many of the commands in
 
 Several variables determine where Bog looks for things.
 
-- =bog-notes-directory=
+- =bog-note-directory=
 - =bog-file-directory=
 - =bog-bib-directory= or =bog-bib-file=
 - =bog-stage-directory=
