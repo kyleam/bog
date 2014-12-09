@@ -249,8 +249,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
     (unless (bobp)
       (re-search-backward bog-allowed-before-citekey)
       (forward-char 1))
-    (when (looking-at bog-citekey-format)
-      (match-string-no-properties 0))))
+    (and (looking-at bog-citekey-format)
+         (match-string-no-properties 0))))
 
 (defun bog-citekey-from-surroundings ()
   "Get the citekey from the context of the Org file."
@@ -277,17 +277,19 @@ be preceded by a characters in `bog-allowed-before-citekey'."
   "Retrieve citekey from heading title."
   (unless (org-before-first-heading-p)
     (let ((heading (org-no-properties (org-get-heading t t))))
-      (when (bog-citekey-p heading) heading))))
+      (and (bog-citekey-p heading)
+           heading))))
 
 (defun bog-citekey-from-property ()
   "Retrieve citekey from `bog-citekey-property'."
   (--when-let (org-entry-get (point) bog-citekey-property)
-    (when (bog-citekey-p it) it)))
+    (and (bog-citekey-p it)
+         it)))
 
 (defun bog-citekey-p (text)
   "Does TEXT match `bog-citekey-format'?"
-  (when (string-match-p (format "^%s$" bog-citekey-format) text)
-    t))
+  (and (string-match-p (format "^%s$" bog-citekey-format) text)
+       t))
 
 (defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
@@ -446,8 +448,8 @@ used to control the default string used in the prompt."
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
   (let ((fname (file-name-base file)))
-    (when (string-match (concat "^" bog-citekey-format) fname)
-      (match-string 0 fname))))
+    (and (string-match (concat "^" bog-citekey-format) fname)
+         (match-string 0 fname))))
 
 (defun bog-all-citekey-files ()
   "Return list of all files in `bog-file-directory'."
