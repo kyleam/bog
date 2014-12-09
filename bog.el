@@ -202,16 +202,16 @@ If NO-CONTEXT is non-nil, immediately fall back."
           (,context-method)
           (bog-select-citekey (,collection-method)))))
 
-(bog-selection-method "notes-or-files"
-                      bog-citekey-from-notes
+(bog-selection-method "surroundings-or-files"
+                      bog-citekey-from-surroundings
                       bog-all-file-citekeys)
 
-(bog-selection-method "notes-or-bibs"
-                      bog-citekey-from-notes
+(bog-selection-method "surroundings-or-bibs"
+                      bog-citekey-from-surroundings
                       bog-bib-citekeys)
 
-(bog-selection-method "notes-or-all"
-                      bog-citekey-from-notes
+(bog-selection-method "surroundings-or-all"
+                      bog-citekey-from-surroundings
                       bog-all-citekeys)
 
 (bog-selection-method "point-or-buffer-headings"
@@ -252,7 +252,7 @@ be preceded by a characters in `bog-allowed-before-citekey'."
     (when (looking-at bog-citekey-format)
       (match-string-no-properties 0))))
 
-(defun bog-citekey-from-notes ()
+(defun bog-citekey-from-surroundings ()
   "Get the citekey from the context of the Org file."
   (or (bog-citekey-at-point)
       (bog-citekey-from-tree)))
@@ -351,7 +351,8 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from citekeys for all associated files.  This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
-  (bog--find-citekey-file (bog-citekey-from-notes-or-files no-context)))
+  (bog--find-citekey-file
+   (bog-citekey-from-surroundings-or-files no-context)))
 
 (defun bog--find-citekey-file (citekey)
   (let* (citekey-file
@@ -392,7 +393,8 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (bog--rename-staged-file-to-citekey (bog-citekey-from-notes-or-all no-context)))
+  (bog--rename-staged-file-to-citekey
+   (bog-citekey-from-surroundings-or-all no-context)))
 
 (defun bog--rename-staged-file-to-citekey (citekey)
   (let* ((staged-files (bog-staged-files))
@@ -477,7 +479,7 @@ from citekeys for all BibTeX files.  This same prompt will be
 opened if locating a citekey from context fails."
   (interactive "P")
   (funcall bog-find-citekey-bib-func
-           (bog-citekey-from-notes-or-bibs no-context)))
+           (bog-citekey-from-surroundings-or-bibs no-context)))
 
 (defun bog-find-citekey-bib-file (citekey)
   "Open BibTeX file of CITEKEY contained in `bog-bib-directory'."
@@ -598,7 +600,8 @@ opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (bog--search-citekey-on-web (bog-citekey-from-notes-or-all no-context)))
+  (bog--search-citekey-on-web
+   (bog-citekey-from-surroundings-or-all no-context)))
 
 (defun bog--search-citekey-on-web (citekey)
   (browse-url (bog-citekey-as-search-url citekey)))
@@ -739,7 +742,8 @@ The citekey will be taken from the text under point if it matches
 not found, a prompt will open to select from all citekeys present
 in notes."
   (interactive "P")
-  (bog-search-notes todo-only (bog-citekey-from-notes-or-all nil)))
+  (bog-search-notes todo-only
+                    (bog-citekey-from-surroundings-or-all nil)))
 
 (defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
   "Sort topic headings in this buffer.

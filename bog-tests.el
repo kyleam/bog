@@ -196,36 +196,36 @@ some text
 some text"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-;; `bog-citekey-from-notes'
+;; `bog-citekey-from-surroundings'
 
-(ert-deftest bog-citekey-from-notes-on-heading ()
+(ert-deftest bog-citekey-from-surroundings-on-heading ()
   (let ((citekey "name2010word"))
     (bog-tests--with-temp-text
         "
 * top level
 ** <point><citekey>
 some text"
-      (should (equal (bog-citekey-from-notes) citekey)))))
+      (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-notes-before-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings-before-text-citekey ()
   (let ((citekey "name2010word"))
     (bog-tests--with-temp-text
         "
 * top level
 ** other2000key
 some text and <point><citekey>"
-      (should (equal (bog-citekey-from-notes) citekey)))))
+      (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-notes-after-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings-after-text-citekey ()
   (let ((citekey "name2010word"))
     (bog-tests--with-temp-text
         "
 * top level
 ** other2000key
 some text and <citekey><point>"
-      (should (equal (bog-citekey-from-notes) citekey)))))
+      (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-notes-on-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings-on-text-citekey ()
   (let ((citekey "name2010word"))
     (bog-tests--with-temp-text
         "
@@ -233,14 +233,14 @@ some text and <citekey><point>"
 ** other2000key
 some text and <point><citekey>"
       (forward-char)
-      (should (equal (bog-citekey-from-notes) citekey)))))
+      (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-notes-no-citekey ()
+(ert-deftest bog-citekey-from-surroundings-no-citekey ()
   (bog-tests--with-temp-text
       "
 * top level
 ** second"
-    (should-not (bog-citekey-from-notes))))
+    (should-not (bog-citekey-from-surroundings))))
 
 
 ;;; File functions
