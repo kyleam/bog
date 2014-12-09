@@ -287,9 +287,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
          it)))
 
 (defun bog-citekey-p (text)
-  "Does TEXT match `bog-citekey-format'?"
-  (and (string-match-p (format "^%s$" bog-citekey-format) text)
-       t))
+  "Return non-nil if TEXT matches `bog-citekey-format'."
+  (string-match-p (format "^%s$" bog-citekey-format) text))
 
 (defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
