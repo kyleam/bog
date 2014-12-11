@@ -254,6 +254,65 @@ some text and <point><citekey>"
 ** second"
     (should-not (bog-citekey-from-surroundings))))
 
+;; bog-{next,previous}-non-heading-citekey
+
+(ert-deftest bog-next-non-heading-citekey-default-arg ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+<point>
+<citekey> other2000key"
+      (bog-next-non-heading-citekey)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-next-non-heading-citekey-pos-arg ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+<point>
+other2000key <citekey>"
+      (bog-next-non-heading-citekey 2)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-next-non-heading-citekey-on-citekey ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+<point>other2000key
+<citekey>"
+      (bog-next-non-heading-citekey)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-next-non-heading-citekey-pos-neg-arg ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "<citekey> <point>"
+      (bog-next-non-heading-citekey -1)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-previous-non-heading-citekey-default-arg ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "other2000key <citekey> <point>"
+      (bog-previous-non-heading-citekey)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-previous-non-heading-citekey-on-citekey ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+<citekey>
+<point>other2000key"
+      (bog-previous-non-heading-citekey)
+      (should (equal citekey (bog-citekey-at-point))))))
+
+(ert-deftest bog-previous-non-heading-citekey-pos-arg ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "<citekey> other2000key <point>"
+      (bog-previous-non-heading-citekey 2)
+      (should (equal citekey (bog-citekey-at-point))))))
+
 
 ;;; File functions
 

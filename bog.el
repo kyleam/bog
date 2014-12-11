@@ -820,6 +820,36 @@ be opened if locating a citekey from context fails."
            (org-open-at-point)))
       (message "Heading for %s not found in notes" citekey))))
 
+(defun bog-next-non-heading-citekey (&optional arg)
+  "Move foward to next non-heading citekey.
+With argument ARG, do it ARG times."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (if (< arg 0)
+      (bog-previous-non-heading-citekey (- arg))
+    (bog--with-citekey-syntax
+      (skip-syntax-forward "w")
+      (let (case-fold-search)
+        (while (and (> arg 0)
+                    (re-search-forward bog-citekey-format nil t))
+          (unless (org-at-heading-p)
+            (setq arg (1- arg))))))
+    (org-show-context)))
+
+(defun bog-previous-non-heading-citekey (&optional arg)
+  "Move backward to previous non-heading citekey.
+With argument ARG, do it ARG times."
+  (interactive "p")
+  (or arg (setq arg 1))
+  (bog--with-citekey-syntax
+    (let (case-fold-search)
+      (while (and (> arg 0)
+                  (re-search-backward bog-citekey-format nil t))
+        (unless (org-at-heading-p)
+          (setq arg (1- arg)))))
+    (skip-syntax-backward "w"))
+  (org-show-context))
+
 
 ;;; Font-lock
 
@@ -919,6 +949,8 @@ chosen."
       (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
       (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
       (define-key prefix-map "l" 'bog-open-first-citekey-link)
+      (define-key prefix-map "n" 'bog-next-non-heading-citekey)
+      (define-key prefix-map "p" 'bog-previous-non-heading-citekey)
       (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
       (define-key prefix-map "s" 'bog-search-notes)
       (define-key prefix-map "w" 'bog-refile)

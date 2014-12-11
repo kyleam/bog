@@ -31,6 +31,9 @@
   link in the citekey's subtree.  The citekey is either taken from at
   point or selected from all heading citekeys.
 
+- New commands =bog-next-non-heading-citekey= and
+  =bog-previous-non-heading-citekey=
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and
