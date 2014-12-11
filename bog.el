@@ -48,6 +48,9 @@ By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
 then lower case letters.
 
+This is case-sensitive (i.e., case-fold-search will be set to
+nil).
+
 The default format corresponds to the following BibTeX autokey
 settings:
 
@@ -236,9 +239,10 @@ corresponds to the last name of the first author, the publication
 year, and the first meaningful word in the title)."
   (let ((groups (or groups '(1 2 3)))
         (delim (or delim " ")))
-    (string-match bog-citekey-format citekey)
-    (mapconcat (lambda (g) (match-string-no-properties g citekey))
-               groups delim)))
+    (let (case-fold-search)
+      (string-match bog-citekey-format citekey)
+      (mapconcat (lambda (g) (match-string-no-properties g citekey))
+                 groups delim))))
 
 (defun bog-citekey-at-point ()
   "Return citekey at point.
@@ -288,7 +292,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
 
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
-  (string-match-p (format "^%s$" bog-citekey-format) text))
+  (let (case-fold-search)
+    (string-match-p (format "^%s$" bog-citekey-format) text)))
 
 (defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
@@ -313,7 +318,8 @@ be preceded by a characters in `bog-allowed-before-citekey'."
 
 (defun bog-citekeys-in-file (file)
   "Return all citekeys in FILE."
-  (let (refs)
+  (let (refs
+        case-fold-search)
     (with-temp-buffer
       (org-mode)
       (insert-file-contents file)
@@ -446,7 +452,8 @@ used to control the default string used in the prompt."
 
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
-  (let ((fname (file-name-base file)))
+  (let ((fname (file-name-base file))
+        case-fold-search)
     (and (string-match (concat "^" bog-citekey-format) fname)
          (match-string 0 fname))))
 
@@ -554,7 +561,8 @@ alphabetically."
 
 (defun bog-collect-references ()
   "Return names in buffer that match `bog-citekey-format'."
-  (let (refs)
+  (let (refs
+        case-fold-search)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
@@ -811,10 +819,11 @@ be opened if locating a citekey from context fails."
   "Face used to highlight text that matches `bog-citekey-format'.")
 
 (defun bog-fontify-non-heading-citekeys (limit)
-  (while (re-search-forward bog-citekey-format limit t)
-    (unless (save-match-data (org-at-heading-p))
-      (add-text-properties (match-beginning 0) (match-end 0)
-                           '(face bog-citekey-face)))))
+  (let (case-fold-search)
+    (while (re-search-forward bog-citekey-format limit t)
+      (unless (save-match-data (org-at-heading-p))
+        (add-text-properties (match-beginning 0) (match-end 0)
+                             '(face bog-citekey-face))))))
 
 
 ;;; Commander
