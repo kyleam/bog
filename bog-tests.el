@@ -77,16 +77,12 @@ point at the beginning of the inserted text."
 (ert-deftest bog-citekey-p-with-other-text ()
   (should-not (bog-citekey-p "name2010word more text")))
 
-;; `bog-citekey-groups-with-delim'
+;; `bog--citekey-groups-with-delim'
 
-(ert-deftest bog-citekey-groups-with-delim ()
+(ert-deftest bog--citekey-groups-with-delim ()
   (let ((citekey "name2010word"))
-    (should (equal (bog-citekey-groups-with-delim citekey)
-                   "name 2010 word"))
-    (should (equal (bog-citekey-groups-with-delim citekey ",")
-                   "name,2010,word"))
-    (should (equal (bog-citekey-groups-with-delim citekey nil '(1 3))
-                   "name word"))))
+    (should (equal (bog--citekey-groups-with-delim citekey ",")
+                   "name,2010,word"))))
 
 ;; `bog-citekey-at-point'
 

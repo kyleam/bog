@@ -65,6 +65,14 @@ settings:
   :group 'bog
   :type 'regexp)
 
+(defcustom bog-citekey-web-search-groups '(1 2 3)
+  "List of citekey subexpressions to use for web search.
+The default groups correspond to the last name of the first
+author, the publication year, and the first meaningful word in
+the title."
+  :group 'bog
+  :type '(repeat integer))
+
 (defcustom bog-citekey-property "CUSTOM_ID"
   "Property name used to store citekey.
 The default corresponds to the default value of
@@ -229,21 +237,6 @@ If NO-CONTEXT is non-nil, immediately fall back."
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
   (org-icompleting-read "Select citekey: " citekeys))
-
-(defun bog-citekey-groups-with-delim (citekey &optional delim groups)
-  "Return groups of `bog-citekey-format', seperated by DELIM.
-
-If DELIM is nil, space is used.
-
-If GROUPS is nil, groups 1, 2, and 3 are selected (which
-corresponds to the last name of the first author, the publication
-year, and the first meaningful word in the title)."
-  (let ((groups (or groups '(1 2 3)))
-        (delim (or delim " ")))
-    (let (case-fold-search)
-      (string-match bog-citekey-format citekey)
-      (mapconcat (lambda (g) (match-string-no-properties g citekey))
-                 groups delim))))
 
 (defmacro bog--with-citekey-syntax (&rest body)
   "Execute BODY with hyphen and underscore as word constituents."
@@ -626,7 +619,16 @@ If the citekey file prompt is slow to appear, consider enabling
 
 (defun bog-citekey-as-search-url (citekey)
   "Return URL to use for CITEKEY search."
-  (format bog-web-search-url (bog-citekey-groups-with-delim citekey "+")))
+  (format bog-web-search-url
+          (bog--citekey-groups-with-delim citekey "+")))
+
+(defun bog--citekey-groups-with-delim (citekey delim)
+  "Return expression groups CITEKEY, seperated by DELIM.
+Groups are specified by `bog-citekey-web-search-groups'."
+  (let (case-fold-search)
+    (string-match bog-citekey-format citekey)
+    (mapconcat (lambda (g) (match-string-no-properties g citekey))
+               bog-citekey-web-search-groups delim)))
 
 
 ;;; Notes-related

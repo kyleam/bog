@@ -45,6 +45,9 @@
 
 - =bog-notes-directory= has been renamed to =bog-note-directory=.
 
+- New variable =bog-citekey-web-search-groups= specifies which parts
+  of the citekey are used for the search.
+
 * v0.6.0
 
 ** New features
