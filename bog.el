@@ -63,7 +63,7 @@ settings:
         bibtex-autokey-titlewords 1
         bibtex-autokey-year-title-separator \"\")"
   :group 'bog
-  :type 'string)
+  :type 'regexp)
 
 (defcustom bog-citekey-property "CUSTOM_ID"
   "Property name used to store citekey.
@@ -75,19 +75,19 @@ The default corresponds to the default value of
 (defcustom bog-root-directory "~/bib/"
   "Root directory for default values of other Bog directories."
   :group 'bog
-  :type 'string)
+  :type 'directory)
 
 (defcustom bog-note-directory
   (expand-file-name "notes/" bog-root-directory)
   "Directory with Org research notes."
   :group 'bog
-  :type 'string)
+  :type 'directory)
 
 (defcustom bog-file-directory
   (expand-file-name "citekey-files/" bog-root-directory)
   "Directory with citekey-associated files."
   :group 'bog
-  :type 'string)
+  :type 'directory)
 
 (defcustom bog-stage-directory
   (expand-file-name "stage/" bog-root-directory)
@@ -96,7 +96,7 @@ The default corresponds to the default value of
 `bog-rename-staged-bib-to-citekey' will search here for files to
 rename."
   :group 'bog
-  :type 'string)
+  :type 'directory)
 
 (defcustom bog-find-citekey-bib-func 'bog-find-citekey-bib-file
   "Function used to find BibTeX entry for citekey.
@@ -116,26 +116,31 @@ entry."
 This is only meaningful if `bog-find-citekey-bib-func' set to
 `bog-find-citekey-bib-file'."
   :group 'bog
-  :type 'string)
+  :type 'directory)
 
 (defcustom bog-bib-file nil
   "BibTeX file name.
 This is only meaningful if `bog-find-citekey-bib-func' set to
 `bog-find-citekey-entry'."
   :group 'bog
-  :type 'string)
+  :type '(choice (const :tag "Don't use single file" nil)
+                 (file :tag "Single file")))
 
 (defcustom bog-citekey-file-name-separators '("-" "_")
   "Values allowed to follow the citekey in file names.
 When `bog-find-citekey-file' is run on <citekey>, it will find
 files with the format <citekey>.* and <citekey><sep>*.<ext>,
-where <sep> is one of these characters.")
+where <sep> is one of these characters."
+  :group 'bog
+  :type '(repeat string))
 
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
   "Function used to rename staged files.
 This function should accept a file name and a citekey as
 arguments and return the name of the final file.  Currently the
-only built-in function is `bog-file-ask-on-conflict'.")
+only built-in function is `bog-file-ask-on-conflict'."
+  :group 'bog
+  :type 'function)
 
 (defcustom bog-file-secondary-name "-supplement"
   "Modification to make to file name on renaming confict.
@@ -143,7 +148,9 @@ When a staged file is being renamed with
 `bog-file-ask-on-conflict', the user will be prompted if
 <citekey>.<ext> already exists.
 <citekey>`bog-file-secondary-name'.<ext> will be the default
-value for the prompt.")
+value for the prompt."
+  :group 'bog
+  :type 'string)
 
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
@@ -168,7 +175,7 @@ level to operate on."
 (defcustom bog-keymap-prefix (kbd "C-c \"")
   "Bog keymap prefix."
   :group 'bog
-  :type 'string)
+  :type 'key-sequence)
 
 (defcustom bog-use-citekey-cache nil
   "Cache list of all citekeys.
