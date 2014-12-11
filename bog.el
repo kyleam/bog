@@ -42,7 +42,7 @@
 
 (defcustom bog-citekey-format
   "\\([a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z][a-z0-9]*\\)"
-  "Regex used to match study citekey.
+  "Regular expression used to match study citekey.
 
 By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
