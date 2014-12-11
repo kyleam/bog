@@ -41,12 +41,15 @@
   :group 'org)
 
 (defcustom bog-citekey-format
-  "\\([a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z][a-z0-9]*\\)"
+  "\\b\\([a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z][a-z0-9]*\\)\\b"
   "Regular expression used to match study citekey.
 
 By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
 then lower case letters.
+
+The format must be anchored by '\b' and should be restricted to
+letters, digits, '-', and '_'.
 
 This is case-sensitive (i.e., case-fold-search will be set to
 nil).
@@ -59,15 +62,6 @@ settings:
         bibtex-autokey-titlewords-stretch 0
         bibtex-autokey-titlewords 1
         bibtex-autokey-year-title-separator \"\")"
-  :group 'bog
-  :type 'string)
-
-(defcustom bog-allowed-before-citekey
-  "\\(\n\\|\\s-\\|(\\|\\[\\|{\\|<\\|,\\)"
-  "Regex that specifies characters allowed before a citekey.
-This may need to be modified if you have a custom
-`bog-citekey-format' or if you tend to used a certain character
-before citekeys that isn't included above."
   :group 'bog
   :type 'string)
 
@@ -244,17 +238,25 @@ year, and the first meaningful word in the title)."
       (mapconcat (lambda (g) (match-string-no-properties g citekey))
                  groups delim))))
 
+(defmacro bog--with-citekey-syntax (&rest body)
+  "Execute BODY with hyphen and underscore as word constituents."
+  (declare (indent 0))
+  `(with-syntax-table (copy-syntax-table (syntax-table))
+     (modify-syntax-entry ?- "w")
+     (modify-syntax-entry ?_ "w")
+     ,@body))
+
 (defun bog-citekey-at-point ()
   "Return citekey at point.
 The citekey must have the format specified by
-`bog-citekey-format' and, if not at the beginning of the buffer,
-be preceded by a characters in `bog-allowed-before-citekey'."
+`bog-citekey-format'.  Hyphens and underscores are considered as
+word constituents."
   (save-excursion
-    (unless (bobp)
-      (re-search-backward bog-allowed-before-citekey)
-      (forward-char 1))
-    (and (looking-at bog-citekey-format)
-         (match-string-no-properties 0))))
+    (bog--with-citekey-syntax
+      (skip-syntax-backward "w")
+      (let (case-fold-search)
+        (and (looking-at bog-citekey-format)
+             (match-string-no-properties 0))))))
 
 (defun bog-citekey-from-surroundings ()
   "Get the citekey from the context of the Org file."

@@ -121,7 +121,19 @@ point at the beginning of the inserted text."
   (let ((citekey "hyphen-name2010word"))
     (with-temp-buffer
       (insert citekey)
+      ;; At beginning
       (goto-char (point-min))
+      (should (equal (bog-citekey-at-point) citekey))
+      ;; On hyphen
+      (skip-chars-forward "-")
+      (should (equal (bog-citekey-at-point) citekey))
+      ;; After hyphen
+      (forward-char)
+      (should (equal (bog-citekey-at-point) citekey))
+      ;; On word
+      (skip-chars-forward "0-9")
+      ;; At year
+      (skip-chars-forward "-a-z")
       (should (equal (bog-citekey-at-point) citekey)))))
 
 ;; `bog-citekey-from-tree'

@@ -36,6 +36,10 @@
 - =bog-goto-citekey-heading-in-buffer= and
   =bog-goto-citekey-heading-in-notes= will now widen the buffer if the
   heading is outside of the narrowed region.
+
+- The format for citekeys is now restricted to letters, digits,
+  underscores, and hyphens.
+
 - =bog-notes-directory= has been renamed to =bog-note-directory=.
 
 * v0.6.0
