@@ -336,7 +336,7 @@ word constituents."
     (bog-heading-citekeys-in-buffer)))
 
 (defun bog-heading-citekeys-in-buffer ()
-  "Return all citekeys in current buffer."
+  "Return all heading citekeys in current buffer."
   (--keep it
           (org-map-entries 'bog-citekey-from-heading)))
 
