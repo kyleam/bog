@@ -34,6 +34,9 @@
 - New commands =bog-next-non-heading-citekey= and
   =bog-previous-non-heading-citekey=
 
+- New command =bog-list-orphan-citekeys= finds citekeys that are
+  referred to in the notes but don't have their own heading.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

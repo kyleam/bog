@@ -24,7 +24,7 @@ Perhaps use a cache file.  This could be used in
 
 * Notes
 
-** ENH Find in-text citekeys that don't have a header
+** DONE Find in-text citekeys that don't have a header
 
 ** CANCELED Check for duplicate citekeys headings
    :LOGBOOK:

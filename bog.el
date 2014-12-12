@@ -345,6 +345,44 @@ word constituents."
   (--keep it
           (org-map-entries 'bog-citekey-from-heading nil 'file)))
 
+(defun bog-non-heading-citekeys-in-file (file)
+  "Return all non-heading citekeys in FILE."
+  (let (refs
+        case-fold-search)
+    (with-temp-buffer
+      (org-mode)
+      (insert-file-contents file)
+      (while (re-search-forward bog-citekey-format nil t)
+        (unless (or (org-at-heading-p)
+                    (org-at-property-p))
+          (push (match-string-no-properties 0) refs))))
+    (-distinct refs)))
+
+(defun bog-list-orphan-citekeys (&optional file)
+  "List in citekeys that appear in notes but don't have heading.
+With prefix FILE, include only orphan citekeys from that file."
+  (interactive (list (and current-prefix-arg
+                          (bog-read-note-file-name))))
+  (let ((files (or (and file (list file))
+                   (bog-notes)))
+        (heading-cks (bog-all-heading-citekeys))
+        cks)
+    (with-current-buffer (get-buffer-create "*Bog orphan citekeys*")
+      (delete-region (point-min) (point-max))
+      (insert "\n")
+      (-each files
+        (lambda (f)
+          (setq cks
+                (--> (bog-non-heading-citekeys-in-file f)
+                  (-difference it heading-cks)
+                  (-sort (lambda (x y) (string-lessp x y)) it)
+                  (mapconcat #'identity it "\n")))
+          (unless (equal cks "")
+            (insert (format "* %s\n\n" (file-name-nondirectory f)))
+            (insert (concat cks "\n\n")))))
+      (org-mode)
+      (show-all))))
+
 
 ;;; Citekey-associated files
 
@@ -739,6 +777,13 @@ level `bog-refile-maxlevel' are considered."
    (file-expand-wildcards
     (concat (file-name-as-directory bog-note-directory)
             "*.org"))))
+
+(defun bog-read-note-file-name ()
+  (let ((nodir-files (-annotate #'file-name-nondirectory
+                                (bog-notes))))
+    (cdr (assoc (org-icompleting-read "File: "
+                                      (-map #'car nodir-files))
+                nodir-files))))
 
 (defun bog-search-notes (&optional todo-only string)
   "Search notes using `org-search-view'.
