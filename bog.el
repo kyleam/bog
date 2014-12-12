@@ -333,7 +333,7 @@ word constituents."
   (with-temp-buffer
     (org-mode)
     (insert-file-contents file)
-    (setq citekeys (bog-heading-citekeys-in-buffer))))
+    (bog-heading-citekeys-in-buffer)))
 
 (defun bog-heading-citekeys-in-buffer ()
   "Return all citekeys in current buffer."
