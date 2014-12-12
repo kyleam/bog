@@ -320,13 +320,19 @@ word constituents."
 
 (defun bog-citekeys-in-file (file)
   "Return all citekeys in FILE."
-  (let (refs
-        case-fold-search)
-    (with-temp-buffer
-      (insert-file-contents file)
+  (with-temp-buffer
+    (insert-file-contents file)
+    (bog-citekeys-in-buffer)))
+
+(defun bog-citekeys-in-buffer ()
+  "Return all citekeys in current buffer."
+  (save-excursion
+    (let (refs
+          case-fold-search)
+      (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
-        (push (match-string-no-properties 0) refs)))
-    (-distinct refs)))
+        (push (match-string-no-properties 0) refs))
+      (-distinct refs))))
 
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."

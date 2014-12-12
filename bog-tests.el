@@ -250,6 +250,25 @@ some text and <point><citekey>"
 ** second"
     (should-not (bog-citekey-from-surroundings))))
 
+(ert-deftest bog-citekeys-in-buffer ()
+  (should (equal '("abc1900def" "ghi1950jkl" "mno2000pqr")
+           (bog-tests--with-temp-text
+            "
+* abc1900def
+ghi1950jkl
+* mno2000pqr
+* mno2000pqr"
+            (--sort (string-lessp it other) (bog-citekeys-in-buffer))))))
+
+(ert-deftest bog-heading-citekeys-in-buffer ()
+  (should (equal '("abc1900def" "mno2000pqr")
+           (bog-tests--with-temp-text
+            "
+* abc1900def
+ghi1950jkl
+* mno2000pqr"
+            (bog-heading-citekeys-in-buffer)))))
+
 ;; bog-{next,previous}-non-heading-citekey
 
 (ert-deftest bog-next-non-heading-citekey-default-arg ()
