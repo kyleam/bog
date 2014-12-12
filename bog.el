@@ -323,7 +323,6 @@ word constituents."
   (let (refs
         case-fold-search)
     (with-temp-buffer
-      (org-mode)
       (insert-file-contents file)
       (while (re-search-forward bog-citekey-format nil t)
         (push (match-string-no-properties 0) refs)))
