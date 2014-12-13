@@ -433,14 +433,6 @@ some text"
         (kill-buffer new-buffer)
         (delete-file new-file)))))
 
-;; `bog-collect-references'
-
-(ert-deftest bog-collect-unique-references ()
-  (with-temp-buffer
-    (insert  "abc1900word\nhij2000word\nefg1800word\n")
-    (should (equal (bog-collect-unique-references)
-                   '("abc1900word" "efg1800word" "hij2000word")))))
-
 ;; `bog-sort-topic-headings-in-buffer'
 
 (ert-deftest bog-sort-topic-headings-in-buffer ()

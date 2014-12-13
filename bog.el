@@ -587,32 +587,32 @@ one entry per BibTeX file."
 (defun bog-create-combined-bib ()
   "Create buffer that has entries for all citekeys in buffer."
   (interactive)
-  (let ((bib-buffer (get-buffer-create "*Bib*"))
-        (refs (-map 'bog-citekey-as-bib (bog-collect-unique-references))))
-    (--each refs (unless (file-exists-p it) (user-error "%s does not exist" it)))
-    (switch-to-buffer-other-window bib-buffer)
-    (--each refs
-      (insert "\n")
-      (insert-file-contents it)
-      (goto-char (point-max)))
-    (bibtex-mode)
-    (goto-char (point-min))))
-
-(defun bog-collect-unique-references ()
-  "Return names in buffer that match `bog-citekey-format'.
-Duplicates are removed and the entries are sorted
-alphabetically."
-  (-distinct (--sort (string-lessp it other) (bog-collect-references))))
-
-(defun bog-collect-references ()
-  "Return names in buffer that match `bog-citekey-format'."
-  (let (refs
-        case-fold-search)
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward bog-citekey-format nil t)
-        (push (match-string-no-properties 0) refs))
-      refs)))
+  (let ((bib-buffer-name "*Bog combined bib*")
+        citekeys
+        bib-files)
+    (if (derived-mode-p 'dired-mode)
+        (--each (dired-get-marked-files)
+          (with-temp-buffer
+            (insert-file-contents it)
+            (setq citekeys (append (bog-citekeys-in-buffer) citekeys))))
+      (setq citekeys (bog-citekeys-in-buffer)))
+    (setq bib-files
+          (-map #'bog-citekey-as-bib
+                (-distinct (--sort (string-lessp it other) citekeys))))
+    (with-current-buffer (get-buffer-create bib-buffer-name)
+      (delete-region (point-min) (point-max))
+      (--each bib-files
+        (cond
+         ((file-exists-p it)
+          (insert "\n")
+          (insert-file-contents it)
+          (goto-char (point-max)))
+         ((not (y-or-n-p (format "%s does not exist.  Skip it?" it)))
+          (kill-buffer bib-buffer)
+          (user-error "Aborting"))))
+      (bibtex-mode)
+      (goto-char (point-min)))
+    (switch-to-buffer-other-window bib-buffer-name)))
 
 (defun bog-citekey-as-bib (citekey)
   "Return file name `bog-bib-directory'/CITEKEY.bib."

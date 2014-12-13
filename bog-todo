@@ -40,7 +40,7 @@ as a heading, not a property.
 
 * BibTeX files
 
-** ENH Create combined bib from a suffix glob
+** DONE Create combined bib from a suffix glob
 
 For documents generated from multiple files
 

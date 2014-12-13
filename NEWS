@@ -37,6 +37,9 @@
 - New command =bog-list-orphan-citekeys= finds citekeys that are
   referred to in the notes but don't have their own heading.
 
+- =bog-create-combined-bib= now supports collecting citekeys from
+  marked files in a Dired buffer.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and
