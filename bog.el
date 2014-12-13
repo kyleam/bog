@@ -327,12 +327,12 @@ word constituents."
 (defun bog-citekeys-in-buffer ()
   "Return all citekeys in current buffer."
   (save-excursion
-    (let (refs
+    (let (citekeys
           case-fold-search)
       (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
-        (push (match-string-no-properties 0) refs))
-      (-distinct refs))))
+        (push (match-string-no-properties 0) citekeys))
+      (-distinct citekeys))))
 
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."
@@ -353,7 +353,7 @@ word constituents."
 
 (defun bog-non-heading-citekeys-in-file (file)
   "Return all non-heading citekeys in FILE."
-  (let (refs
+  (let (citekeys
         case-fold-search)
     (with-temp-buffer
       (org-mode)
@@ -361,8 +361,8 @@ word constituents."
       (while (re-search-forward bog-citekey-format nil t)
         (unless (or (org-at-heading-p)
                     (org-at-property-p))
-          (push (match-string-no-properties 0) refs))))
-    (-distinct refs)))
+          (push (match-string-no-properties 0) citekeys))))
+    (-distinct citekeys)))
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List in citekeys that appear in notes but don't have heading.
