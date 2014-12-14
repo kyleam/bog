@@ -40,6 +40,10 @@
 - =bog-create-combined-bib= now supports collecting citekeys from
   marked files in a Dired buffer.
 
+- =bog-goto-citekey-heading-in-buffer= and
+  =bog-goto-citekey-heading-in-notes= now work when citekeys are
+  stored are stored as property values.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

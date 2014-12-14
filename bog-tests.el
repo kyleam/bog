@@ -328,6 +328,34 @@ other2000key <citekey>"
       (bog-previous-non-heading-citekey 2)
       (should (equal citekey (bog-citekey-at-point))))))
 
+;; `bog--find-citekey-heading-in-buffer'
+
+(ert-deftest bog--find-citekey-heading-in-buffer-citekey-heading ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        "
+<point>
+* other heading
+
+* <citekey> "
+      (goto-char (bog--find-citekey-heading-in-buffer citekey))
+      (should (equal citekey (org-get-heading t t))))))
+
+(ert-deftest bog--find-citekey-heading-in-buffer-citekey-property ()
+  (let ((citekey "name2010word"))
+    (bog-tests--with-temp-text
+        (format "
+<point>
+* other heading
+
+* heading
+  :PROPERTIES:
+  :%s: <citekey>
+  :END"
+                bog-citekey-property)
+      (goto-char (bog--find-citekey-heading-in-buffer citekey))
+      (should (equal "heading" (org-get-heading t t))))))
+
 
 ;;; File functions
 

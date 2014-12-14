@@ -32,7 +32,7 @@ Perhaps use a cache file.  This could be used in
      This is easy enough to do with bog-search or grepping.
    :END:
 
-** ENH Make bog-goto functions work when citekey is property
+** DONE Make bog-goto functions work when citekey is property
 
 Currently, `bog-goto-citekey-heading-in-buffer' and
 `bog-goto-citekey-heading-in-notes' only work if the citekey is stored

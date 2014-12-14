@@ -686,14 +686,11 @@ With prefix argument NO-CONTEXT, a prompt will open to select
 from all citekeys for headings in the current buffer.  This same
 prompt will be opened if locating a citekey from context fails.
 
-This only works for headings that store the citekey as the
-heading title (not as a property).
-
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-buffer-headings no-context))
-         (pos (org-find-exact-headline-in-buffer citekey nil t)))
+         (pos (bog--find-citekey-heading-in-buffer citekey)))
     (if pos
         (progn
          (when (or (< pos (point-min))
@@ -703,6 +700,36 @@ buffer, the narrowing is removed."
          (goto-char pos)
          (org-show-context))
       (message "Heading for %s not found in buffer" citekey))))
+
+(defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
+  "Return the marker of heading for CITEKEY.
+CITEKEY can either be the heading title or the property value of
+the key `bog-citekey-property'.  If POS-ONLY is non-nil, return
+the position instead of a marker."
+  (or (org-find-exact-headline-in-buffer citekey nil pos-only)
+      (bog--find-citekey-property-in-buffer citekey nil pos-only)))
+
+(defun bog--find-citekey-property-in-buffer (citekey &optional buffer pos-only)
+  "Return marker in BUFFER for heading with CITEKEY as a property value.
+The property key must match `bog-citekey-property'.  If POS-ONLY
+is non-nil, return the position instead of a marker."
+  (with-current-buffer (or buffer (current-buffer))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
+        (catch 'found
+          (while (re-search-forward (concat "\\b" citekey "\\b") nil t)
+            (save-excursion
+              (beginning-of-line)
+              (when (and (looking-at org-property-re)
+                         (equal (downcase (match-string 2))
+                                (downcase bog-citekey-property)))
+                (org-back-to-heading t)
+                (throw 'found
+                       (if pos-only
+                           (point)
+                         (move-marker (make-marker) (point))))))))))))
 
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
@@ -717,14 +744,13 @@ be opened if locating a citekey from context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'.
 
-This only works for headings that store the citekey as the
-heading title (not as a property).
-
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-exact-heading-in-notes citekey)))
+         (marker (or (and (member (buffer-file-name) (bog-notes))
+                          (bog--find-citekey-heading-in-buffer citekey))
+                     (bog--find-citekey-heading-in-notes citekey))))
     (if marker
         (progn
           (switch-to-buffer (marker-buffer marker))
@@ -735,13 +761,28 @@ buffer, the narrowing is removed."
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
 
-(defun bog--find-exact-heading-in-notes (heading)
-  "Return the marker of HEADING in notes.
+(defun bog--find-citekey-heading-in-notes (citekey)
+  "Return the marker of heading for CITEKEY in notes.
+CITEKEY can either be the heading title or the property value of
+the key `bog-citekey-property'."
+  (or (org-find-exact-heading-in-directory citekey bog-note-directory)
+      (bog--find-citekey-property-in-notes citekey)))
+
+(defun bog--find-citekey-property-in-notes (citekey)
+  "Return marker within notes for heading with CITEKEY as a property value.
 If the current buffer is a note file, try to find the heading
 there first."
-  (or (when (member (buffer-file-name) (bog-notes))
-        (org-find-exact-headline-in-buffer heading))
-      (org-find-exact-heading-in-directory heading bog-note-directory)))
+  ;; Modified from `org-find-exact-heading-in-directory'.
+  (let ((files (bog-notes))
+        file visiting m buffer)
+    (catch 'found
+      (while (setq file (pop files))
+        (message "Searching properties in %s" file)
+        (setq visiting (org-find-base-buffer-visiting file))
+        (setq buffer (or visiting (find-file-noselect file)))
+        (setq m (bog--find-citekey-property-in-buffer citekey buffer))
+        (when (and (not m) (not visiting)) (kill-buffer buffer))
+        (and m (throw 'found m))))))
 
 (defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
   "Open subtree for citekey in an indirect buffer.
