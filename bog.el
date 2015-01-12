@@ -301,9 +301,8 @@ word constituents."
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
   (or (and bog-use-citekey-cache bog--all-citekeys)
-      (setq bog--all-citekeys (apply 'append
-                                    (-map 'bog-citekeys-in-file
-                                          (bog-notes))))))
+      (setq bog--all-citekeys (-mapcat #'bog-citekeys-in-file
+                                       (bog-notes)))))
 
 (defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
