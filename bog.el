@@ -831,16 +831,32 @@ level `bog-refile-maxlevel' are considered."
                                       (-map #'car nodir-files))
                 nodir-files))))
 
+(defmacro bog--with-search-lprops (&rest body)
+  "Execute BODY with Bog-related agenda values.
+Restore the `org-lprops' property value for
+`org-agenda-redo-command' after executing BODY."
+  (declare (indent 0))
+  `(let ((org-lprops (get 'org-agenda-redo-command 'org-lprops))
+         (bog-lprops '((org-agenda-buffer-name "*Bog search*")
+                       (org-agenda-files (bog-notes))
+                       org-agenda-text-search-extra-files
+                       org-agenda-sticky)))
+     (put 'org-agenda-redo-command 'org-lprops bog-lprops)
+     (org-let bog-lprops ,@body)
+     (use-local-map (let ((map (make-sparse-keymap)))
+                      (set-keymap-parent map org-agenda-mode-map)
+                      (define-key map "r" 'bog-agenda-redo)
+                      map))
+     (put 'org-agenda-redo-command 'org-lprops org-lprops)))
+
 (defun bog-search-notes (&optional todo-only string)
   "Search notes using `org-search-view'.
 With prefix argument TODO-ONLY, search only TODO entries.  If
 STRING is non-nil, use it as the search term (instead of
 prompting for one)."
   (interactive "P")
-  (let ((lprops '((org-agenda-files (bog-notes))
-                  (org-agenda-text-search-extra-files nil))))
-    (put 'org-agenda-redo-command 'org-lprops lprops)
-    (org-let lprops '(org-search-view todo-only string))))
+  (bog--with-search-lprops
+    '(org-search-view todo-only string)))
 
 (defun bog-search-notes-for-citekey (&optional todo-only)
   "Search notes for citekey using `org-search-view'.
@@ -853,6 +869,11 @@ not found, prompt with citekeys present in any note file."
   (interactive "P")
   (bog-search-notes todo-only
                     (bog-citekey-from-surroundings-or-all nil)))
+
+(defun bog-agenda-redo (&optional all)
+  (interactive "P")
+  (bog--with-search-lprops
+    '(org-agenda-redo all)))
 
 (defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
   "Sort topic headings in this buffer.
