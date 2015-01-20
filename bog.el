@@ -371,8 +371,9 @@ With prefix FILE, include only orphan citekeys from that file."
   (let ((files (or (and file (list file))
                    (bog-notes)))
         (heading-cks (bog-all-heading-citekeys))
+        (bufname "*Bog orphan citekeys*")
         cks)
-    (with-current-buffer (get-buffer-create "*Bog orphan citekeys*")
+    (with-current-buffer (get-buffer-create bufname)
       (erase-buffer)
       (insert "\n")
       (-each files
@@ -386,7 +387,9 @@ With prefix FILE, include only orphan citekeys from that file."
             (insert (format "* %s\n\n" (file-name-nondirectory f)))
             (insert (concat cks "\n\n")))))
       (org-mode)
-      (show-all))))
+      (show-all)
+      (goto-char (point-min)))
+    (pop-to-buffer bufname)))
 
 
 ;;; Citekey-associated files
