@@ -611,7 +611,7 @@ one entry per BibTeX file."
           (user-error "Aborting"))))
       (bibtex-mode)
       (goto-char (point-min)))
-    (switch-to-buffer-other-window bib-buffer-name)))
+    (pop-to-buffer bib-buffer-name)))
 
 (defun bog-citekey-as-bib (citekey)
   "Return file name `bog-bib-directory'/CITEKEY.bib."
