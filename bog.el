@@ -373,7 +373,7 @@ With prefix FILE, include only orphan citekeys from that file."
         (heading-cks (bog-all-heading-citekeys))
         cks)
     (with-current-buffer (get-buffer-create "*Bog orphan citekeys*")
-      (delete-region (point-min) (point-max))
+      (erase-buffer)
       (insert "\n")
       (-each files
         (lambda (f)
@@ -599,7 +599,7 @@ one entry per BibTeX file."
           (-map #'bog-citekey-as-bib
                 (-distinct (--sort (string-lessp it other) citekeys))))
     (with-current-buffer (get-buffer-create bib-buffer-name)
-      (delete-region (point-min) (point-max))
+      (erase-buffer)
       (--each bib-files
         (cond
          ((file-exists-p it)
