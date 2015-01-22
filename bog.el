@@ -392,6 +392,37 @@ With prefix FILE, include only orphan citekeys from that file."
       (goto-char (point-min)))
     (pop-to-buffer bufname)))
 
+(defun bog-list-duplicate-heading-citekeys (&optional clear-cache)
+  "List citekeys that have more than one heading.
+With prefix CLEAR-CACHE, reset cache of citekey headings (which
+is only active if `bog-use-citekey-cache' is non-nil)."
+  (interactive "P")
+  (when clear-cache
+    (setq bog--all-heading-citekeys nil))
+  (let ((bufname "*Bog duplicate heading citekeys*")
+        (dup-cks (-sort (lambda (x y) (string-lessp x y))
+                        (bog--find-duplicates (bog-all-heading-citekeys)))))
+    (if (not dup-cks)
+        (message "No duplicate citekeys found")
+      (with-current-buffer (get-buffer-create bufname)
+        (erase-buffer)
+        (insert (mapconcat #'identity dup-cks "\n"))
+        (org-mode)
+        (bog-mode 1)
+        (goto-char (point-min)))
+      (pop-to-buffer bufname))))
+
+(defun bog--find-duplicates (list)
+  (let (dups uniqs)
+    (--each list
+      (cond
+       ((member it dups))
+       ((member it uniqs)
+        (push it dups))
+       (t
+        (push it uniqs))))
+    (nreverse dups)))
+
 
 ;;; Citekey-associated files
 
