@@ -387,6 +387,7 @@ With prefix FILE, include only orphan citekeys from that file."
             (insert (format "* %s\n\n" (file-name-nondirectory f)))
             (insert (concat cks "\n\n")))))
       (org-mode)
+      (bog-mode 1)
       (show-all)
       (goto-char (point-min)))
     (pop-to-buffer bufname)))
