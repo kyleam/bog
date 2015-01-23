@@ -342,13 +342,11 @@ word constituents."
 
 (defun bog-heading-citekeys-in-buffer ()
   "Return all heading citekeys in current buffer."
-  (--keep it
-          (org-map-entries 'bog-citekey-from-heading)))
+  (-non-nil (org-map-entries 'bog-citekey-from-heading)))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
   "Return all citekeys in current buffer, without any narrowing."
-  (--keep it
-          (org-map-entries 'bog-citekey-from-heading nil 'file)))
+  (-non-nil (org-map-entries 'bog-citekey-from-heading nil 'file)))
 
 (defun bog-non-heading-citekeys-in-file (file)
   "Return all non-heading citekeys in FILE."
