@@ -366,7 +366,8 @@ word constituents."
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List in citekeys that appear in notes but don't have heading.
-With prefix FILE, include only orphan citekeys from that file."
+With prefix argument FILE, include only orphan citekeys from that
+file."
   (interactive (list (and current-prefix-arg
                           (bog-read-note-file-name))))
   (let ((files (or (and file (list file))
