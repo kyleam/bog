@@ -44,6 +44,9 @@
   =bog-goto-citekey-heading-in-notes= now work when citekeys are
   stored are stored as property values.
 
+- New command =bog-list-duplicate-heading-citekeys= finds citekeys
+  that have more than one heading in the notes.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and
