@@ -833,7 +833,7 @@ If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-exact-heading-in-notes citekey)))
+         (marker (bog--find-citekey-heading-in-notes citekey)))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (save-excursion
@@ -958,7 +958,7 @@ heading in any note file.  Do the same if locating a citekey from
 context fails."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-exact-heading-in-notes citekey)))
+         (marker (bog--find-citekey-heading-in-notes citekey)))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (org-with-wide-buffer
