@@ -789,7 +789,7 @@ buffer, the narrowing is removed."
                      (bog--find-citekey-heading-in-notes citekey))))
     (if marker
         (progn
-          (switch-to-buffer (marker-buffer marker))
+          (pop-to-buffer (marker-buffer marker))
           (when (or (< marker (point-min))
                     (> marker (point-max)))
             (widen))
