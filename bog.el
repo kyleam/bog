@@ -848,7 +848,7 @@ If the citekey file prompt is slow to appear, consider enabling
 All headings from Org files in `bog-note-directory' at or above
 level `bog-refile-maxlevel' are considered."
   (interactive)
-  (let ((org-refile-targets `((,(bog-notes)
+  (let ((org-refile-targets `((bog-notes
                                :maxlevel . ,bog-refile-maxlevel))))
     (org-refile)))
 
