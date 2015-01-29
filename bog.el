@@ -33,6 +33,9 @@
 (require 'dash)
 (require 'org)
 
+(eval-when-compile
+  (require 'cl))
+
 
 ;;; Customization
 
