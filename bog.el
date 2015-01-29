@@ -643,7 +643,7 @@ one entry per BibTeX file."
           (insert-file-contents it)
           (goto-char (point-max)))
          ((not (y-or-n-p (format "%s does not exist.  Skip it?" it)))
-          (kill-buffer bib-buffer)
+          (kill-buffer bib-buffer-name)
           (user-error "Aborting"))))
       (bibtex-mode)
       (goto-char (point-min)))
