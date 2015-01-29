@@ -47,6 +47,9 @@
 - New command =bog-list-duplicate-heading-citekeys= finds citekeys
   that have more than one heading in the notes.
 
+- New command =bog-jump-to-topic-heading= provides quick navigation to
+  topic headings in any note file.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

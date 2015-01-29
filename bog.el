@@ -172,8 +172,8 @@ It should contain the placeholder \"%s\" for the query."
 (defcustom  bog-topic-heading-level 1
   "Consider headings at this level to be topic headings.
 Topic headings for studies may be at any level, but
-`bog-sort-topic-headings' uses this variable to determine what
-level to operate on."
+`bog-sort-topic-headings' and `bog-jump-to-topic-heading' use
+this variable to determine what level to operate on."
   :group 'bog
   :type 'integer)
 
@@ -999,6 +999,14 @@ With argument ARG, do it ARG times."
     (skip-syntax-backward "w"))
   (org-show-context))
 
+(defun bog-jump-to-topic-heading ()
+  "Jump to topic heading.
+Topic headings are determined by `bog-topic-heading-level'."
+  (interactive)
+  (let ((org-refile-targets
+         `((bog-notes :level . ,bog-topic-heading-level))))
+    (org-refile '(4))))
+
 
 ;;; Font-lock
 
@@ -1080,6 +1088,10 @@ chosen."
   "Find citekey heading in notes."
   (bog-goto-citekey-heading-in-notes t))
 
+(def-bog-commander-method ?j
+  "Jump to topic heading in notes."
+  (bog-jump-to-topic-heading))
+
 (def-bog-commander-method ?s
   "Search notes with `org-search-view'."
   (bog-search-notes))
@@ -1097,6 +1109,7 @@ chosen."
       (define-key prefix-map "h" 'bog-goto-citekey-heading-in-buffer)
       (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
       (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
+      (define-key prefix-map "j" 'bog-jump-to-topic-heading)
       (define-key prefix-map "l" 'bog-open-first-citekey-link)
       (define-key prefix-map "n" 'bog-next-non-heading-citekey)
       (define-key prefix-map "p" 'bog-previous-non-heading-citekey)
