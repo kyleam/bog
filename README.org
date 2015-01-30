@@ -103,6 +103,9 @@ Other useful functions include
 - =bog-goto-citekey-heading-in-buffer=
 - =bog-goto-citekey-heading-in-notes=
 - =bog-insert-heading-citekey=
+- =bog-jump-to-topic-heading=
+- =bog-list-duplicate-heading-citekeys=
+- =bog-list-orphan-citekeys=
 - =bog-open-first-citekey-link=
 - =bog-refile=
 - =bog-search-notes=
