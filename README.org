@@ -106,6 +106,7 @@ Other useful functions include
 - =bog-jump-to-topic-heading=
 - =bog-list-duplicate-heading-citekeys=
 - =bog-list-orphan-citekeys=
+- =bog-open-citekey-link=
 - =bog-open-first-citekey-link=
 - =bog-refile=
 - =bog-search-notes=

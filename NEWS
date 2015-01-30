@@ -25,11 +25,12 @@
 - New command =bog-insert-heading-citekey= prompts with all heading
   citekeys and inserts the selected one at point.
 
-- New command =bog-open-first-citekey-link= opens the first link found
-  under the subtree of a citekey.  This is particularly useful if you
-  place the main link for the study (usually a DOI link) as the first
-  link in the citekey's subtree.  The citekey is either taken from at
-  point or selected from all heading citekeys.
+- New commands =bog-open-citekey-link= and
+  =bog-open-first-citekey-link= open a link (or links) for a citekey.
+  =bog-open-first-citekey-link= is particularly useful if you place
+  the main link for the study (usually a DOI link) as the first link
+  in the citekey's subtree.  The citekey is either taken from at point
+  or selected from all heading citekeys.
 
 - New commands =bog-next-non-heading-citekey= and
   =bog-previous-non-heading-citekey=

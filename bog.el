@@ -948,8 +948,13 @@ current buffer."
                         'bog-all-heading-citekeys)))
     (insert (bog-select-citekey (funcall citekey-func)))))
 
-(defun bog-open-first-citekey-link (&optional no-context)
-  "Open first link under citekey heading.
+(defun bog-open-citekey-link (&optional no-context first)
+  "Open a link for a citekey heading.
+
+If FIRST is non-nil, open the first link under the heading.
+Otherwise, if there is more than one link under the heading,
+prompt with a list of links using the `org-open-at-point'
+interface.
 
 The citekey is taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.
@@ -965,9 +970,21 @@ context fails."
           (org-with-wide-buffer
            (goto-char marker)
            (org-narrow-to-subtree)
-           (org-next-link)
+           (when first (org-next-link))
            (org-open-at-point)))
       (message "Heading for %s not found in notes" citekey))))
+
+(defun bog-open-first-citekey-link (&optional no-context)
+  "Open first link for a citekey heading.
+
+The citekey is taken from the text under point if it matches
+`bog-citekey-format' or from the current tree.
+
+With prefix argument NO-CONTEXT, prompt with citekeys that have a
+heading in any note file.  Do the same if locating a citekey from
+context fails."
+  (interactive "P")
+  (bog-open-citekey-link no-context t))
 
 (defun bog-next-non-heading-citekey (&optional arg)
   "Move foward to next non-heading citekey.
@@ -1110,7 +1127,8 @@ chosen."
       (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
       (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
       (define-key prefix-map "j" 'bog-jump-to-topic-heading)
-      (define-key prefix-map "l" 'bog-open-first-citekey-link)
+      (define-key prefix-map "l" 'bog-open-citekey-link)
+      (define-key prefix-map "L" 'bog-open-first-citekey-link)
       (define-key prefix-map "n" 'bog-next-non-heading-citekey)
       (define-key prefix-map "p" 'bog-previous-non-heading-citekey)
       (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
