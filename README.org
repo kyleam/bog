@@ -99,16 +99,16 @@ the first parent heading that is a study heading.
 
 Other useful functions include
 
+- =bog-citekey-tree-to-indirect-buffer=
 - =bog-goto-citekey-heading-in-buffer=
 - =bog-goto-citekey-heading-in-notes=
-- =bog-citekey-tree-to-indirect-buffer=
+- =bog-insert-heading-citekey=
+- =bog-open-first-citekey-link=
 - =bog-refile=
 - =bog-search-notes=
 - =bog-search-notes-for-citekey=
 - =bog-sort-topic-headings-in-buffer=
 - =bog-sort-topic-headings-in-notes=
-- =bog-insert-heading-citekey=
-- =bog-open-first-citekey-link=
 
 You can try out many of the commands in
 [[file:example/notes/org-mode-pubs.org][example/notes/org-mode-pubs.org]].
@@ -117,9 +117,9 @@ You can try out many of the commands in
 
 Several variables determine where Bog looks for things.
 
-- =bog-note-directory=
-- =bog-file-directory=
 - =bog-bib-directory= or =bog-bib-file=
+- =bog-file-directory=
+- =bog-note-directory=
 - =bog-stage-directory=
 
 The variables below are important for specifying how Bog behaves.
