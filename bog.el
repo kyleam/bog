@@ -784,9 +784,7 @@ If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (or (and (member (buffer-file-name) (bog-notes))
-                          (bog--find-citekey-heading-in-buffer citekey))
-                     (bog--find-citekey-heading-in-notes citekey))))
+         (marker (bog--find-citekey-heading-in-notes citekey)))
     (if marker
         (progn
           (pop-to-buffer (marker-buffer marker))
@@ -800,9 +798,12 @@ buffer, the narrowing is removed."
 (defun bog--find-citekey-heading-in-notes (citekey)
   "Return the marker of heading for CITEKEY in notes.
 CITEKEY can either be the heading title or the property value of
-the key `bog-citekey-property'."
-  (or (org-find-exact-heading-in-directory citekey bog-note-directory)
-      (bog--find-citekey-property-in-notes citekey)))
+the key `bog-citekey-property'.  When in a note file, search for
+headings there first."
+  (or (and (member (buffer-file-name) (bog-notes))
+           (bog--find-citekey-heading-in-buffer citekey))
+      (or (org-find-exact-heading-in-directory citekey bog-note-directory)
+          (bog--find-citekey-property-in-notes citekey))))
 
 (defun bog--find-citekey-property-in-notes (citekey)
   "Return marker within notes for heading with CITEKEY as a property value.
