@@ -1109,6 +1109,14 @@ chosen."
   "Jump to topic heading in notes."
   (bog-jump-to-topic-heading))
 
+(def-bog-commander-method ?l
+  "Open a link for a citekey heading."
+  (bog-open-citekey-link))
+
+(def-bog-commander-method ?L
+  "Open first link for a citekey heading."
+  (bog-open-first-citekey-link))
+
 (def-bog-commander-method ?s
   "Search notes with `org-search-view'."
   (bog-search-notes))
