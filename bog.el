@@ -884,6 +884,7 @@ Restore the `org-lprops' property value for
      (use-local-map (let ((map (make-sparse-keymap)))
                       (set-keymap-parent map org-agenda-mode-map)
                       (define-key map "r" 'bog-agenda-redo)
+                      (define-key map "g" 'bog-agenda-redo)
                       map))
      (put 'org-agenda-redo-command 'org-lprops org-lprops)))
 
