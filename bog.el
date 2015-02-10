@@ -339,8 +339,8 @@ word constituents."
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."
   (with-temp-buffer
-    (org-mode)
     (insert-file-contents file)
+    (org-mode)
     (bog-heading-citekeys-in-buffer)))
 
 (defun bog-heading-citekeys-in-buffer ()
@@ -356,8 +356,8 @@ word constituents."
   (let (citekeys
         case-fold-search)
     (with-temp-buffer
-      (org-mode)
       (insert-file-contents file)
+      (org-mode)
       (while (re-search-forward bog-citekey-format nil t)
         (unless (or (org-at-heading-p)
                     (org-at-property-p))
