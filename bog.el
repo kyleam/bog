@@ -838,10 +838,9 @@ If the citekey file prompt is slow to appear, consider enabling
          (marker (bog--find-citekey-heading-in-notes citekey)))
     (if marker
         (with-current-buffer (marker-buffer marker)
-          (save-excursion
-            (save-restriction
-              (goto-char marker)
-              (org-tree-to-indirect-buffer))))
+          (org-with-wide-buffer
+           (goto-char marker)
+           (org-tree-to-indirect-buffer)))
       (message "Heading for %s not found in notes" citekey))))
 
 (defun bog-refile ()
