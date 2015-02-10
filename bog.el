@@ -800,10 +800,14 @@ buffer, the narrowing is removed."
 CITEKEY can either be the heading title or the property value of
 the key `bog-citekey-property'.  When in a note file, search for
 headings there first."
-  (or (and (member (buffer-file-name) (bog-notes))
-           (bog--find-citekey-heading-in-buffer citekey))
-      (or (org-find-exact-heading-in-directory citekey bog-note-directory)
-          (bog--find-citekey-property-in-notes citekey))))
+  (let* ((base-buf (buffer-base-buffer))
+         (buf (or base-buf (current-buffer)))
+         (buf-file (buffer-file-name buf)))
+    (or (and (member buf-file (bog-notes))
+             (with-current-buffer buf
+               (bog--find-citekey-heading-in-buffer citekey)))
+        (org-find-exact-heading-in-directory citekey bog-note-directory)
+        (bog--find-citekey-property-in-notes citekey))))
 
 (defun bog--find-citekey-property-in-notes (citekey)
   "Return marker within notes for heading with CITEKEY as a property value.
