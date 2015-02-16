@@ -197,6 +197,15 @@ added citekeys, clear the cache with `bog-clear-citekey-cache'."
   :group 'bog
   :type 'boolean)
 
+(defvar bog-citekey-syntax-table
+  (let ((st (make-syntax-table org-mode-syntax-table)))
+    (modify-syntax-entry ?- "w" st)
+    (modify-syntax-entry ?_ "w" st)
+    st)
+  "Syntax table used when working with citekeys.
+Like `org-mode-syntax-table', but hyphens and underscores are
+treated as word characters.")
+
 
 ;;; Citekey methods
 
@@ -241,21 +250,13 @@ If NO-CONTEXT is non-nil, immediately fall back."
   "Prompt for citekey from CITEKEYS."
   (org-icompleting-read "Select citekey: " citekeys))
 
-(defmacro bog--with-citekey-syntax (&rest body)
-  "Execute BODY with hyphen and underscore as word constituents."
-  (declare (indent 0))
-  `(with-syntax-table (copy-syntax-table (syntax-table))
-     (modify-syntax-entry ?- "w")
-     (modify-syntax-entry ?_ "w")
-     ,@body))
-
 (defun bog-citekey-at-point ()
   "Return citekey at point.
 The citekey must have the format specified by
 `bog-citekey-format'.  Hyphens and underscores are considered as
 word constituents."
   (save-excursion
-    (bog--with-citekey-syntax
+    (with-syntax-table bog-citekey-syntax-table
       (skip-syntax-backward "w")
       (let (case-fold-search)
         (and (looking-at bog-citekey-format)
@@ -998,7 +999,7 @@ With argument ARG, do it ARG times."
   (or arg (setq arg 1))
   (if (< arg 0)
       (bog-previous-non-heading-citekey (- arg))
-    (bog--with-citekey-syntax
+    (with-syntax-table bog-citekey-syntax-table
       (skip-syntax-forward "w")
       (let (case-fold-search)
         (while (and (> arg 0)
@@ -1012,7 +1013,7 @@ With argument ARG, do it ARG times."
 With argument ARG, do it ARG times."
   (interactive "p")
   (or arg (setq arg 1))
-  (bog--with-citekey-syntax
+  (with-syntax-table bog-citekey-syntax-table
     (let (case-fold-search)
       (while (and (> arg 0)
                   (re-search-backward bog-citekey-format nil t))
