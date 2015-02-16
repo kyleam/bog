@@ -197,6 +197,13 @@ added citekeys, clear the cache with `bog-clear-citekey-cache'."
   :group 'bog
   :type 'boolean)
 
+(defcustom bog-keep-indirect nil
+  "Keep the previous buffer from `bog-citekey-tree-to-indirect-buffer'.
+Otherwise, each call to `bog-citekey-tree-to-indirect-buffer'
+kills the indirect buffer created by the previous call."
+  :group 'bog
+  :type 'boolean)
+
 (defvar bog-citekey-syntax-table
   (let ((st (make-syntax-table org-mode-syntax-table)))
     (modify-syntax-entry ?- "w" st)
@@ -826,8 +833,13 @@ there first."
         (when (and (not m) (not visiting)) (kill-buffer buffer))
         (and m (throw 'found m))))))
 
+(defvar bog--last-indirect-buffer nil)
+
 (defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
   "Open subtree for citekey in an indirect buffer.
+
+Unless `bog-keep-indirect' is non-nil, replace the indirect
+buffer from the previous call.
 
 The citekey is taken from the text under point if it matches
 `bog-citekey-format'.
@@ -839,14 +851,21 @@ context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-citekey-heading-in-notes citekey)))
-    (if marker
-        (with-current-buffer (marker-buffer marker)
-          (org-with-wide-buffer
-           (goto-char marker)
-           (org-tree-to-indirect-buffer)))
-      (message "Heading for %s not found in notes" citekey))))
+  (-if-let* ((orig-buf (current-buffer))
+             (citekey (bog-citekey-from-point-or-all-headings no-context))
+             (marker (bog--find-citekey-heading-in-notes citekey)))
+      (with-current-buffer (marker-buffer marker)
+        (org-with-wide-buffer
+         (goto-char marker)
+         (let ((org-indirect-buffer-display
+                (if (and (not bog-keep-indirect)
+                         (eq bog--last-indirect-buffer orig-buf))
+                    'current-window
+                  'other-window))
+               (last-buf-p (not (buffer-live-p bog--last-indirect-buffer))))
+           (org-tree-to-indirect-buffer (or bog-keep-indirect last-buf-p))
+           (setq bog--last-indirect-buffer org-last-indirect-buffer))))
+    (message "Heading for %s not found in notes" citekey)))
 
 (defun bog-refile ()
   "Refile heading within notes.
