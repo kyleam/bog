@@ -617,8 +617,10 @@ one entry per BibTeX file."
       (insert-file-contents file)
       (bibtex-skip-to-valid-entry)
       (bibtex-clean-entry new-key)
-      (setq bib-file (expand-file-name (concat (bibtex-key-in-head) ".bib")
-                                       new-directory))
+      (if (looking-at bibtex-entry-head)
+          (setq bib-file (expand-file-name (concat (bibtex-key-in-head) ".bib")
+                                           new-directory))
+        (error "BibTeX header line looks wrong"))
       (write-file bib-file))
     ;; If a buffer was visiting the original bib file, point it to the
     ;; new file.
