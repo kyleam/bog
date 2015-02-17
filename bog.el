@@ -30,8 +30,11 @@
 
 ;;; Code:
 
+(require 'bibtex)
 (require 'dash)
+(require 'dired)
 (require 'org)
+(require 'org-agenda)
 
 (eval-when-compile
   (require 'cl))
@@ -851,21 +854,22 @@ context fails.
 If the citekey file prompt is slow to appear, consider enabling
 `bog-use-citekey-cache'."
   (interactive "P")
-  (-if-let* ((orig-buf (current-buffer))
-             (citekey (bog-citekey-from-point-or-all-headings no-context))
-             (marker (bog--find-citekey-heading-in-notes citekey)))
-      (with-current-buffer (marker-buffer marker)
-        (org-with-wide-buffer
-         (goto-char marker)
-         (let ((org-indirect-buffer-display
-                (if (and (not bog-keep-indirect)
-                         (eq bog--last-indirect-buffer orig-buf))
-                    'current-window
-                  'other-window))
-               (last-buf-p (not (buffer-live-p bog--last-indirect-buffer))))
-           (org-tree-to-indirect-buffer (or bog-keep-indirect last-buf-p))
-           (setq bog--last-indirect-buffer org-last-indirect-buffer))))
-    (message "Heading for %s not found in notes" citekey)))
+  (let* ((orig-buf (current-buffer))
+         (citekey (bog-citekey-from-point-or-all-headings no-context))
+         (marker (bog--find-citekey-heading-in-notes citekey)))
+    (if marker
+        (with-current-buffer (marker-buffer marker)
+          (org-with-wide-buffer
+           (goto-char marker)
+           (let ((org-indirect-buffer-display
+                  (if (and (not bog-keep-indirect)
+                           (eq bog--last-indirect-buffer orig-buf))
+                      'current-window
+                    'other-window))
+                 (last-buf-p (not (buffer-live-p bog--last-indirect-buffer))))
+             (org-tree-to-indirect-buffer (or bog-keep-indirect last-buf-p))
+             (setq bog--last-indirect-buffer org-last-indirect-buffer))))
+      (message "Heading for %s not found in notes" citekey))))
 
 (defun bog-refile ()
   "Refile heading within notes.
