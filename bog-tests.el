@@ -397,6 +397,26 @@ some text"
      (should-not (file-exists-p (expand-file-name
                                  (concat "one.pdf") bog-stage-directory))))))
 
+(ert-deftest bog-rename-staged-file-to-citekey-one-file-subdir ()
+  (bog-tests--with-temp-dir
+   (let ((bog-stage-directory (expand-file-name "stage"))
+         (bog-file-directory (expand-file-name "citekey-files"))
+         (citekey "name2010word")
+         (bog-subdirectory-group 2))
+     (make-directory bog-stage-directory)
+     (make-directory bog-file-directory)
+     (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
+     (bog-tests--with-temp-text
+         "
+* top level
+** <point><citekey>
+some text"
+       (bog-rename-staged-file-to-citekey))
+     (should (file-exists-p (expand-file-name
+                             (concat "2010/" citekey ".pdf") bog-file-directory)))
+     (should-not (file-exists-p (expand-file-name
+                                 (concat "one.pdf") bog-stage-directory))))))
+
 (ert-deftest bog-file-citekeys-multiple-variants ()
   (bog-tests--with-temp-dir
    (let* ((bog-file-directory (expand-file-name "citekey-files"))
@@ -422,7 +442,8 @@ some text"
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
                       nil ".bib"))
-          (citekey "name2010word"))
+          (citekey "name2010word")
+          (bog-bib-directory default-directory))
       (with-current-buffer (find-file-noselect temp-file)
         (insert (format "\n@article{%s,\n" citekey)
                 "title = {A title},\n"
@@ -436,6 +457,7 @@ some text"
       (should-not (file-exists-p temp-file))
       (let* ((new-file (concat citekey ".bib"))
              (new-buffer (get-file-buffer new-file)))
+        (should (file-exists-p new-file))
         (should-not new-buffer)
         (delete-file new-file)))))
 
@@ -444,7 +466,8 @@ some text"
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
                       nil ".bib"))
-          (citekey "name2010word"))
+          (citekey "name2010word")
+          (bog-bib-directory default-directory))
       (with-current-buffer (find-file-noselect temp-file)
         (insert (format "\n@article{%s,\n" citekey)
                 "title = {A title},\n"
@@ -459,6 +482,29 @@ some text"
              (new-buffer (get-file-buffer new-file)))
         (should new-buffer)
         (kill-buffer new-buffer)
+        (delete-file new-file)))))
+
+(ert-deftest bog--prepare-bib-file-subdir ()
+  (bog-tests--with-temp-dir
+    (let ((temp-file (make-temp-file
+                      (expand-file-name "bog-testing-" default-directory)
+                      nil ".bib"))
+          (citekey "name2010word")
+          (bog-bib-directory default-directory)
+          (bog-subdirectory-group 2))
+      (with-current-buffer (find-file-noselect temp-file)
+        (insert (format "\n@article{%s,\n" citekey)
+                "title = {A title},\n"
+                "author = {Last, First},\n"
+                "journal = {Some journal},\n"
+                "year = 2009,\n"
+                "\n}")
+        (save-buffer))
+      (kill-buffer (get-file-buffer temp-file))
+      (bog--prepare-bib-file temp-file)
+      (should-not (file-exists-p temp-file))
+      (let ((new-file (concat "2010/" citekey ".bib")))
+        (should (file-exists-p new-file))
         (delete-file new-file)))))
 
 ;; `bog-sort-topic-headings-in-buffer'

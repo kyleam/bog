@@ -51,6 +51,10 @@
 - New command =bog-jump-to-topic-heading= provides quick navigation to
   topic headings in any note file.
 
+- New variable =bog-subdirectory-group= controls whether BibTeX and
+  citekey-associated files are organized into subdirectories generated
+  from a =bog-citekey-format= regexp group.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

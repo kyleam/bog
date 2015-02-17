@@ -99,7 +99,9 @@ The default corresponds to the default value of
 
 (defcustom bog-file-directory
   (expand-file-name "citekey-files/" bog-root-directory)
-  "Directory with citekey-associated files."
+  "Directory with citekey-associated files.
+Files are stored in subdirectories if `bog-subdirectory-group' is
+non-nil."
   :group 'bog
   :type 'directory)
 
@@ -124,11 +126,20 @@ entry."
   :group 'bog
   :type 'function)
 
+(defcustom bog-subdirectory-group nil
+  "Regexp group from `bog-citekey-format' to use as subdirectory name.
+If non-nil, use the indicated group to generate the subdirectory
+name for BibTeX and citekey-associated files."
+  :group 'bog
+  :type '(choice (const :tag "Don't use subdirectories" nil)
+                 (integer :tag "Regexp group number")))
+
 (defcustom bog-bib-directory
   (expand-file-name "bibs/" bog-root-directory)
   "The name of the directory that BibTeX files are stored in.
 This is only meaningful if `bog-find-citekey-bib-func' set to
-`bog-find-citekey-bib-file'."
+`bog-find-citekey-bib-file'.  Files are stored in subdirectories
+if `bog-subdirectory-group' is non-nil."
   :group 'bog
   :type 'directory)
 
@@ -454,29 +465,40 @@ locating a citekey from context fails."
    (bog-citekey-from-surroundings-or-files no-context)))
 
 (defun bog--find-citekey-file (citekey)
-  (let* (citekey-file
-         (citekey-files (bog-citekey-files citekey))
-         (citekey-file-names (-map 'file-name-nondirectory citekey-files))
-         (num-choices (length citekey-file-names)))
+  (let* ((citekey-files (bog-citekey-files citekey))
+         (num-choices (length citekey-files))
+         citekey-file)
     (case num-choices
       (0 (user-error "No file found for %s" citekey))
       (1 (setq citekey-file (car citekey-files)))
-      (t (setq citekey-file (expand-file-name
-                             (org-icompleting-read "Select file: "
-                                                   citekey-file-names)
-                             bog-file-directory))))
+      (t
+       (let* ((fname-paths (-annotate #'file-name-nondirectory citekey-files))
+              (fname (org-icompleting-read "Select file: "
+                                           (-map #'car fname-paths))))
+         (setq citekey-file (cdr (assoc fname fname-paths))))))
     (org-open-file citekey-file)))
 
 (defun bog-citekey-files (citekey)
   "Return files in `bog-file-directory' associated with CITEKEY.
-These should be named CITEKEY<sep>*.<ext>, where <sep> is a
-character in `bog-citekey-file-name-separators'."
-  (let* ((patterns (--map (concat it "*") bog-citekey-file-name-separators))
+These should be named [<subdir>/]CITEKEY<sep>*.<ext>, where <sep>
+is a character in `bog-citekey-file-name-separators' and is
+determined by `bog-subdirectory-group'."
+  (let* ((subdir (bog--get-subdir citekey))
+         (dir (file-name-as-directory
+               (or (and subdir (expand-file-name subdir bog-file-directory))
+                   bog-file-directory)))
+         (patterns (--map (concat it "*") bog-citekey-file-name-separators))
          (patterns (cons ".*" patterns)))
-    (--mapcat (file-expand-wildcards
-               (concat (file-name-as-directory bog-file-directory)
-                       citekey it))
-              patterns)))
+    (--mapcat (file-expand-wildcards (concat dir citekey it)) patterns)))
+
+(defun bog--get-subdir (citekey)
+  "Return subdirectory for citekey file.
+Subdirectory is determined by `bog-subdirectory-group'."
+  (let (case-fold-search)
+    (and bog-subdirectory-group
+         (string-match bog-citekey-format citekey)
+         (match-string-no-properties bog-subdirectory-group
+                                     citekey))))
 
 ;;;###autoload
 (defun bog-rename-staged-file-to-citekey (&optional no-context)
@@ -513,15 +535,20 @@ If the citekey file prompt is slow to appear, consider enabling
 (defun bog-file-ask-on-conflict (staged-file citekey)
   "Rename citekey file, prompting for a new name if it already exists.
 STAGED-FILE is renamed to <citekey>.<ext> within
-`bog-file-directory'.  If this file already exists, prompt for
-another name.  `bog-file-secondary-name' controls the default
-string for the prompt."
+`bog-file-directory' (and, optionally, within a subdirectory,
+depending on `bog-subdirectory-group').  If this file already
+exists, prompt for another name.  `bog-file-secondary-name'
+controls the default string for the prompt."
   (let* ((ext (file-name-extension staged-file))
-         (citekey-file (bog-citekey-as-file citekey ext)))
+         (citekey-file (bog-citekey-as-file citekey ext))
+         (dir (file-name-directory citekey-file)))
+    (unless (file-exists-p dir)
+      (make-directory dir))
     (condition-case nil
         (rename-file staged-file citekey-file)
       (file-error
-       (let ((new-file-name
+       (let ((dir (file-name-directory citekey-file))
+             (new-file-name
               (file-name-nondirectory
                (bog-citekey-as-file (concat citekey bog-file-secondary-name)
                                     ext))))
@@ -530,13 +557,20 @@ string for the prompt."
                 (format "File %s already exists.  Name to use instead: "
                         citekey-file)
                 new-file-name nil nil '(new-file-name)))
-         (setq citekey-file (expand-file-name new-file-name bog-file-directory))
+         (setq citekey-file (expand-file-name new-file-name dir))
          (rename-file staged-file citekey-file))))
     citekey-file))
 
 (defun bog-citekey-as-file (citekey ext)
-  "Return file name `bog-file-directory'/CITEKEY.<ext>."
-  (expand-file-name (concat citekey "." ext) bog-file-directory))
+  "Return name of associated file for CITEKEY.
+Generate a file name with the form
+`bog-file-directory'/[<subdir>/]CITEKEY.EXT, where the optional
+<subdir> is determined by `bog-subdirectory-group'."
+  (let* ((subdir (bog--get-subdir citekey))
+         (dir (file-name-as-directory
+               (or (and subdir (expand-file-name subdir bog-file-directory))
+                   bog-file-directory))))
+    (expand-file-name (concat citekey "." ext) dir)))
 
 (defun bog-all-file-citekeys ()
   "Return a list of citekeys for files in `bog-file-directory'."
@@ -551,9 +585,18 @@ string for the prompt."
 
 (defun bog-all-citekey-files ()
   "Return list of all files in `bog-file-directory'."
-  (-remove 'file-directory-p
-           (directory-files bog-file-directory
-                            t directory-files-no-dot-files-regexp)))
+  (let (dirs)
+    (if bog-subdirectory-group
+        (dolist (df (directory-files bog-file-directory t
+                                     directory-files-no-dot-files-regexp))
+          (when (and (file-readable-p df) (file-directory-p df))
+            (push df dirs)))
+      (push bog-file-directory dirs))
+    (-remove #'file-directory-p
+             (-mapcat (lambda (d)
+                        (directory-files
+                         d t directory-files-no-dot-files-regexp))
+                      dirs))))
 
 (defun bog-staged-files ()
   "Return files in `bog-stage-directory'."
@@ -599,7 +642,8 @@ fails."
 
 Search for new BibTeX files in `bog-stage-directory', and run
 `bibtex-clean-entry' on each file before it is moved to
-`bog-bib-directory'/<citekey>.bib.
+`bog-bib-directory'/[<subdir>/]<citekey>.bib, where the optional
+<subdir> is determined by `bog-subdirectory-group'.
 
 This function is only useful if you use the non-standard setup of
 one entry per BibTeX file."
@@ -608,9 +652,9 @@ one entry per BibTeX file."
          (file-expand-wildcards
           (concat (file-name-as-directory bog-stage-directory) "*.bib"))))
     (--each staged
-      (bog--prepare-bib-file it t bog-bib-directory))))
+      (bog--prepare-bib-file it t))))
 
-(defun bog--prepare-bib-file (file &optional new-key new-directory)
+(defun bog--prepare-bib-file (file &optional new-key)
   (let (bib-file)
     (with-temp-buffer
       (bibtex-mode)
@@ -618,9 +662,11 @@ one entry per BibTeX file."
       (bibtex-skip-to-valid-entry)
       (bibtex-clean-entry new-key)
       (if (looking-at bibtex-entry-head)
-          (setq bib-file (expand-file-name (concat (bibtex-key-in-head) ".bib")
-                                           new-directory))
+          (setq bib-file (bog-citekey-as-bib (bibtex-key-in-head)))
         (error "BibTeX header line looks wrong"))
+      (let ((dir (file-name-directory bib-file)))
+        (unless (file-exists-p dir)
+          (make-directory dir)))
       (write-file bib-file))
     ;; If a buffer was visiting the original bib file, point it to the
     ;; new file.
@@ -665,7 +711,11 @@ one entry per BibTeX file."
 
 (defun bog-citekey-as-bib (citekey)
   "Return file name `bog-bib-directory'/CITEKEY.bib."
-  (expand-file-name (concat citekey ".bib") bog-bib-directory))
+  (let* ((subdir (bog--get-subdir citekey))
+         (dir (file-name-as-directory
+               (or (and subdir (expand-file-name subdir bog-bib-directory))
+                   bog-bib-directory))))
+    (expand-file-name (concat citekey ".bib") dir)))
 
 (defun bog-bib-citekeys ()
   "Return a list citekeys for all BibTeX entries.
@@ -675,11 +725,20 @@ instead of citekeys from file names in `bog-bib-directory'."
       (with-temp-buffer
         (bibtex-mode)
         (insert-file-contents bog-bib-file)
-        (-map 'car (bibtex-parse-keys)))
-    (-map 'file-name-base
-          (file-expand-wildcards (concat
-                                  (file-name-as-directory bog-bib-directory)
-                                  "*.bib")))))
+        (-map #'car (bibtex-parse-keys)))
+    (let (dirs)
+      (if bog-subdirectory-group
+          (dolist (df (directory-files
+                       bog-bib-directory t directory-files-no-dot-files-regexp))
+            (when (and (file-readable-p df) (file-directory-p df))
+              (push df dirs)))
+      (push bog-bib-directory dirs))
+      (-map #'file-name-base
+            (-mapcat
+             (lambda (dir)
+               (file-expand-wildcards
+                (concat (file-name-as-directory dir) "*.bib")))
+             dirs)))))
 
 
 ;;; Web
