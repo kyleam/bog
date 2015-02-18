@@ -5,6 +5,9 @@
 ** New features
 
 - Any file type (not just PDFs) can now be associated with a citekey.
+  Variables =bog-pdf-directory= and =bog-pdf-file-name-separators=
+  have been replaced by new variables =bog-file-directory= and
+  =bog-citekey-file-name-separators=, respectively.
 
 - In addition to =bog-find-citekey-file= and =bog-find-citekey-bib=,
   most functions will now prompt with set of citekeys when prefix
