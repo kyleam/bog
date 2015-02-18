@@ -387,7 +387,7 @@ word constituents."
     (-distinct citekeys)))
 
 (defun bog-list-orphan-citekeys (&optional file)
-  "List in citekeys that appear in notes but don't have heading.
+  "List citekeys that appear in notes but don't have a heading.
 With prefix argument FILE, include only orphan citekeys from that
 file."
   (interactive (list (and current-prefix-arg
@@ -400,16 +400,14 @@ file."
     (with-current-buffer (get-buffer-create bufname)
       (erase-buffer)
       (insert "\n")
-      (-each files
-        (lambda (f)
-          (setq cks
-                (--> (bog-non-heading-citekeys-in-file f)
-                  (-difference it heading-cks)
-                  (-sort (lambda (x y) (string-lessp x y)) it)
-                  (mapconcat #'identity it "\n")))
-          (unless (equal cks "")
-            (insert (format "* %s\n\n" (file-name-nondirectory f)))
-            (insert (concat cks "\n\n")))))
+      (dolist (file files)
+        (let* ((text-cks (bog-non-heading-citekeys-in-file file))
+               (nohead-cks (sort (-difference text-cks heading-cks)
+                                 #'string-lessp)))
+          (when nohead-cks
+            (insert (format "* %s\n\n%s\n\n"
+                            (file-name-nondirectory file)
+                            (mapconcat #'identity nohead-cks "\n"))))))
       (org-mode)
       (bog-mode 1)
       (show-all)
