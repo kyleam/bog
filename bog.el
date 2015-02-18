@@ -151,13 +151,13 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   :type '(choice (const :tag "Don't use single file" nil)
                  (file :tag "Single file")))
 
-(defcustom bog-citekey-file-name-separators '("-" "_")
-  "Values allowed to follow the citekey in file names.
+(defcustom bog-citekey-file-name-separators "[-_]"
+  "Regular expression matching separators in file names.
 When `bog-find-citekey-file' is run on <citekey>, it will find
 files with the format <citekey>.* and <citekey><sep>*.<ext>,
-where <sep> is one of these characters."
+where <sep> is matched by this regular expression.."
   :group 'bog
-  :type '(repeat string))
+  :type 'regexp)
 
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
   "Function used to rename staged files.
@@ -480,16 +480,17 @@ locating a citekey from context fails."
 
 (defun bog-citekey-files (citekey)
   "Return files in `bog-file-directory' associated with CITEKEY.
-These should be named [<subdir>/]CITEKEY<sep>*.<ext>, where <sep>
-is a character in `bog-citekey-file-name-separators' and is
+These should be named [<subdir>/]CITEKEY[<sep>*].<ext>, where
+<sep> is a character in `bog-citekey-file-name-separators' and is
 determined by `bog-subdirectory-group'."
   (let* ((subdir (bog--get-subdir citekey))
          (dir (file-name-as-directory
                (or (and subdir (expand-file-name subdir bog-file-directory))
-                   bog-file-directory)))
-         (patterns (--map (concat it "*") bog-citekey-file-name-separators))
-         (patterns (cons ".*" patterns)))
-    (--mapcat (file-expand-wildcards (concat dir citekey it)) patterns)))
+                   bog-file-directory))))
+    (directory-files dir t
+                     (format "^%s\\(%s.*\\)\\{0,1\\}\\..*"
+                             citekey
+                             bog-citekey-file-name-separators))))
 
 (defun bog--get-subdir (citekey)
   "Return subdirectory for citekey file.
