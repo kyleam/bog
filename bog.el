@@ -648,11 +648,9 @@ Search for new BibTeX files in `bog-stage-directory', and run
 This function is only useful if you use the non-standard setup of
 one entry per BibTeX file."
   (interactive)
-  (let ((staged
-         (file-expand-wildcards
-          (concat (file-name-as-directory bog-stage-directory) "*.bib"))))
-    (--each staged
-      (bog--prepare-bib-file it t))))
+  (let ((staged (directory-files bog-stage-directory t ".*\\.bib$")))
+    (dolist (file staged)
+      (bog--prepare-bib-file file t))))
 
 (defun bog--prepare-bib-file (file &optional new-key)
   (let (bib-file)
