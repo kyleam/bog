@@ -951,6 +951,7 @@ level `bog-refile-maxlevel' are considered."
             "*.org"))))
 
 (defun bog-read-note-file-name ()
+  "Read name of Org file in `bog-note-directory'."
   (let ((nodir-files (-annotate #'file-name-nondirectory
                                 (bog-notes))))
     (cdr (assoc (org-icompleting-read "File: "
