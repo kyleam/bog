@@ -424,8 +424,8 @@ is only active if `bog-use-citekey-cache' is non-nil)."
   (when clear-cache
     (setq bog--all-heading-citekeys nil))
   (let ((bufname "*Bog duplicate heading citekeys*")
-        (dup-cks (-sort (lambda (x y) (string-lessp x y))
-                        (bog--find-duplicates (bog-all-heading-citekeys)))))
+        (dup-cks (sort (bog--find-duplicates (bog-all-heading-citekeys))
+                       #'string-lessp)))
     (if (not dup-cks)
         (message "No duplicate citekeys found")
       (with-current-buffer (get-buffer-create bufname)
@@ -693,7 +693,7 @@ one entry per BibTeX file."
       (setq citekeys (bog-citekeys-in-buffer)))
     (setq bib-files
           (-map #'bog-citekey-as-bib
-                (-distinct (--sort (string-lessp it other) citekeys))))
+                (-distinct (sort citekeys #'string-lessp))))
     (with-current-buffer (get-buffer-create bib-buffer-name)
       (erase-buffer)
       (--each bib-files
