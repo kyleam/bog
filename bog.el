@@ -183,7 +183,7 @@ It should contain the placeholder \"%s\" for the query."
   :group 'bog
   :type 'string)
 
-(defcustom  bog-topic-heading-level 1
+(defcustom bog-topic-heading-level 1
   "Consider headings at this level to be topic headings.
 Topic headings for studies may be at any level, but
 `bog-sort-topic-headings' and `bog-jump-to-topic-heading' use
@@ -191,7 +191,7 @@ this variable to determine what level to operate on."
   :group 'bog
   :type 'integer)
 
-(defcustom  bog-refile-maxlevel bog-topic-heading-level
+(defcustom bog-refile-maxlevel bog-topic-heading-level
   "Consider up to this level when refiling with `bog-refile'."
   :group 'bog
   :type 'integer)
