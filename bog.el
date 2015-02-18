@@ -943,12 +943,8 @@ level `bog-refile-maxlevel' are considered."
 
 (defun bog-notes ()
   "Return Org files in `bog-note-directory'."
-  (--remove (let ((base-name (file-name-nondirectory it)))
-              (or (string-prefix-p "." base-name)
-                  (auto-save-file-name-p base-name)))
-   (file-expand-wildcards
-    (concat (file-name-as-directory bog-note-directory)
-            "*.org"))))
+  (directory-files bog-note-directory t
+                   "^[^\\.].*.org$"))
 
 (defun bog-read-note-file-name ()
   "Read name of Org file in `bog-note-directory'."
