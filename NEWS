@@ -61,6 +61,9 @@
   citekey-associated files are organized into subdirectories generated
   from a =bog-citekey-format= regexp group.
 
+- New minor mode Bog View sets the buffer to read-only and provides
+  single-letter key for bindings for many Bog commands.
+
 ** Other changes
 
 - =bog-goto-citekey-heading-in-buffer= and

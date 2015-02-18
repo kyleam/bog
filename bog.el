@@ -1224,6 +1224,7 @@ chosen."
       (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
       (define-key prefix-map "s" 'bog-search-notes)
       (define-key prefix-map "w" 'bog-refile)
+      (define-key prefix-map "v" 'bog-view-mode)
       (define-key prefix-map "y" 'bog-insert-heading-citekey)
       (define-key map bog-keymap-prefix prefix-map))
     map)
@@ -1247,7 +1248,68 @@ if ARG is omitted or nil.
     (font-lock-fontify-buffer))
    (t
     (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
-    (font-lock-fontify-buffer))))
+    (font-lock-fontify-buffer)
+    (bog-view-mode -1))))
+
+
+;;; View minor mode
+
+(defvar bog-view-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" 'bog-find-citekey-bib)
+    (define-key map "c" 'bog-search-notes-for-citekey)
+    (define-key map "f" 'bog-find-citekey-file)
+    (define-key map "g" 'bog-search-citekey-on-web)
+    (define-key map "h" 'bog-goto-citekey-heading-in-buffer)
+    (define-key map "H" 'bog-goto-citekey-heading-in-notes)
+    (define-key map "i" 'bog-citekey-tree-to-indirect-buffer)
+    (define-key map "j" 'bog-jump-to-topic-heading)
+    (define-key map "l" 'bog-open-citekey-link)
+    (define-key map "L" 'bog-open-first-citekey-link)
+    (define-key map "n" 'bog-next-non-heading-citekey)
+    (define-key map "p" 'bog-previous-non-heading-citekey)
+    (define-key map "q" 'bog-view-quit)
+    (define-key map "r" 'bog-rename-staged-file-to-citekey)
+    (define-key map "s" 'bog-search-notes)
+    map)
+  "Keymap for Bog View mode.")
+
+(defvar bog-view--old-buffer-read-only nil)
+(defvar bog-view--old-bog-mode nil)
+
+(define-minor-mode bog-view-mode
+  "Toggle Bog View mode in this buffer.
+
+With a prefix argument ARG, enable `bog-view-mode' if ARG is
+positive, and disable it otherwise.  If called from Lisp, enable
+the mode if ARG is omitted or nil.
+
+Turning on Bog View mode sets the buffer to read-only and gives
+many of the Bog commands a single-letter key binding.
+
+\\<bog-view-mode-map>\
+To exit Bog View mode, type \\[bog-view-quit].
+
+\\{bog-view-mode-map}"
+  :keymap bog-view-mode-map
+  :group 'bog
+  :lighter " Bog-view"
+  :require 'bog
+  (cond
+   (bog-view-mode
+    (setq bog-view--old-buffer-read-only buffer-read-only
+          buffer-read-only t)
+    (setq bog-view--old-bog-mode bog-mode)
+    (bog-mode))
+   (t
+    (setq buffer-read-only bog-view--old-buffer-read-only)
+    (unless bog-view--old-bog-mode
+      (bog-mode -1)))))
+
+(defun bog-view-quit ()
+  "Leave Bog View mode."
+  (interactive)
+  (bog-view-mode -1))
 
 (provide 'bog)
 
