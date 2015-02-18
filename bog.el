@@ -730,13 +730,9 @@ instead of citekeys from file names in `bog-bib-directory'."
                        bog-bib-directory t directory-files-no-dot-files-regexp))
             (when (and (file-readable-p df) (file-directory-p df))
               (push df dirs)))
-      (push bog-bib-directory dirs))
-      (-map #'file-name-base
-            (-mapcat
-             (lambda (dir)
-               (file-expand-wildcards
-                (concat (file-name-as-directory dir) "*.bib")))
-             dirs)))))
+        (push bog-bib-directory dirs))
+      (-mapcat (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+               dirs))))
 
 
 ;;; Web
