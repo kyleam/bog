@@ -33,7 +33,7 @@ help:
 	@printf "  test               Run tests.\n"
 
 .PHONY: test
-test:
+test: $(main_elc)
 	@$(EMACS) -L . -l bog-tests \
 	--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
