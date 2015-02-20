@@ -326,6 +326,12 @@ Otherwise, prompt for CATEGORY."
         (unless (eq category t)
           (assq-delete-all category bog--citekey-cache))))
 
+(defvar bog--no-sort nil)
+(defun bog--maybe-sort (values)
+  "Sort VALUES by `string-lessp' unless `bog--no-sort' is non-nil."
+  (or (and bog--no-sort values)
+      (sort values #'string-lessp)))
+
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
   (org-icompleting-read "Select citekey: " citekeys))
@@ -383,12 +389,16 @@ word constituents."
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
   (bog--with-citekey-cache 'all-notes
-    (cl-mapcan #'bog-citekeys-in-file (bog-notes))))
+    (bog--maybe-sort
+     (let ((bog--no-sort t))
+       (cl-mapcan #'bog-citekeys-in-file (bog-notes))))))
 
 (defun bog-all-heading-citekeys ()
   "Return citekeys that have a heading in any note file."
   (bog--with-citekey-cache 'headings
-    (cl-mapcan #'bog-heading-citekeys-in-file (bog-notes))))
+    (bog--maybe-sort
+     (let ((bog--no-sort t))
+       (cl-mapcan #'bog-heading-citekeys-in-file (bog-notes))))))
 
 (defun bog-citekeys-in-file (file)
   "Return all citekeys in FILE."
@@ -404,7 +414,7 @@ word constituents."
       (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
         (push (match-string-no-properties 0) citekeys))
-      (delete-dups citekeys))))
+      (bog--maybe-sort (delete-dups citekeys)))))
 
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."
@@ -416,11 +426,12 @@ word constituents."
 
 (defun bog-heading-citekeys-in-buffer ()
   "Return all heading citekeys in current buffer."
-  (delq nil (org-map-entries #'bog-citekey-from-heading)))
+  (bog--maybe-sort (delq nil (org-map-entries #'bog-citekey-from-heading))))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
   "Return all citekeys in current buffer, without any narrowing."
-  (delq nil (org-map-entries #'bog-citekey-from-heading nil 'file)))
+  (bog--maybe-sort
+   (delq nil (org-map-entries #'bog-citekey-from-heading nil 'file))))
 
 (defun bog-non-heading-citekeys-in-file (file)
   "Return all non-heading citekeys in FILE."
@@ -434,7 +445,7 @@ word constituents."
           (unless (or (org-at-heading-p)
                       (org-at-property-p))
             (push (match-string-no-properties 0) citekeys))))
-      (delete-dups citekeys))))
+      (bog--maybe-sort (delete-dups citekeys)))))
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
@@ -452,9 +463,8 @@ file."
       (insert "\n")
       (dolist (file files)
         (let* ((text-cks (bog-non-heading-citekeys-in-file file))
-               (nohead-cks (sort (cl-set-difference text-cks heading-cks
-                                                    :test #'string=)
-                                 #'string-lessp)))
+               (nohead-cks (nreverse (cl-set-difference text-cks heading-cks
+                                                        :test #'string=))))
           (when nohead-cks
             (insert (format "* %s\n\n%s\n\n"
                             (file-name-nondirectory file)
@@ -473,8 +483,7 @@ is only active if `bog-use-citekey-cache' is non-nil)."
   (when clear-cache
     (bog-clear-citekey-cache 'headings))
   (let ((bufname "*Bog duplicate heading citekeys*")
-        (dup-cks (sort (bog--find-duplicates (bog-all-heading-citekeys))
-                       #'string-lessp)))
+        (dup-cks (bog--find-duplicates (bog-all-heading-citekeys))))
     (if (not dup-cks)
         (progn (message "No duplicate citekeys found")
                (and (get-buffer bufname)
@@ -633,8 +642,9 @@ Generate a file name with the form
 (defun bog-all-file-citekeys ()
   "Return a list of citekeys for files in `bog-file-directory'."
   (bog--with-citekey-cache 'files
-    (delq nil (delete-dups (mapcar #'bog-file-citekey
-                                   (bog-all-citekey-files))))))
+    (bog--maybe-sort
+     (delq nil (delete-dups (mapcar #'bog-file-citekey
+                                    (bog-all-citekey-files)))))))
 
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
@@ -758,7 +768,7 @@ Otherwise, collect citekeys the current buffer."
       (setq citekeys (bog-citekeys-in-buffer)))
     (setq citekey-bibs
           (mapcar (lambda (ck) (cons ck (bog-citekey-as-bib ck)))
-                  (sort citekeys #'string-lessp)))
+                  citekeys))
     (with-current-buffer (get-buffer-create bib-buffer-name)
       (erase-buffer)
       (dolist (citekey-bib citekey-bibs)
@@ -801,10 +811,11 @@ instead of citekeys from file names in `bog-bib-directory'."
               (when (and (file-readable-p df) (file-directory-p df))
                 (push df dirs)))
           (push bog-bib-directory dirs))
-        (mapcar #'file-name-sans-extension
-                (cl-mapcan
-                 (lambda (dir) (directory-files dir nil ".*\\.bib$"))
-                 dirs))))))
+        (bog--maybe-sort
+         (mapcar #'file-name-sans-extension
+                 (cl-mapcan
+                  (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+                  dirs)))))))
 
 
 ;;; Web
