@@ -589,3 +589,14 @@ some text"
       (outline-next-visible-heading 3)
       (should (equal (org-no-properties (org-get-heading t t))
                      "orange2000key")))))
+
+
+;;; Other
+
+(ert-deftest bog--find-duplicates ()
+  (should (equal nil (bog--find-duplicates nil)))
+  (should (equal (list 1) (bog--find-duplicates (list 1 1 2))))
+  (should (equal (list "a" "b")
+                 (sort (bog--find-duplicates
+                        (list "a" "b" "c" "b" "a"))
+                       #'string-lessp))))
