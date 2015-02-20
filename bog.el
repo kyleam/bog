@@ -6,7 +6,7 @@
 ;; URL: https://github.com/kyleam/bog
 ;; Keywords: bib, outlines
 ;; Version: 0.6.0
-;; Package-Requires: ((dash "2.5.0"))
+;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,13 +31,10 @@
 ;;; Code:
 
 (require 'bibtex)
-(require 'dash)
+(require 'cl-lib)
 (require 'dired)
 (require 'org)
 (require 'org-agenda)
-
-(eval-when-compile
-  (require 'cl))
 
 
 ;;; Customization
@@ -313,9 +310,8 @@ word constituents."
 
 (defun bog-citekey-from-property ()
   "Retrieve citekey from `bog-citekey-property'."
-  (--when-let (org-entry-get (point) bog-citekey-property)
-    (and (bog-citekey-p it)
-         it)))
+  (let ((ck (org-entry-get (point) bog-citekey-property)))
+    (and ck (bog-citekey-p ck) ck)))
 
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
@@ -326,15 +322,15 @@ word constituents."
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
   (or (and bog-use-citekey-cache bog--all-citekeys)
-      (setq bog--all-citekeys (-mapcat #'bog-citekeys-in-file
-                                       (bog-notes)))))
+      (setq bog--all-citekeys (cl-mapcan #'bog-citekeys-in-file
+                                         (bog-notes)))))
 
 (defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
   "Return citekeys that have a heading in any note file."
   (or (and bog-use-citekey-cache bog--all-heading-citekeys)
-      (setq bog--all-heading-citekeys (-mapcat 'bog-heading-citekeys-in-file
-                                               (bog-notes)))))
+      (setq bog--all-heading-citekeys (cl-mapcan #'bog-heading-citekeys-in-file
+                                                 (bog-notes)))))
 
 (defun bog-clear-citekey-cache ()
   "Clear cache of citekeys contained in notes."
@@ -356,7 +352,7 @@ word constituents."
       (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
         (push (match-string-no-properties 0) citekeys))
-      (-distinct citekeys))))
+      (delete-dups citekeys))))
 
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."
@@ -367,11 +363,11 @@ word constituents."
 
 (defun bog-heading-citekeys-in-buffer ()
   "Return all heading citekeys in current buffer."
-  (-non-nil (org-map-entries 'bog-citekey-from-heading)))
+  (delq nil (org-map-entries #'bog-citekey-from-heading)))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
   "Return all citekeys in current buffer, without any narrowing."
-  (-non-nil (org-map-entries 'bog-citekey-from-heading nil 'file)))
+  (delq nil (org-map-entries #'bog-citekey-from-heading nil 'file)))
 
 (defun bog-non-heading-citekeys-in-file (file)
   "Return all non-heading citekeys in FILE."
@@ -384,7 +380,7 @@ word constituents."
         (unless (or (org-at-heading-p)
                     (org-at-property-p))
           (push (match-string-no-properties 0) citekeys))))
-    (-distinct citekeys)))
+    (delete-dups citekeys)))
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
@@ -402,7 +398,8 @@ file."
       (insert "\n")
       (dolist (file files)
         (let* ((text-cks (bog-non-heading-citekeys-in-file file))
-               (nohead-cks (sort (-difference text-cks heading-cks)
+               (nohead-cks (sort (cl-set-difference text-cks heading-cks
+                                                    :test #'string=)
                                  #'string-lessp)))
           (when nohead-cks
             (insert (format "* %s\n\n%s\n\n"
@@ -438,7 +435,7 @@ is only active if `bog-use-citekey-cache' is non-nil)."
 
 (defun bog--find-duplicates (list)
   (let (dups uniqs)
-    (--each list
+    (dolist (it list)
       (cond
        ((member it dups))
        ((member it uniqs)
@@ -468,13 +465,16 @@ locating a citekey from context fails."
   (let* ((citekey-files (bog-citekey-files citekey))
          (num-choices (length citekey-files))
          citekey-file)
-    (case num-choices
+    (cl-case num-choices
       (0 (user-error "No file found for %s" citekey))
       (1 (setq citekey-file (car citekey-files)))
       (t
-       (let* ((fname-paths (-annotate #'file-name-nondirectory citekey-files))
+       (let* ((fname-paths
+               (mapcar (lambda (path)
+                         (cons (file-name-nondirectory path) path))
+                       citekey-files))
               (fname (org-icompleting-read "Select file: "
-                                           (-map #'car fname-paths))))
+                                           (mapcar #'car fname-paths))))
          (setq citekey-file (cdr (assoc fname fname-paths))))))
     (org-open-file citekey-file)))
 
@@ -520,10 +520,10 @@ If the citekey file prompt is slow to appear, consider enabling
 
 (defun bog--rename-staged-file-to-citekey (citekey)
   (let* ((staged-files (bog-staged-files))
-         (staged-file-names (-map 'file-name-nondirectory staged-files))
+         (staged-file-names (mapcar #'file-name-nondirectory staged-files))
          (num-choices (length staged-file-names))
          staged-file)
-    (case num-choices
+    (cl-case num-choices
       (0 (setq staged-file (org-iread-file-name "Select file to rename: ")))
       (1 (setq staged-file (car staged-files)))
       (t (setq staged-file (expand-file-name
@@ -575,7 +575,7 @@ Generate a file name with the form
 
 (defun bog-all-file-citekeys ()
   "Return a list of citekeys for files in `bog-file-directory'."
-  (-distinct (-keep 'bog-file-citekey (bog-all-citekey-files))))
+  (delq nil (delete-dups (mapcar #'bog-file-citekey (bog-all-citekey-files)))))
 
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
@@ -593,17 +593,18 @@ Generate a file name with the form
           (when (and (file-readable-p df) (file-directory-p df))
             (push df dirs)))
       (push bog-file-directory dirs))
-    (-remove #'file-directory-p
-             (-mapcat (lambda (d)
-                        (directory-files
-                         d t directory-files-no-dot-files-regexp))
-                      dirs))))
+    (cl-mapcan
+     (lambda (dir)
+       (cl-remove-if #'file-directory-p
+                     (directory-files
+                      dir t directory-files-no-dot-files-regexp)))
+     dirs)))
 
 (defun bog-staged-files ()
   "Return files in `bog-stage-directory'."
-  (-remove 'file-directory-p
-           (directory-files bog-stage-directory
-                            t directory-files-no-dot-files-regexp)))
+  (cl-remove-if #'file-directory-p
+                (directory-files bog-stage-directory
+                                 t directory-files-no-dot-files-regexp)))
 
 
 ;;; BibTeX-related
@@ -669,12 +670,13 @@ one entry per BibTeX file."
       (write-file bib-file))
     ;; If a buffer was visiting the original bib file, point it to the
     ;; new file.
-    (--when-let (find-buffer-visiting file)
-      (with-current-buffer it
-        (when (get-buffer bib-file)
-          (user-error "Buffer for %s already exists" bib-file))
-        (rename-buffer bib-file)
-        (set-visited-file-name bib-file nil t)))
+    (let ((file-buf (find-buffer-visiting file)))
+      (when file-buf
+        (with-current-buffer file-buf
+          (when (get-buffer bib-file)
+            (user-error "Buffer for %s already exists" bib-file))
+          (rename-buffer bib-file)
+          (set-visited-file-name bib-file nil t))))
     (delete-file file)))
 
 ;;;###autoload
@@ -686,24 +688,25 @@ Otherwise, collect citekeys the current buffer."
   (setq arg (and current-prefix-arg arg))
   (let ((bib-buffer-name "*Bog combined bib*")
         citekeys
-        bib-citekeys)
+        citekey-bibs)
     (if (derived-mode-p 'dired-mode)
         (setq citekeys
-              (-distinct (-mapcat #'bog-citekeys-in-file
-                                  (dired-get-marked-files nil arg))))
+              (delete-dups (cl-mapcan #'bog-citekeys-in-file
+                                      (dired-get-marked-files nil arg))))
       (setq citekeys (bog-citekeys-in-buffer)))
-    (setq bib-citekeys (-annotate #'bog-citekey-as-bib
-                                  (sort citekeys #'string-lessp)))
+    (setq citekey-bibs
+          (mapcar (lambda (ck) (cons ck (bog-citekey-as-bib ck)))
+                  (sort citekeys #'string-lessp)))
     (with-current-buffer (get-buffer-create bib-buffer-name)
       (erase-buffer)
-      (dolist (bib-citekey bib-citekeys)
+      (dolist (citekey-bib citekey-bibs)
         (cond
-         ((file-exists-p (car bib-citekey))
+         ((file-exists-p (cdr citekey-bib))
           (insert "\n")
-          (insert-file-contents (car bib-citekey))
+          (insert-file-contents (cdr citekey-bib))
           (goto-char (point-max)))
          ((not (y-or-n-p (format "No BibTeX entry found for %s.  Skip it?"
-                                 (cdr bib-citekey))))
+                                 (car citekey-bib))))
           (kill-buffer bib-buffer-name)
           (user-error "Aborting"))))
       (bibtex-mode)
@@ -726,7 +729,7 @@ instead of citekeys from file names in `bog-bib-directory'."
       (with-temp-buffer
         (bibtex-mode)
         (insert-file-contents bog-bib-file)
-        (-map #'car (bibtex-parse-keys)))
+        (mapcar #'car (bibtex-parse-keys)))
     (let (dirs)
       (if bog-subdirectory-group
           (dolist (df (directory-files
@@ -734,8 +737,8 @@ instead of citekeys from file names in `bog-bib-directory'."
             (when (and (file-readable-p df) (file-directory-p df))
               (push df dirs)))
         (push bog-bib-directory dirs))
-      (-mapcat (lambda (dir) (directory-files dir nil ".*\\.bib$"))
-               dirs))))
+      (cl-mapcan (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+                 dirs))))
 
 
 ;;; Web
@@ -945,11 +948,12 @@ level `bog-refile-maxlevel' are considered."
 
 (defun bog-read-note-file-name ()
   "Read name of Org file in `bog-note-directory'."
-  (let ((nodir-files (-annotate #'file-name-nondirectory
-                                (bog-notes))))
+  (let ((note-paths (mapcar (lambda (path)
+                              (cons (file-name-nondirectory path) path))
+                            (bog-notes))))
     (cdr (assoc (org-icompleting-read "File: "
-                                      (-map #'car nodir-files))
-                nodir-files))))
+                                      (mapcar #'car note-paths))
+                note-paths))))
 
 (defmacro bog--with-search-lprops (&rest body)
   "Execute BODY with Bog-related agenda values.
@@ -1125,7 +1129,7 @@ Topic headings are determined by `bog-topic-heading-level'."
 
 ;;; Commander
 
-;;; The commander functionality is taken from projectile.
+;;; The commander functionality is modified from projectile.
 ;;; https://github.com/bbatsov/projectile
 
 (defconst bog-commander-help-buffer "*Commander Help*")
@@ -1144,11 +1148,11 @@ to invoke.  Press \"?\" to describe available actions.
 
 See `def-bog-commander-method' for defining new methods."
   (interactive)
-  (-let* ((choices (-map #'car bog-commander-methods))
-          (prompt (concat "Commander [" choices "]: "))
-          (ch (read-char-choice prompt choices))
-          ((_ _ fn) (assq ch bog-commander-methods)))
-    (funcall fn))  )
+  (let* ((choices (mapcar #'car bog-commander-methods))
+         (prompt (concat "Commander [" choices "]: "))
+         (ch (read-char-choice prompt choices))
+         (fn (car (last (assq ch bog-commander-methods)))))
+    (funcall fn)))
 
 (defmacro def-bog-commander-method (key description &rest body)
   "Define a new `bog-commander' method.
@@ -1162,16 +1166,16 @@ chosen."
   (let ((method `(lambda ()
                    ,@body)))
     `(setq bog-commander-methods
-           (--sort (< (car it) (car other))
-                   (cons (list ,key ,description ,method)
-                         (assq-delete-all ,key bog-commander-methods))))))
+           (sort (cons (list ,key ,description ,method)
+                       (assq-delete-all ,key bog-commander-methods))
+                 (lambda (x y) (< (car x) (car y)))))))
 
 (def-bog-commander-method ?? "Commander help buffer."
   (ignore-errors (kill-buffer bog-commander-help-buffer))
   (with-current-buffer (get-buffer-create bog-commander-help-buffer)
     (insert "Bog commander methods:\n\n")
-    (loop for (key line nil) in bog-commander-methods
-          do (insert (format "%c:\t%s\n" key line)))
+    (cl-loop for (key line nil) in bog-commander-methods
+             do (insert (format "%c:\t%s\n" key line)))
     (goto-char (point-min))
     (help-mode)
     (display-buffer (current-buffer) t))

@@ -1,18 +1,15 @@
 EMACS = emacs -Q --batch
-CURL = curl --silent
 name = bog
 main_el :=  $(name).el
 main_elc =  $(main_el)c
 AUTOLOADS_FILE := $(name)-autoloads.el
-
-DASH_URL = https://raw.githubusercontent.com/magnars/dash.el/master/dash.el
 
 all: elc autoloads
 
 .PHONY: autoloads
 autoloads: $(AUTOLOADS_FILE)
 
-$(AUTOLOADS_FILE): $(main_el) .downloads
+$(AUTOLOADS_FILE): $(main_el)
 	@$(EMACS) -L . --eval \
 	"(let (make-backup-files) \
 	  (update-file-autoloads \"$(CURDIR)/$<\" t \"$(CURDIR)/$@\"))"
@@ -36,15 +33,10 @@ help:
 	@printf "  test               Run tests.\n"
 
 .PHONY: test
-test: .downloads
+test:
 	@$(EMACS) -L . -l bog-tests \
 	--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
-%.elc: %.el .downloads
+%.elc: %.el
 	@$(EMACS) -L . -f batch-byte-compile $<
-
-
-.downloads:
-	$(CURL) $(DASH_URL) > dash.el
-	touch .downloads
 

@@ -21,14 +21,13 @@
 
 (require 'ert)
 (require 'org)
-(require 'dash)
-(require 'cl)
+(require 'cl-lib)
 (require 'bog)
 
 ;; Modified from magit-tests.el.
 (defmacro bog-tests--with-temp-dir (&rest body)
   (declare (indent 0) (debug t))
-  (let ((dir (gensym)))
+  (let ((dir (cl-gensym)))
     `(let ((,dir (file-name-as-directory (make-temp-file "dir" t))))
        (unwind-protect
            (let ((default-directory ,dir)) ,@body)
@@ -258,7 +257,7 @@ some text and <point><citekey>"
 ghi1950jkl
 * mno2000pqr
 * mno2000pqr"
-            (--sort (string-lessp it other) (bog-citekeys-in-buffer))))))
+            (sort (bog-citekeys-in-buffer) #'string-lessp)))))
 
 (ert-deftest bog-heading-citekeys-in-buffer ()
   (should (equal '("abc1900def" "mno2000pqr")
@@ -427,8 +426,8 @@ some text"
                           (concat citekey "-supplement.pdf")))
           found-files)
      (make-directory bog-file-directory)
-     (--each variants
-       (write-region "" nil (expand-file-name it bog-file-directory)))
+     (dolist (var variants)
+       (write-region "" nil (expand-file-name var bog-file-directory)))
      (setq files-found (bog-citekey-files citekey))
      (should (= (length files-found) 4)))))
 
