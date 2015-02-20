@@ -739,8 +739,9 @@ instead of citekeys from file names in `bog-bib-directory'."
             (when (and (file-readable-p df) (file-directory-p df))
               (push df dirs)))
         (push bog-bib-directory dirs))
-      (cl-mapcan (lambda (dir) (directory-files dir nil ".*\\.bib$"))
-                 dirs))))
+      (mapcar #'file-name-sans-extension
+              (cl-mapcan (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+                         dirs)))))
 
 
 ;;; Web
