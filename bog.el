@@ -658,7 +658,7 @@ Generate a file name with the form
   (let (dirs)
     (if bog-subdirectory-group
         (dolist (df (directory-files bog-file-directory t
-                                     directory-files-no-dot-files-regexp))
+                                     directory-files-no-dot-files-regexp t))
           (when (and (file-readable-p df) (file-directory-p df))
             (push df dirs)))
       (push bog-file-directory dirs))
@@ -666,7 +666,7 @@ Generate a file name with the form
      (lambda (dir)
        (cl-remove-if #'file-directory-p
                      (directory-files
-                      dir t directory-files-no-dot-files-regexp)))
+                      dir t directory-files-no-dot-files-regexp t)))
      dirs)))
 
 (defun bog-staged-files ()
@@ -807,14 +807,14 @@ instead of citekeys from file names in `bog-bib-directory'."
         (if bog-subdirectory-group
             (dolist (df (directory-files
                          bog-bib-directory t
-                         directory-files-no-dot-files-regexp))
+                         directory-files-no-dot-files-regexp t))
               (when (and (file-readable-p df) (file-directory-p df))
                 (push df dirs)))
           (push bog-bib-directory dirs))
         (bog--maybe-sort
          (mapcar #'file-name-sans-extension
                  (cl-mapcan
-                  (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+                  (lambda (dir) (directory-files dir nil ".*\\.bib$" t))
                   dirs)))))))
 
 
