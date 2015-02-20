@@ -678,30 +678,32 @@ one entry per BibTeX file."
     (delete-file file)))
 
 ;;;###autoload
-(defun bog-create-combined-bib ()
-  "Create buffer that has entries for all citekeys in buffer."
-  (interactive)
+(defun bog-create-combined-bib (&optional arg)
+  "Create buffer that has entries for all citekeys in buffer.
+If in Dired, collect citekeys from marked (or next ARG) files.
+Otherwise, collect citekeys the current buffer."
+  (interactive "p")
+  (setq arg (and current-prefix-arg arg))
   (let ((bib-buffer-name "*Bog combined bib*")
         citekeys
-        bib-files)
+        bib-citekeys)
     (if (derived-mode-p 'dired-mode)
-        (--each (dired-get-marked-files)
-          (with-temp-buffer
-            (insert-file-contents it)
-            (setq citekeys (append (bog-citekeys-in-buffer) citekeys))))
+        (setq citekeys
+              (-distinct (-mapcat #'bog-citekeys-in-file
+                                  (dired-get-marked-files nil arg))))
       (setq citekeys (bog-citekeys-in-buffer)))
-    (setq bib-files
-          (-map #'bog-citekey-as-bib
-                (-distinct (sort citekeys #'string-lessp))))
+    (setq bib-citekeys (-annotate #'bog-citekey-as-bib
+                                  (sort citekeys #'string-lessp)))
     (with-current-buffer (get-buffer-create bib-buffer-name)
       (erase-buffer)
-      (--each bib-files
+      (dolist (bib-citekey bib-citekeys)
         (cond
-         ((file-exists-p it)
+         ((file-exists-p (car bib-citekey))
           (insert "\n")
-          (insert-file-contents it)
+          (insert-file-contents (car bib-citekey))
           (goto-char (point-max)))
-         ((not (y-or-n-p (format "%s does not exist.  Skip it?" it)))
+         ((not (y-or-n-p (format "No BibTeX entry found for %s.  Skip it?"
+                                 (cdr bib-citekey))))
           (kill-buffer bib-buffer-name)
           (user-error "Aborting"))))
       (bibtex-mode)
