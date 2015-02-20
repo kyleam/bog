@@ -1,4 +1,5 @@
-EMACS = emacs -Q --batch
+EMACS = emacs
+BATCH := $(EMACS) -Q --batch
 name = bog
 main_el :=  $(name).el
 main_elc =  $(main_el)c
@@ -10,7 +11,7 @@ all: elc autoloads
 autoloads: $(AUTOLOADS_FILE)
 
 $(AUTOLOADS_FILE): $(main_el)
-	@$(EMACS) -L . --eval \
+	@$(BATCH) -L . --eval \
 	"(let (make-backup-files) \
 	  (update-file-autoloads \"$(CURDIR)/$<\" t \"$(CURDIR)/$@\"))"
 
@@ -34,9 +35,9 @@ help:
 
 .PHONY: test
 test: $(main_elc)
-	@$(EMACS) -L . -l bog-tests \
+	@$(BATCH) -L . -l bog-tests \
 	--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
 %.elc: %.el
-	@$(EMACS) -L . -f batch-byte-compile $<
+	@$(BATCH) -L . -f batch-byte-compile $<
 
