@@ -357,9 +357,10 @@ word constituents."
 (defun bog-heading-citekeys-in-file (file)
   "Return all citekeys in headings of FILE."
   (with-temp-buffer
-    (insert-file-contents file)
-    (org-mode)
-    (bog-heading-citekeys-in-buffer)))
+    (let ((default-directory (file-name-directory file)))
+      (insert-file-contents file)
+      (org-mode)
+      (bog-heading-citekeys-in-buffer))))
 
 (defun bog-heading-citekeys-in-buffer ()
   "Return all heading citekeys in current buffer."
@@ -374,13 +375,14 @@ word constituents."
   (let (citekeys
         case-fold-search)
     (with-temp-buffer
-      (insert-file-contents file)
-      (org-mode)
-      (while (re-search-forward bog-citekey-format nil t)
-        (unless (or (org-at-heading-p)
-                    (org-at-property-p))
-          (push (match-string-no-properties 0) citekeys))))
-    (delete-dups citekeys)))
+      (let ((default-directory (file-name-directory file)))
+        (insert-file-contents file)
+        (org-mode)
+        (while (re-search-forward bog-citekey-format nil t)
+          (unless (or (org-at-heading-p)
+                      (org-at-property-p))
+            (push (match-string-no-properties 0) citekeys))))
+      (delete-dups citekeys))))
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
