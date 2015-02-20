@@ -199,14 +199,35 @@ this variable to determine what level to operate on."
   :type 'key-sequence)
 
 (defcustom bog-use-citekey-cache nil
-  "Cache list of all citekeys.
-Depending on the number of citekeys present in your notes,
-enabling this can make functions that prompt with a list of all
-citekeys (or all heading citekeys) noticeably faster.  However,
-no attempt is made to update the list of citekeys.  To see newly
-added citekeys, clear the cache with `bog-clear-citekey-cache'."
+  "List indicating which citekey lists to cache.
+
+Possible values are
+
+  - headings         Citekeys for all headings in the notes
+  - all-notes        All citekeys in the notes
+  - files            Citekeys with associated files
+  - bibs             Citekeys with BibTeX entries
+
+If set to nil, disable cache completely.  If set to t, enable
+cache for all categories.
+
+Depending on the number of citekeys present for each of these
+categories, enabling this can make functions that prompt with a
+list of citekeys noticeably faster.  However, no attempt is made
+to update the list of citekeys.  To see newly added citekeys,
+clear the cache with `bog-clear-citekey-cache'.
+
+This cache will not persist across sessions."
   :group 'bog
-  :type 'boolean)
+  :type '(choice
+          (const :tag "Disable cache" nil)
+          (const :tag "Cache all" t)
+          (repeat :tag "Individual categories"
+                  (choice
+                   (const :tag "Cache citekeys for headings" headings)
+                   (const :tag "Cache all citekeys in notes" all-notes)
+                   (const :tag "Cache citekeys with associated files" files)
+                   (const :tag "Cache citekeys with BibTeX entries" bibs)))))
 
 (defcustom bog-keep-indirect nil
   "Keep the previous buffer from `bog-citekey-tree-to-indirect-buffer'.
@@ -264,6 +285,47 @@ If NO-CONTEXT is non-nil, immediately fall back."
                       bog-citekey-at-point
                       bog-all-heading-citekeys)
 
+(defvar bog--citekey-cache nil
+  "Alist of cached citekeys.
+Keys match values in `bog-use-citekey-cache'.")
+
+(defun bog--use-cache-p (key)
+  "Return non-nil if cache should be used for KEY."
+  (or (eq bog-use-citekey-cache t)
+      (memq key bog-use-citekey-cache)))
+
+(defmacro bog--with-citekey-cache (key &rest body)
+  "Execute BODY, maybe using cached citekey values for KEY.
+Use cached values if `bog-use-citekey-cache' is non-nil for KEY.
+Cached values are updated to the return values of BODY."
+  (declare (indent 1))
+  `(let* ((use-cache-p (bog--use-cache-p ,key))
+          (citekeys (or (and use-cache-p
+                             (cdr (assq ,key bog--citekey-cache)))
+                        ,@body)))
+     (when use-cache-p
+       (setq bog--citekey-cache
+             (cons (cons ,key citekeys)
+                   (assq-delete-all ,key bog--citekey-cache))))
+     citekeys))
+
+(defun bog-clear-citekey-cache (category)
+  "Clear cache of citekeys for CATEGORY.
+CATEGORY should be a key in `bog-use-citekey-cache' or t, which
+indicates to clear all categories.  Interactively, clear all
+categories when a single \\[universal-argument] is given.
+Otherwise, prompt for CATEGORY."
+  (interactive
+   (list (or (equal current-prefix-arg '(4))
+             (and bog--citekey-cache
+                  (intern (org-icompleting-read
+                       "Category: "
+                       (mapcar (lambda (c) (symbol-name (car c)))
+                               bog--citekey-cache)))))))
+  (setq bog--citekey-cache
+        (unless (eq category t)
+          (assq-delete-all category bog--citekey-cache))))
+
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
   (org-icompleting-read "Select citekey: " citekeys))
@@ -318,25 +380,15 @@ word constituents."
   (let (case-fold-search)
     (string-match-p (format "^%s$" bog-citekey-format) text)))
 
-(defvar bog--all-citekeys nil)
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
-  (or (and bog-use-citekey-cache bog--all-citekeys)
-      (setq bog--all-citekeys (cl-mapcan #'bog-citekeys-in-file
-                                         (bog-notes)))))
+  (bog--with-citekey-cache 'all-notes
+    (cl-mapcan #'bog-citekeys-in-file (bog-notes))))
 
-(defvar bog--all-heading-citekeys nil)
 (defun bog-all-heading-citekeys ()
   "Return citekeys that have a heading in any note file."
-  (or (and bog-use-citekey-cache bog--all-heading-citekeys)
-      (setq bog--all-heading-citekeys (cl-mapcan #'bog-heading-citekeys-in-file
-                                                 (bog-notes)))))
-
-(defun bog-clear-citekey-cache ()
-  "Clear cache of citekeys contained in notes."
-  (interactive)
-  (setq bog--all-citekeys nil
-        bog--all-heading-citekeys nil))
+  (bog--with-citekey-cache 'headings
+    (cl-mapcan #'bog-heading-citekeys-in-file (bog-notes))))
 
 (defun bog-citekeys-in-file (file)
   "Return all citekeys in FILE."
@@ -419,7 +471,7 @@ With prefix CLEAR-CACHE, reset cache of citekey headings (which
 is only active if `bog-use-citekey-cache' is non-nil)."
   (interactive "P")
   (when clear-cache
-    (setq bog--all-heading-citekeys nil))
+    (bog-clear-citekey-cache 'headings))
   (let ((bufname "*Bog duplicate heading citekeys*")
         (dup-cks (sort (bog--find-duplicates (bog-all-heading-citekeys))
                        #'string-lessp)))
@@ -458,7 +510,10 @@ The citekey is taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, prompt with citekeys that have
 an associated file in `bog-file-directory'.  Do the same if
-locating a citekey from context fails."
+locating a citekey from context fails.
+
+If the citekey prompt is slow to appear, consider enabling the
+`files' category in `bog-use-citekey-cache'."
   (interactive "P")
   (bog--find-citekey-file
    (bog-citekey-from-surroundings-or-files no-context)))
@@ -514,8 +569,8 @@ With prefix argument NO-CONTEXT, prompt with citekeys present in
 any note file.  Do the same if locating a citekey from context
 fails.
 
-If the citekey file prompt is slow to appear, consider enabling
-`bog-use-citekey-cache'."
+If the citekey prompt is slow to appear, consider enabling the
+`files' category in `bog-use-citekey-cache'."
   (interactive "P")
   (bog--rename-staged-file-to-citekey
    (bog-citekey-from-surroundings-or-all no-context)))
@@ -577,7 +632,9 @@ Generate a file name with the form
 
 (defun bog-all-file-citekeys ()
   "Return a list of citekeys for files in `bog-file-directory'."
-  (delq nil (delete-dups (mapcar #'bog-file-citekey (bog-all-citekey-files)))))
+  (bog--with-citekey-cache 'files
+    (delq nil (delete-dups (mapcar #'bog-file-citekey
+                                   (bog-all-citekey-files))))))
 
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
@@ -623,7 +680,10 @@ citekey is found.
 
 With prefix argument NO-CONTEXT, prompt with citekeys that have a
 BibTeX entry.  Do the same if locating a citekey from context
-fails."
+fails.
+
+If the citekey prompt is slow to appear, consider enabling the
+`bib' category in `bog-use-citekey-cache'."
   (interactive "P")
   (funcall bog-find-citekey-bib-func
            (bog-citekey-from-surroundings-or-bibs no-context)))
@@ -727,21 +787,24 @@ Otherwise, collect citekeys the current buffer."
   "Return a list citekeys for all BibTeX entries.
 If `bog-bib-file' is non-nil, it returns citekeys from this file
 instead of citekeys from file names in `bog-bib-directory'."
-  (if bog-bib-file
-      (with-temp-buffer
-        (bibtex-mode)
-        (insert-file-contents bog-bib-file)
-        (mapcar #'car (bibtex-parse-keys)))
-    (let (dirs)
-      (if bog-subdirectory-group
-          (dolist (df (directory-files
-                       bog-bib-directory t directory-files-no-dot-files-regexp))
-            (when (and (file-readable-p df) (file-directory-p df))
-              (push df dirs)))
-        (push bog-bib-directory dirs))
-      (mapcar #'file-name-sans-extension
-              (cl-mapcan (lambda (dir) (directory-files dir nil ".*\\.bib$"))
-                         dirs)))))
+  (bog--with-citekey-cache 'bibs
+    (if bog-bib-file
+        (with-temp-buffer
+          (bibtex-mode)
+          (insert-file-contents bog-bib-file)
+          (mapcar #'car (bibtex-parse-keys)))
+      (let (dirs)
+        (if bog-subdirectory-group
+            (dolist (df (directory-files
+                         bog-bib-directory t
+                         directory-files-no-dot-files-regexp))
+              (when (and (file-readable-p df) (file-directory-p df))
+                (push df dirs)))
+          (push bog-bib-directory dirs))
+        (mapcar #'file-name-sans-extension
+                (cl-mapcan
+                 (lambda (dir) (directory-files dir nil ".*\\.bib$"))
+                 dirs))))))
 
 
 ;;; Web
@@ -763,7 +826,10 @@ any note file.  Do the same if locating a citekey from context
 fails.
 
 If the citekey file prompt is slow to appear, consider enabling
-`bog-use-citekey-cache'."
+`bog-use-citekey-cache'.
+
+If the citekey prompt is slow to appear, consider enabling the
+`all-notes' category in `bog-use-citekey-cache'."
   (interactive "P")
   (bog--search-citekey-on-web
    (bog-citekey-from-surroundings-or-all no-context)))
@@ -852,8 +918,8 @@ With prefix argument NO-CONTEXT, prompt with citekeys that have a
 heading in any note file.  Do the same if locating a citekey from
 context fails.
 
-If the citekey file prompt is slow to appear, consider enabling
-`bog-use-citekey-cache'.
+If the citekey prompt is slow to appear, consider enabling the
+`heading' category in `bog-use-citekey-cache'.
 
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
@@ -915,8 +981,8 @@ With prefix argument NO-CONTEXT, prompt with citekeys that have a
 heading in any note file.  Do the same if locating a citekey from
 context fails.
 
-If the citekey file prompt is slow to appear, consider enabling
-`bog-use-citekey-cache'."
+If the citekey prompt is slow to appear, consider enabling the
+`heading' category in `bog-use-citekey-cache'."
   (interactive "P")
   (let* ((orig-buf (current-buffer))
          (citekey (bog-citekey-from-point-or-all-headings no-context))
@@ -993,7 +1059,10 @@ With prefix argument TODO-ONLY, search only TODO entries.
 
 The citekey is taken from the text under point if it matches
 `bog-citekey-format' or from the current tree.  If a citekey is
-not found, prompt with citekeys present in any note file."
+not found, prompt with citekeys present in any note file.
+
+If the citekey prompt is slow to appear, consider enabling the
+`all-notes' category in `bog-use-citekey-cache'."
   (interactive "P")
   (bog-search-notes todo-only
                     (bog-citekey-from-surroundings-or-all nil)))
@@ -1052,7 +1121,10 @@ The citekey is taken from the text under point if it matches
 
 With prefix argument NO-CONTEXT, prompt with citekeys that have a
 heading in any note file.  Do the same if locating a citekey from
-context fails."
+context fails.
+
+If the citekey prompt is slow to appear, consider enabling the
+`heading' category in `bog-use-citekey-cache'."
   (interactive "P")
   (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
          (marker (bog--find-citekey-heading-in-notes citekey)))
