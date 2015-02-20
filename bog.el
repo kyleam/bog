@@ -257,7 +257,8 @@ behavior:
 - If CONTEXT-METHOD returns nil or if NO-CONTEXT is non-nil,
   prompts with the citekeys gathered by COLLECTION-METHOD."
   `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
-     ,(format "Select citekey with `%s', falling back on `%s'.
+     ,(format "Select citekey with `%s'.
+Fall back on `%s'.
 If NO-CONTEXT is non-nil, immediately fall back."
               (symbol-name context-method)
               (symbol-name collection-method))
