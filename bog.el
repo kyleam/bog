@@ -1272,6 +1272,12 @@ chosen."
   "Find citekey BibTeX file."
   (bog-find-citekey-bib t))
 
+(def-bog-commander-method ?c
+  "Search notes for citekey with `org-search-view'."
+  ;; Switch to temporary buffer to prevent citekey being taken from
+  ;; context.
+  (with-temp-buffer (bog-search-notes-for-citekey)))
+
 (def-bog-commander-method ?f
   "Find citekey file."
   (bog-find-citekey-file t))
