@@ -1298,6 +1298,10 @@ chosen."
   "Open first link for a citekey heading."
   (bog-open-first-citekey-link))
 
+(def-bog-commander-method ?r
+  "Rename staged file."
+  (bog-rename-staged-file-to-citekey t))
+
 (def-bog-commander-method ?s
   "Search notes with `org-search-view'."
   (bog-search-notes))
