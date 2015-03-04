@@ -762,11 +762,13 @@ Otherwise, collect citekeys the current buffer."
   (let ((bib-buffer-name "*Bog combined bib*")
         citekeys
         citekey-bibs)
-    (if (derived-mode-p 'dired-mode)
-        (setq citekeys
-              (delete-dups (cl-mapcan #'bog-citekeys-in-file
-                                      (dired-get-marked-files nil arg))))
-      (setq citekeys (bog-citekeys-in-buffer)))
+    (let ((bog--no-sort t))
+      (if (derived-mode-p 'dired-mode)
+          (setq citekeys
+                (delete-dups (cl-mapcan #'bog-citekeys-in-file
+                                        (dired-get-marked-files nil arg))))
+        (setq citekeys (bog-citekeys-in-buffer))))
+    (setq citekeys (sort citekeys #'string-lessp))
     (setq citekey-bibs
           (mapcar (lambda (ck) (cons ck (bog-citekey-as-bib ck)))
                   citekeys))
