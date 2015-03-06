@@ -873,36 +873,6 @@ Groups are specified by `bog-citekey-web-search-groups'."
 
 ;;; Notes-related
 
-(defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
-  "Return the marker of heading for CITEKEY.
-CITEKEY can either be the heading title or the property value of
-the key `bog-citekey-property'.  If POS-ONLY is non-nil, return
-the position instead of a marker."
-  (or (org-find-exact-headline-in-buffer citekey nil pos-only)
-      (bog--find-citekey-property-in-buffer citekey nil pos-only)))
-
-(defun bog--find-citekey-property-in-buffer (citekey &optional buffer pos-only)
-  "Return marker in BUFFER for heading with CITEKEY as a property value.
-The property key must match `bog-citekey-property'.  If POS-ONLY
-is non-nil, return the position instead of a marker."
-  (with-current-buffer (or buffer (current-buffer))
-    (save-excursion
-      (save-restriction
-        (widen)
-        (goto-char (point-min))
-        (catch 'found
-          (while (re-search-forward (concat "\\b" citekey "\\b") nil t)
-            (save-excursion
-              (beginning-of-line)
-              (when (and (looking-at org-property-re)
-                         (equal (downcase (match-string 2))
-                                (downcase bog-citekey-property)))
-                (org-back-to-heading t)
-                (throw 'found
-                       (if pos-only
-                           (point)
-                         (move-marker (make-marker) (point))))))))))))
-
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
 
@@ -934,6 +904,36 @@ buffer, the narrowing is removed."
           (goto-char marker)
           (org-show-context))
       (message "Heading for %s not found in notes" citekey))))
+
+(defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
+  "Return the marker of heading for CITEKEY.
+CITEKEY can either be the heading title or the property value of
+the key `bog-citekey-property'.  If POS-ONLY is non-nil, return
+the position instead of a marker."
+  (or (org-find-exact-headline-in-buffer citekey nil pos-only)
+      (bog--find-citekey-property-in-buffer citekey nil pos-only)))
+
+(defun bog--find-citekey-property-in-buffer (citekey &optional buffer pos-only)
+  "Return marker in BUFFER for heading with CITEKEY as a property value.
+The property key must match `bog-citekey-property'.  If POS-ONLY
+is non-nil, return the position instead of a marker."
+  (with-current-buffer (or buffer (current-buffer))
+    (save-excursion
+      (save-restriction
+        (widen)
+        (goto-char (point-min))
+        (catch 'found
+          (while (re-search-forward (concat "\\b" citekey "\\b") nil t)
+            (save-excursion
+              (beginning-of-line)
+              (when (and (looking-at org-property-re)
+                         (equal (downcase (match-string 2))
+                                (downcase bog-citekey-property)))
+                (org-back-to-heading t)
+                (throw 'found
+                       (if pos-only
+                           (point)
+                         (move-marker (make-marker) (point))))))))))))
 
 (defun bog--find-citekey-heading-in-notes (citekey)
   "Return the marker of heading for CITEKEY in notes.
