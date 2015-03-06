@@ -1360,7 +1360,8 @@ if ARG is omitted or nil.
    (t
     (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
     (font-lock-fontify-buffer)
-    (bog-view-mode -1))))
+    (when (bound-and-true-p bog-view-mode)
+      (bog-view-mode -1)))))
 
 
 ;;; View minor mode
