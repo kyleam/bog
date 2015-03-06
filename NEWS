@@ -47,8 +47,7 @@
 - =bog-create-combined-bib= now supports collecting citekeys from
   marked files in a Dired buffer.
 
-- =bog-goto-citekey-heading-in-buffer= and
-  =bog-goto-citekey-heading-in-notes= now work when citekeys are
+- =bog-goto-citekey-heading-in-notes= now works when citekeys are
   stored are stored as property values.
 
 - New command =bog-list-duplicate-heading-citekeys= finds citekeys
@@ -66,8 +65,11 @@
 
 ** Other changes
 
-- =bog-goto-citekey-heading-in-buffer= and
-  =bog-goto-citekey-heading-in-notes= will now widen the buffer if the
+- The command =bog-goto-citekey-heading-in-buffer= has been removed.
+  Similar behavior is now available when a double C-u is used as the
+  prefix argument to =bog-goto-citekey-heading-in-notes=.
+
+- =bog-goto-citekey-heading-in-notes= now widens the buffer if the
   heading is outside of the narrowed region.
 
 - The format for citekeys is now restricted to letters, digits,

@@ -873,30 +873,37 @@ Groups are specified by `bog-citekey-web-search-groups'."
 
 ;;; Notes-related
 
-(defun bog-goto-citekey-heading-in-buffer (&optional no-context)
-  "Find citekey heading in this buffer.
+(defun bog-goto-citekey-heading-in-notes (&optional no-context)
+  "Find citekey heading in notes.
 
 The citekey is taken from the text under point if it matches
 `bog-citekey-format'.
 
-With prefix argument NO-CONTEXT, prompt with citekeys that have a
-heading in the current buffer.  Do the same if locating a citekey
-from context fails.
+When the prefix argument NO-CONTEXT is given by a single
+\\[universal-argument], prompt with citekeys that have a heading
+in any note file.  Do the same if locating a citekey from context
+fails.  With a double \\[universal-argument], restrict the prompt
+to citekeys that have a heading in the current buffer.
+
+If the citekey prompt is slow to appear, consider enabling the
+`heading' category in `bog-use-citekey-cache'.
 
 If the heading is found outside any current narrowing of the
 buffer, the narrowing is removed."
   (interactive "P")
-  (let* ((citekey (bog-citekey-from-point-or-buffer-headings no-context))
-         (pos (bog--find-citekey-heading-in-buffer citekey)))
-    (if pos
+  (let* ((citekey (if (equal no-context '(16))
+                      (bog-citekey-from-point-or-buffer-headings no-context)
+                    (bog-citekey-from-point-or-all-headings no-context)))
+         (marker (bog--find-citekey-heading-in-notes citekey)))
+    (if marker
         (progn
-         (when (or (< pos (point-min))
-                   (> pos (point-max)))
-           (widen))
-         (org-mark-ring-push)
-         (goto-char pos)
-         (org-show-context))
-      (message "Heading for %s not found in buffer" citekey))))
+          (pop-to-buffer (marker-buffer marker))
+          (when (or (< marker (point-min))
+                    (> marker (point-max)))
+            (widen))
+          (goto-char marker)
+          (org-show-context))
+      (message "Heading for %s not found in notes" citekey))))
 
 (defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
   "Return the marker of heading for CITEKEY.
@@ -927,34 +934,6 @@ is non-nil, return the position instead of a marker."
                        (if pos-only
                            (point)
                          (move-marker (make-marker) (point))))))))))))
-
-(defun bog-goto-citekey-heading-in-notes (&optional no-context)
-  "Find citekey heading in notes.
-
-The citekey is taken from the text under point if it matches
-`bog-citekey-format'.
-
-With prefix argument NO-CONTEXT, prompt with citekeys that have a
-heading in any note file.  Do the same if locating a citekey from
-context fails.
-
-If the citekey prompt is slow to appear, consider enabling the
-`heading' category in `bog-use-citekey-cache'.
-
-If the heading is found outside any current narrowing of the
-buffer, the narrowing is removed."
-  (interactive "P")
-  (let* ((citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-citekey-heading-in-notes citekey)))
-    (if marker
-        (progn
-          (pop-to-buffer (marker-buffer marker))
-          (when (or (< marker (point-min))
-                    (> marker (point-max)))
-            (widen))
-          (goto-char marker)
-          (org-show-context))
-      (message "Heading for %s not found in notes" citekey))))
 
 (defun bog--find-citekey-heading-in-notes (citekey)
   "Return the marker of heading for CITEKEY in notes.
@@ -1324,8 +1303,7 @@ chosen."
       (define-key prefix-map "c" 'bog-search-notes-for-citekey)
       (define-key prefix-map "f" 'bog-find-citekey-file)
       (define-key prefix-map "g" 'bog-search-citekey-on-web)
-      (define-key prefix-map "h" 'bog-goto-citekey-heading-in-buffer)
-      (define-key prefix-map "H" 'bog-goto-citekey-heading-in-notes)
+      (define-key prefix-map "h" 'bog-goto-citekey-heading-in-notes)
       (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
       (define-key prefix-map "j" 'bog-jump-to-topic-heading)
       (define-key prefix-map "l" 'bog-open-citekey-link)
@@ -1372,8 +1350,7 @@ if ARG is omitted or nil.
     (define-key map "c" 'bog-search-notes-for-citekey)
     (define-key map "f" 'bog-find-citekey-file)
     (define-key map "g" 'bog-search-citekey-on-web)
-    (define-key map "h" 'bog-goto-citekey-heading-in-buffer)
-    (define-key map "H" 'bog-goto-citekey-heading-in-notes)
+    (define-key map "h" 'bog-goto-citekey-heading-in-notes)
     (define-key map "i" 'bog-citekey-tree-to-indirect-buffer)
     (define-key map "j" 'bog-jump-to-topic-heading)
     (define-key map "l" 'bog-open-citekey-link)
