@@ -1,6 +1,2 @@
 *-autoloads.el
 *.elc
-
-# Needed for `make test`
-.downloads
-dash.el
