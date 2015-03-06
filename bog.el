@@ -248,43 +248,7 @@ treated as word characters.")
 
 ;;; Citekey methods
 
-(defmacro bog-selection-method (name context-method collection-method)
-  "Create citekey selection function.
-Create a function named bog-citekey-from-NAME with the following
-behavior:
-- Takes one argument (NO-CONTEXT).
-- If NO-CONTEXT is nil, calls CONTEXT-METHOD with no arguments.
-- If CONTEXT-METHOD returns nil or if NO-CONTEXT is non-nil,
-  prompts with the citekeys gathered by COLLECTION-METHOD."
-  `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
-     ,(format "Select citekey with `%s'.
-Fall back on `%s'.
-If NO-CONTEXT is non-nil, immediately fall back."
-              (symbol-name context-method)
-              (symbol-name collection-method))
-      (or (and no-context (bog-select-citekey (,collection-method)))
-          (,context-method)
-          (bog-select-citekey (,collection-method)))))
-
-(bog-selection-method "surroundings-or-files"
-                      bog-citekey-from-surroundings
-                      bog-all-file-citekeys)
-
-(bog-selection-method "surroundings-or-bibs"
-                      bog-citekey-from-surroundings
-                      bog-bib-citekeys)
-
-(bog-selection-method "surroundings-or-all"
-                      bog-citekey-from-surroundings
-                      bog-all-citekeys)
-
-(bog-selection-method "point-or-buffer-headings"
-                      bog-citekey-at-point
-                      bog-heading-citekeys-in-wide-buffer)
-
-(bog-selection-method "point-or-all-headings"
-                      bog-citekey-at-point
-                      bog-all-heading-citekeys)
+;;;; Collection
 
 (defvar bog--citekey-cache nil
   "Alist of cached citekeys.
@@ -332,10 +296,6 @@ Otherwise, prompt for CATEGORY."
   "Sort VALUES by `string-lessp' unless `bog--no-sort' is non-nil."
   (or (and bog--no-sort values)
       (sort values #'string-lessp)))
-
-(defun bog-select-citekey (citekeys)
-  "Prompt for citekey from CITEKEYS."
-  (org-icompleting-read "Select citekey: " citekeys))
 
 (defun bog-citekey-at-point ()
   "Return citekey at point.
@@ -447,6 +407,52 @@ word constituents."
                       (org-at-property-p))
             (push (match-string-no-properties 0) citekeys))))
       (bog--maybe-sort (delete-dups citekeys)))))
+
+;;;; Selection
+
+(defmacro bog-selection-method (name context-method collection-method)
+  "Create citekey selection function.
+Create a function named bog-citekey-from-NAME with the following
+behavior:
+- Takes one argument (NO-CONTEXT).
+- If NO-CONTEXT is nil, calls CONTEXT-METHOD with no arguments.
+- If CONTEXT-METHOD returns nil or if NO-CONTEXT is non-nil,
+  prompts with the citekeys gathered by COLLECTION-METHOD."
+  `(defun ,(intern (concat "bog-citekey-from-" name)) (no-context)
+     ,(format "Select citekey with `%s'.
+Fall back on `%s'.
+If NO-CONTEXT is non-nil, immediately fall back."
+              (symbol-name context-method)
+              (symbol-name collection-method))
+      (or (and no-context (bog-select-citekey (,collection-method)))
+          (,context-method)
+          (bog-select-citekey (,collection-method)))))
+
+(bog-selection-method "surroundings-or-files"
+                      bog-citekey-from-surroundings
+                      bog-all-file-citekeys)
+
+(bog-selection-method "surroundings-or-bibs"
+                      bog-citekey-from-surroundings
+                      bog-bib-citekeys)
+
+(bog-selection-method "surroundings-or-all"
+                      bog-citekey-from-surroundings
+                      bog-all-citekeys)
+
+(bog-selection-method "point-or-buffer-headings"
+                      bog-citekey-at-point
+                      bog-heading-citekeys-in-wide-buffer)
+
+(bog-selection-method "point-or-all-headings"
+                      bog-citekey-at-point
+                      bog-all-heading-citekeys)
+
+(defun bog-select-citekey (citekeys)
+  "Prompt for citekey from CITEKEYS."
+  (org-icompleting-read "Select citekey: " citekeys))
+
+;;;; Other
 
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
