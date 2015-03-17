@@ -143,10 +143,8 @@ The variables below are important for specifying how Bog behaves.
 A keymap is defined for Bog under the prefix =C-c "​=.  If you prefer
 something else (like =C-c b=), set =bog-keymap-prefix=.
 
-Some Bog functions are useful outside of an Org buffer (e.g.,
-=bog-search-notes=).  These functions are available through the
-=bog-commander= interface (based of off =projectile-commander=).  This
-can be bound to a global key for quick access.
+Many of the Bog functions are useful outside of an Org buffer, so you
+can also bind =bog-command-map= to a global key.
 
 * Other approaches
 

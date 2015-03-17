@@ -19,10 +19,8 @@
 - When locating a citekey from the notes fails, functions will now
   prompt with a list of citekeys instead of giving an error.
 
-- Bog commands are now available outside of Org buffers through
-  =bog-commander=.  This is based off of =projectile-commander=.  The
-  custom Bog commands for the Org agenda have been removed because
-  this functionality is now available through =bog-commander=.
+- All Bog commands now work outside of Org buffers.  To access them,
+  bind =bog-command= a global key.
 
 - New command =bog-citekey-tree-to-indirect-buffer= opens the subtree
   for a citekey in an indirect buffer.  The citekey is either taken from

@@ -1215,123 +1215,41 @@ Topic headings are determined by `bog-topic-heading-level'."
                              '(face bog-citekey-face))))))
 
 
-;;; Commander
-
-;;; The commander functionality is modified from projectile.
-;;; https://github.com/bbatsov/projectile
-
-(defconst bog-commander-help-buffer "*Commander Help*")
-
-(defvar bog-commander-methods nil
-  "List of file-selection methods for the `bog-commander' command.
-Each element is a list (KEY DESCRIPTION FUNCTION).
-DESCRIPTION is a one-line description of what the key selects.")
+;;; Minor mode
 
 ;;;###autoload
-(defun bog-commander ()
-  "Execute a Bog command with a single letter.
+(defvar bog-command-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map "b" 'bog-find-citekey-bib)
+    (define-key map "c" 'bog-search-notes-for-citekey)
+    (define-key map "f" 'bog-find-citekey-file)
+    (define-key map "g" 'bog-search-citekey-on-web)
+    (define-key map "h" 'bog-goto-citekey-heading-in-notes)
+    (define-key map "i" 'bog-citekey-tree-to-indirect-buffer)
+    (define-key map "j" 'bog-jump-to-topic-heading)
+    (define-key map "l" 'bog-open-citekey-link)
+    (define-key map "L" 'bog-open-first-citekey-link)
+    (define-key map "n" 'bog-next-non-heading-citekey)
+    (define-key map "p" 'bog-previous-non-heading-citekey)
+    (define-key map "r" 'bog-rename-staged-file-to-citekey)
+    (define-key map "s" 'bog-search-notes)
+    (define-key map "w" 'bog-refile)
+    (define-key map "v" 'bog-view-mode)
+    (define-key map "y" 'bog-insert-heading-citekey)
+    map)
+  "Map for Bog commands.
+In Bog mode, these are under `bog-keymap-prefix'.
+`bog-command-map' can also be bound to a key outside of Bog
+mode.")
 
-The user is prompted for a single character indicating the action
-to invoke.  Press \"?\" to describe available actions.
-
-See `def-bog-commander-method' for defining new methods."
-  (interactive)
-  (let* ((choices (mapcar #'car bog-commander-methods))
-         (prompt (concat "Commander [" choices "]: "))
-         (ch (read-char-choice prompt choices))
-         (fn (car (last (assq ch bog-commander-methods)))))
-    (funcall fn)))
-
-(defmacro def-bog-commander-method (key description &rest body)
-  "Define a new `bog-commander' method.
-
-KEY is the key the user will enter to choose this method.
-
-DESCRIPTION is a one-line sentence describing the method.
-
-BODY is a series of forms which are evaluated when the method is
-chosen."
-  (let ((method `(lambda ()
-                   ,@body)))
-    `(setq bog-commander-methods
-           (sort (cons (list ,key ,description ,method)
-                       (assq-delete-all ,key bog-commander-methods))
-                 (lambda (x y) (< (car x) (car y)))))))
-
-(def-bog-commander-method ?? "Commander help buffer."
-  (ignore-errors (kill-buffer bog-commander-help-buffer))
-  (with-current-buffer (get-buffer-create bog-commander-help-buffer)
-    (insert "Bog commander methods:\n\n")
-    (cl-loop for (key line nil) in bog-commander-methods
-             do (insert (format "%c:\t%s\n" key line)))
-    (goto-char (point-min))
-    (help-mode)
-    (display-buffer (current-buffer) t))
-  (bog-commander))
-
-(def-bog-commander-method ?b
-  "Find citekey BibTeX file."
-  (bog-find-citekey-bib t))
-
-(def-bog-commander-method ?c
-  "Search notes for citekey with `org-search-view'."
-  ;; Switch to temporary buffer to prevent citekey being taken from
-  ;; context.
-  (with-temp-buffer (bog-search-notes-for-citekey)))
-
-(def-bog-commander-method ?f
-  "Find citekey file."
-  (bog-find-citekey-file t))
-
-(def-bog-commander-method ?h
-  "Find citekey heading in notes."
-  (bog-goto-citekey-heading-in-notes t))
-
-(def-bog-commander-method ?j
-  "Jump to topic heading in notes."
-  (bog-jump-to-topic-heading))
-
-(def-bog-commander-method ?l
-  "Open a link for a citekey heading."
-  (bog-open-citekey-link))
-
-(def-bog-commander-method ?L
-  "Open first link for a citekey heading."
-  (bog-open-first-citekey-link))
-
-(def-bog-commander-method ?r
-  "Rename staged file."
-  (bog-rename-staged-file-to-citekey t))
-
-(def-bog-commander-method ?s
-  "Search notes with `org-search-view'."
-  (bog-search-notes))
-
-
-;;; Minor mode
+;;;###autoload
+(fset 'bog-command-map bog-command-map)
 
 (defvar bog-mode-map
   (let ((map (make-sparse-keymap)))
-    (let ((prefix-map (make-sparse-keymap)))
-      (define-key prefix-map "b" 'bog-find-citekey-bib)
-      (define-key prefix-map "c" 'bog-search-notes-for-citekey)
-      (define-key prefix-map "f" 'bog-find-citekey-file)
-      (define-key prefix-map "g" 'bog-search-citekey-on-web)
-      (define-key prefix-map "h" 'bog-goto-citekey-heading-in-notes)
-      (define-key prefix-map "i" 'bog-citekey-tree-to-indirect-buffer)
-      (define-key prefix-map "j" 'bog-jump-to-topic-heading)
-      (define-key prefix-map "l" 'bog-open-citekey-link)
-      (define-key prefix-map "L" 'bog-open-first-citekey-link)
-      (define-key prefix-map "n" 'bog-next-non-heading-citekey)
-      (define-key prefix-map "p" 'bog-previous-non-heading-citekey)
-      (define-key prefix-map "r" 'bog-rename-staged-file-to-citekey)
-      (define-key prefix-map "s" 'bog-search-notes)
-      (define-key prefix-map "w" 'bog-refile)
-      (define-key prefix-map "v" 'bog-view-mode)
-      (define-key prefix-map "y" 'bog-insert-heading-citekey)
-      (define-key map bog-keymap-prefix prefix-map))
+    (define-key map bog-keymap-prefix 'bog-command-map)
     map)
-  "Keymap for Bog.")
+  "Keymap for Bog mode.")
 
 ;;;###autoload
 (define-minor-mode bog-mode
