@@ -873,6 +873,7 @@ Groups are specified by `bog-citekey-web-search-groups'."
 
 ;;; Notes-related
 
+;;;###autoload
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
 
@@ -967,6 +968,7 @@ there first."
 
 (defvar bog--last-indirect-buffer nil)
 
+;;;###autoload
 (defun bog-citekey-tree-to-indirect-buffer (&optional no-context)
   "Open subtree for citekey in an indirect buffer.
 
@@ -1000,6 +1002,7 @@ If the citekey prompt is slow to appear, consider enabling the
              (setq bog--last-indirect-buffer org-last-indirect-buffer))))
       (message "Heading for %s not found in notes" citekey))))
 
+;;;###autoload
 (defun bog-refile ()
   "Refile heading within notes.
 All headings from Org files in `bog-note-directory' at or above
@@ -1042,6 +1045,7 @@ Restore the `org-lprops' property value for
                       map))
      (put 'org-agenda-redo-command 'org-lprops org-lprops)))
 
+;;;###autoload
 (defun bog-search-notes (&optional todo-only string)
   "Search notes using `org-search-view'.
 With prefix argument TODO-ONLY, search only TODO entries.  If
@@ -1051,6 +1055,7 @@ prompting for one)."
   (bog--with-search-lprops
     '(org-search-view todo-only string)))
 
+;;;###autoload
 (defun bog-search-notes-for-citekey (&optional todo-only)
   "Search notes for citekey using `org-search-view'.
 
@@ -1096,6 +1101,7 @@ Sorting is only done if the heading's level matches
                (not (bog-citekey-from-heading)))
       (org-sort-entries nil sorting-type))))
 
+;;;###autoload
 (defun bog-insert-heading-citekey (&optional current-buffer)
   "Select a citekey to insert at point.
 By default, offer heading citekeys from all files.  With prefix
@@ -1107,6 +1113,7 @@ current buffer."
                         'bog-all-heading-citekeys)))
     (insert (bog-select-citekey (funcall citekey-func)))))
 
+;;;###autoload
 (defun bog-open-citekey-link (&optional no-context first)
   "Open a link for a citekey heading.
 
@@ -1136,6 +1143,7 @@ If the citekey prompt is slow to appear, consider enabling the
            (org-open-at-point)))
       (message "Heading for %s not found in notes" citekey))))
 
+;;;###autoload
 (defun bog-open-first-citekey-link (&optional no-context)
   "Open first link for a citekey heading.
 
@@ -1148,6 +1156,7 @@ context fails."
   (interactive "P")
   (bog-open-citekey-link no-context t))
 
+;;;###autoload
 (defun bog-next-non-heading-citekey (&optional arg)
   "Move foward to next non-heading citekey.
 With argument ARG, do it ARG times."
@@ -1164,6 +1173,7 @@ With argument ARG, do it ARG times."
             (setq arg (1- arg))))))
     (org-show-context)))
 
+;;;###autoload
 (defun bog-previous-non-heading-citekey (&optional arg)
   "Move backward to previous non-heading citekey.
 With argument ARG, do it ARG times."
@@ -1178,6 +1188,7 @@ With argument ARG, do it ARG times."
     (skip-syntax-backward "w"))
   (org-show-context))
 
+;;;###autoload
 (defun bog-jump-to-topic-heading ()
   "Jump to topic heading.
 Topic headings are determined by `bog-topic-heading-level'."
@@ -1366,6 +1377,7 @@ if ARG is omitted or nil.
 (defvar bog-view--old-buffer-read-only nil)
 (defvar bog-view--old-bog-mode nil)
 
+;;;###autoload
 (define-minor-mode bog-view-mode
   "Toggle Bog View mode in this buffer.
 
