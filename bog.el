@@ -316,14 +316,15 @@ word constituents."
 
 (defun bog-citekey-from-tree ()
   "Retrieve citekey from first parent heading associated with citekey."
-  (org-with-wide-buffer
-   (let (maybe-citekey)
-     (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
-                 ;; This isn't actually safe in Org mode <= 8.2.10.
-                 ;; Fixed in Org mode commit
-                 ;; 9ba9f916e87297d863c197cb87199adbb39da894.
-                 (ignore-errors (org-up-heading-safe))))
-     maybe-citekey)))
+  (when (derived-mode-p 'org-mode)
+    (org-with-wide-buffer
+     (let (maybe-citekey)
+       (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
+                   ;; This isn't actually safe in Org mode <= 8.2.10.
+                   ;; Fixed in Org mode commit
+                   ;; 9ba9f916e87297d863c197cb87199adbb39da894.
+                   (ignore-errors (org-up-heading-safe))))
+       maybe-citekey))))
 
 (defun bog-citekey-from-heading ()
   "Retrieve citekey from current heading title or property."
@@ -332,15 +333,17 @@ word constituents."
 
 (defun bog-citekey-from-heading-title ()
   "Retrieve citekey from heading title."
-  (unless (org-before-first-heading-p)
-    (let ((heading (org-no-properties (org-get-heading t t))))
-      (and (bog-citekey-p heading)
-           heading))))
+  (when (derived-mode-p 'org-mode)
+    (unless (org-before-first-heading-p)
+      (let ((heading (org-no-properties (org-get-heading t t))))
+        (and (bog-citekey-p heading)
+             heading)))))
 
 (defun bog-citekey-from-property ()
   "Retrieve citekey from `bog-citekey-property'."
-  (let ((ck (org-entry-get (point) bog-citekey-property)))
-    (and ck (bog-citekey-p ck) ck)))
+  (when (derived-mode-p 'org-mode)
+    (let ((ck (org-entry-get (point) bog-citekey-property)))
+      (and ck (bog-citekey-p ck) ck))))
 
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
