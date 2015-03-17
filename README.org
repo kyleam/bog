@@ -143,8 +143,10 @@ The variables below are important for specifying how Bog behaves.
 A keymap is defined for Bog under the prefix =C-c "​=.  If you prefer
 something else (like =C-c b=), set =bog-keymap-prefix=.
 
-Many of the Bog functions are useful outside of an Org buffer, so you
-can also bind =bog-command-map= to a global key.
+Many of the Bog functions are useful outside of an Org buffer.  You
+can turn Bog minor mode on (=bog-mode=) in non-Org buffers to get
+access to the keymap and citekey highlighting.  To make Bog commands
+available from any buffer, bind =bog-command-map= to a global key.
 
 * Other approaches
 

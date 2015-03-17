@@ -22,6 +22,10 @@
 - All Bog commands now work outside of Org buffers.  To access them,
   bind =bog-command= a global key.
 
+- When Bog mode is turned on in non-Org buffers, text matching
+  bog-citekey-format is now highlighted, without relying on
+  Org-specific font-lock mechanisms.
+
 - New command =bog-citekey-tree-to-indirect-buffer= opens the subtree
   for a citekey in an indirect buffer.  The citekey is either taken from
   at point or selected from all heading citekeys.

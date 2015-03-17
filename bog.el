@@ -1208,11 +1208,16 @@ Topic headings are determined by `bog-topic-heading-level'."
   "Face used to highlight text that matches `bog-citekey-format'.")
 
 (defun bog-fontify-non-heading-citekeys (limit)
+  "Highlight non-heading citekey in an Org buffer."
   (let (case-fold-search)
     (while (re-search-forward bog-citekey-format limit t)
       (unless (save-match-data (org-at-heading-p))
         (add-text-properties (match-beginning 0) (match-end 0)
                              '(face bog-citekey-face))))))
+
+(defvar bog-citekey-font-lock-keywords
+  `((,bog-citekey-format . 'bog-citekey-face))
+  "Citekey font-lock for non-Org buffers.")
 
 
 ;;; Minor mode
@@ -1265,10 +1270,14 @@ if ARG is omitted or nil.
   :require 'bog
   (cond
    (bog-mode
-    (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+    (if (derived-mode-p 'org-mode)
+        (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+      (font-lock-add-keywords nil bog-citekey-font-lock-keywords))
     (font-lock-fontify-buffer))
    (t
-    (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+    (if (derived-mode-p 'org-mode)
+        (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+      (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
     (font-lock-fontify-buffer)
     (when (bound-and-true-p bog-view-mode)
       (bog-view-mode -1)))))
