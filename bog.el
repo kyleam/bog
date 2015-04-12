@@ -690,7 +690,8 @@ Generate a file name with the form
 
 (defun bog-staged-files ()
   "Return files in `bog-stage-directory'."
-  (cl-remove-if #'file-directory-p
+  (cl-remove-if (lambda (f) (or (file-directory-p f)
+                                (backup-file-name-p f)))
                 (directory-files bog-stage-directory
                                  t directory-files-no-dot-files-regexp)))
 
