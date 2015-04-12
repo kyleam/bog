@@ -44,7 +44,16 @@
   :group 'org)
 
 (defcustom bog-citekey-format
-  "\\b\\([a-z]+[-a-z]*\\)\\([0-9]\\{4\\}\\)\\([a-z][a-z0-9]*\\)\\b"
+  (rx
+   word-start
+   (group
+    (one-or-more lower)
+    (zero-or-more (any lower "-")))
+   (group (= 4 digit))
+   (group
+    (one-or-more lower)
+    (zero-or-more (any lower digit)))
+   word-end)
   "Regular expression used to match study citekey.
 
 By default, this matches any sequence of lower case
