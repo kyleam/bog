@@ -3,52 +3,48 @@
 #+tags: maybe
 #+startup: nologdone
 
-* General
+* Release archive                                                   :ARCHIVE:
 
-** DONE Inconsistent face highlighting
+** v1.0.0
+
+*** DONE Inconsistent face highlighting
 
 Some citekeys are not highlighed until the surrounding text is altered.
 
-** DONE Function for getting all citekeys in notes
+*** DONE Function for getting all citekeys in notes
 
 Perhaps use a cache file.  This could be used in
 `bog-search-citekey-on-web' and `bog-rename-staged-pdf-to-citekey'.
 
-** DOC Mention useful tools
+*** CANCELED Mention useful tools
 
 - projectile: Store the notes files in git directory and use projectile
   to manage as project.
 - git annex: Store and sync associated PDF files using git annex.
 
-** DONE Installation instructions
+*** DONE Installation instructions
 
-* Notes
+*** DONE Find in-text citekeys that don't have a header
 
-** DONE Find in-text citekeys that don't have a header
-
-** CANCELED Check for duplicate citekeys headings
+*** CANCELED Check for duplicate citekeys headings
    :LOGBOOK:
    - State "CANCELED"   from "ENH"        [2014-12-07 Sun 20:31] \\
      This is easy enough to do with bog-search or grepping.
    :END:
 
-** DONE Make bog-goto functions work when citekey is property
+*** DONE Make bog-goto functions work when citekey is property
 
 Currently, `bog-goto-citekey-heading-in-buffer' and
 `bog-goto-citekey-heading-in-notes' only work if the citekey is stored
 as a heading, not a property.
 
-* BibTeX files
-
-** DONE Create combined bib from a suffix glob
+*** DONE Create combined bib from a suffix glob
 
 For documents generated from multiple files
 
 Default could be "*.tex".
 
-* PDF files
-
-** DONE Generalize PDF functions in bog
+*** DONE Generalize PDF functions in bog
 
 Replace bog-find-citekey-pdf with bog-find-citekey-file.  The extensions
 that will be considered could be customized.  Rebind this to "f".
@@ -56,17 +52,13 @@ bog-rename-staged-pdf-to-citekey would be
 bog-rename-staged-file-to-citekey and could use the same customized
 extensions (or maybe just take the extension from the original file).
 
-** DONE Use `org-file-apps' instead of `bog-pdf-opener'
+*** DONE Use `org-file-apps' instead of `bog-pdf-opener'
 
-* Testing
+*** DONE Ability to run tests from makefile
 
-** DONE Ability to run tests from makefile
-
-** DONE Put some of the common setup in macros
+*** DONE Put some of the common setup in macros
 
 I'm thinking mainly of temporary Org buffers.
-
-* Release archive                                                   :ARCHIVE:
 
 ** v0.6.0
 *** CANCELED Switch from obsolete `flet' to `noflet'
