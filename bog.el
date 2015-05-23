@@ -558,9 +558,8 @@ If the citekey prompt is slow to appear, consider enabling the
                (mapcar (lambda (path)
                          (cons (file-name-nondirectory path) path))
                        citekey-files))
-              (fname (org-icompleting-read "Select file: "
-                                           (mapcar #'car fname-paths))))
-         (setq citekey-file (cdr (assoc fname fname-paths))))))
+              (fname (org-icompleting-read "Select file: " fname-paths)))
+         (setq citekey-file (cdr (assoc-string fname fname-paths))))))
     (org-open-file citekey-file)))
 
 (defun bog-citekey-files (citekey)
@@ -1035,9 +1034,8 @@ level `bog-refile-maxlevel' are considered."
   (let ((note-paths (mapcar (lambda (path)
                               (cons (file-name-nondirectory path) path))
                             (bog-notes))))
-    (cdr (assoc (org-icompleting-read "File: "
-                                      (mapcar #'car note-paths))
-                note-paths))))
+    (cdr (assoc-string (org-icompleting-read "File: " note-paths)
+                       note-paths))))
 
 (defmacro bog--with-search-lprops (&rest body)
   "Execute BODY with Bog-related agenda values.
