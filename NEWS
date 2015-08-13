@@ -1,5 +1,12 @@
 # -*- mode: org -*-
 
+* master (unreleased)
+
+** Other changes
+
+- ~bog-search-notes~ and ~bog-search-notes-for-citekey~ now ignore any
+  agenda restriction locks.
+
 * v1.0.0
 
 ** New features

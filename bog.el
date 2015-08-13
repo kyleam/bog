@@ -1048,6 +1048,7 @@ Restore the `org-lprops' property value for
                        org-agenda-text-search-extra-files
                        org-agenda-sticky)))
      (put 'org-agenda-redo-command 'org-lprops bog-lprops)
+     (put 'org-agenda-files 'org-restrict nil)
      (org-let bog-lprops ,@body)
      (use-local-map (let ((map (make-sparse-keymap)))
                       (set-keymap-parent map org-agenda-mode-map)
