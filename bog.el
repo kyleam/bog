@@ -357,7 +357,7 @@ word constituents."
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
   (let (case-fold-search)
-    (string-match-p (format "^%s$" bog-citekey-format) text)))
+    (string-match-p (format "\\`%s\\'" bog-citekey-format) text)))
 
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
