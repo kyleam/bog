@@ -1189,7 +1189,7 @@ context fails."
   "Move foward to next non-heading citekey.
 With argument ARG, do it ARG times."
   (interactive "p")
-  (or arg (setq arg 1))
+  (setq arg (or arg 1))
   (if (< arg 0)
       (bog-previous-non-heading-citekey (- arg))
     (with-syntax-table bog-citekey-syntax-table
@@ -1206,7 +1206,7 @@ With argument ARG, do it ARG times."
   "Move backward to previous non-heading citekey.
 With argument ARG, do it ARG times."
   (interactive "p")
-  (or arg (setq arg 1))
+  (setq arg (or arg 1))
   (with-syntax-table bog-citekey-syntax-table
     (let (case-fold-search)
       (while (and (> arg 0)
