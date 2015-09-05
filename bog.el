@@ -924,15 +924,14 @@ buffer, the narrowing is removed."
                       (bog-citekey-from-point-or-buffer-headings no-context)
                     (bog-citekey-from-point-or-all-headings no-context)))
          (marker (bog--find-citekey-heading-in-notes citekey)))
-    (if marker
-        (progn
-          (pop-to-buffer (marker-buffer marker))
-          (when (or (< marker (point-min))
-                    (> marker (point-max)))
-            (widen))
-          (goto-char marker)
-          (org-show-context))
-      (message "Heading for %s not found in notes" citekey))))
+    (if (not marker)
+        (message "Heading for %s not found in notes" citekey)
+      (pop-to-buffer (marker-buffer marker))
+      (when (or (< marker (point-min))
+                (> marker (point-max)))
+        (widen))
+      (goto-char marker)
+      (org-show-context))))
 
 (defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
   "Return the marker of heading for CITEKEY.
