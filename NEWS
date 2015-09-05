@@ -2,10 +2,22 @@
 
 * master (unreleased)
 
+** New features
+
+- New option ~bog-combined-bib-ignore-not-found~ controls whether
+  ~bog-create-combined-bib~ prompts to continue when a citekey's bib
+  file is missing.  With a prefix argument to
+  ~bog-create-combined-bib~, the meaning of this option is reversed.
+
 ** Other changes
 
 - ~bog-search-notes~ and ~bog-search-notes-for-citekey~ now ignore any
   agenda restriction locks.
+
+- In Dired, ~bog-create-combined-bib~ now always acts on the marked
+  files (or, if there are none, the one at point) regardless of the
+  prefix argument, which is no longer interpreted by
+  ~dired-get-marked-files~.
 
 * v1.0.0
 

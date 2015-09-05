@@ -157,6 +157,13 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   :type '(choice (const :tag "Don't use single file" nil)
                  (file :tag "Single file")))
 
+(defcustom bog-combined-bib-ignore-not-found nil
+  "Whether `bog-create-combined-bib' ignores missing bib files.
+If non-nil, `bog-create-combined-bib' does not ask whether to
+continue when a citekey's bib file is not found."
+  :group 'bog
+  :type 'boolean)
+
 (defcustom bog-citekey-file-name-separators "[-_]"
   "Regular expression matching separators in file names.
 When `bog-find-citekey-file' is run on <citekey>, it will find
@@ -773,10 +780,12 @@ one entry per BibTeX file."
 ;;;###autoload
 (defun bog-create-combined-bib (&optional arg)
   "Create a buffer that has entries for a collection of citekeys.
-If in Dired, collect citekeys from marked (or next ARG) files.
-Otherwise, collect citekeys the current buffer."
-  (interactive "p")
-  (setq arg (and current-prefix-arg arg))
+If in Dired, collect citekeys from marked files.  Otherwise,
+collect citekeys the current buffer.  With prefix argument ARG,
+reverse the meaning of `bog-combined-bib-ignore-not-found'."
+  (interactive (list (if current-prefix-arg
+                         (not bog-combined-bib-ignore-not-found)
+                       bog-combined-bib-ignore-not-found)))
   (let ((bib-buffer-name "*Bog combined bib*")
         citekeys
         citekey-bibs)
@@ -784,7 +793,7 @@ Otherwise, collect citekeys the current buffer."
       (if (derived-mode-p 'dired-mode)
           (setq citekeys
                 (delete-dups (cl-mapcan #'bog-citekeys-in-file
-                                        (dired-get-marked-files nil arg))))
+                                        (dired-get-marked-files))))
         (setq citekeys (bog-citekeys-in-buffer))))
     (setq citekeys (sort citekeys #'string-lessp))
     (setq citekey-bibs
@@ -798,8 +807,10 @@ Otherwise, collect citekeys the current buffer."
           (insert "\n")
           (insert-file-contents (cdr citekey-bib))
           (goto-char (point-max)))
-         ((not (y-or-n-p (format "No BibTeX entry found for %s.  Skip it?"
-                                 (car citekey-bib))))
+         ((or arg
+              (y-or-n-p (format "No BibTeX entry found for %s.  Skip it?"
+                                (car citekey-bib)))))
+         (t
           (kill-buffer bib-buffer-name)
           (user-error "Aborting"))))
       (bibtex-mode)
