@@ -35,6 +35,7 @@
 (require 'dired)
 (require 'org)
 (require 'org-agenda)
+(require 'org-compat)
 
 
 ;;; Customization
@@ -473,6 +474,10 @@ If NO-CONTEXT is non-nil, immediately fall back."
 
 ;;;; Other
 
+;; `show-all' is obsolete as of Emacs 25.1.
+(unless (fboundp 'outline-show-all)
+  (defalias 'outline-show-all 'show-all))
+
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
 With prefix argument FILE, include only orphan citekeys from that
@@ -497,7 +502,7 @@ file."
                             (mapconcat #'identity nohead-cks "\n"))))))
       (org-mode)
       (bog-mode 1)
-      (show-all)
+      (outline-show-all)
       (goto-char (point-min)))
     (pop-to-buffer bufname)))
 
@@ -1293,12 +1298,12 @@ if ARG is omitted or nil.
     (if (derived-mode-p 'org-mode)
         (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
       (font-lock-add-keywords nil bog-citekey-font-lock-keywords))
-    (font-lock-fontify-buffer))
+    (font-lock-ensure))
    (t
     (if (derived-mode-p 'org-mode)
         (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
       (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
-    (font-lock-fontify-buffer)
+    (font-lock-ensure)
     (when (bound-and-true-p bog-view-mode)
       (bog-view-mode -1)))))
 
