@@ -772,7 +772,7 @@ one entry per BibTeX file."
 
 ;;;###autoload
 (defun bog-create-combined-bib (&optional arg)
-  "Create buffer that has entries for all citekeys in buffer.
+  "Create a buffer that has entries for a collection of citekeys.
 If in Dired, collect citekeys from marked (or next ARG) files.
 Otherwise, collect citekeys the current buffer."
   (interactive "p")
