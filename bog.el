@@ -762,6 +762,9 @@ one entry per BibTeX file."
     (with-temp-buffer
       (bibtex-mode)
       (insert-file-contents file)
+      ;; Make sure `bibtex-entry-head' is set since we're not visiting
+      ;; a file.
+      (unless bibtex-entry-head (bibtex-set-dialect nil 'local))
       (bibtex-skip-to-valid-entry)
       (bibtex-clean-entry new-key)
       (if (looking-at bibtex-entry-head)
