@@ -1,43 +1,22 @@
-EMACS = emacs
-BATCH := $(EMACS) -Q --batch
-name = bog
-main_el :=  $(name).el
-main_elc =  $(main_el)c
-AUTOLOADS_FILE := $(name)-autoloads.el
 
-all: elc autoloads
+LOAD_PATH ?=
+BATCH = emacs -Q --batch $(LOAD_PATH)
 
-.PHONY: autoloads
-autoloads: $(AUTOLOADS_FILE)
+all: bog.elc bog-autoloads.el
 
-$(AUTOLOADS_FILE): $(main_el)
-	@$(BATCH) -L . --eval \
-	"(let (make-backup-files) \
-	  (update-file-autoloads \"$(CURDIR)/$<\" t \"$(CURDIR)/$@\"))"
+.PHONY: test
+test: bog.elc
+	@$(BATCH) -L . -l bog-tests.el \
+	--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
 
 .PHONY: clean
 clean:
-	$(RM) $(main_elc) $(AUTOLOADS_FILE)
-
-.PHONY: elc
-elc: $(main_elc)
-
-.PHONY: help
-help:
-	@printf "\nMain targets:\n\n"
-	@printf "  all                Byte compile and generate autoloads.\n"
-	@printf "  autoloads          Generate $(AUTOLOADS_FILE).\n"
-	@printf "  elc                Byte compile $(main_el).\n"
-	@printf "\nOther:\n\n"
-	@printf "  clean              Remove generated files.\n"
-	@printf "  help               Print this message.\n"
-	@printf "  test               Run tests.\n"
-
-.PHONY: test
-test: $(main_elc)
-	@$(BATCH) -L . -l bog-tests \
-	--eval "(ert-run-tests-batch-and-exit '(not (tag interactive)))"
+	$(RM) bog.elc bog-autoloads.el
 
 %.elc: %.el
 	@$(BATCH) -L . -f batch-byte-compile $<
 
+bog-autoloads.el: bog.el
+	@$(BATCH) -L . --eval \
+	"(let (make-backup-files) \
+	  (update-file-autoloads \"$(CURDIR)/$<\" t \"$(CURDIR)/$@\"))"
