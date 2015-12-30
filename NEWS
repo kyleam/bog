@@ -4,6 +4,9 @@
 
 ** New features
 
+- New command ~bog-list-orphan-files~ finds citekey files that don't
+  have a corresponding citekey heading in the notes.
+
 - New command ~bog-rename-citekey-file~ updates the name of an
   existing citekey file.
 

@@ -730,6 +730,30 @@ Generate a file name with the form
                 (directory-files bog-stage-directory
                                  t directory-files-no-dot-files-regexp)))
 
+;;;###autoload
+(defun bog-list-orphan-files ()
+  "Find files in `bog-file-directory' without a citekey heading."
+  (interactive)
+  (let ((head-cks (bog-all-heading-citekeys)))
+    (with-current-buffer (get-buffer-create "*Bog orphan files*")
+      (erase-buffer)
+      (setq default-directory bog-root-directory)
+      (insert ?\n)
+      (dolist (ck-file (bog-all-citekey-files))
+        (let ((base-name (file-name-nondirectory ck-file))
+              (case-fold-search nil))
+          (unless (and (string-match (concat "\\`" bog-citekey-format)
+                                     base-name)
+                       (member (match-string-no-properties 0 base-name)
+                               head-cks))
+            (insert (format "- [[file:%s]]\n" (file-relative-name ck-file))))))
+      (goto-char (point-min))
+      (org-mode)
+      (if (/= (buffer-size) 1)
+          (pop-to-buffer (current-buffer))
+        (message "No orphans found")
+        (kill-buffer)))))
+
 
 ;;; BibTeX-related
 
