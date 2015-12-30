@@ -4,6 +4,9 @@
 
 ** New features
 
+- New command ~bog-rename-citekey-file~ updates the name of an
+  existing citekey file.
+
 - New option ~bog-combined-bib-ignore-not-found~ controls whether
   ~bog-create-combined-bib~ prompts to continue when a citekey's bib
   file is missing.  With a prefix argument to

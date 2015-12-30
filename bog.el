@@ -625,8 +625,33 @@ If the citekey prompt is slow to appear, consider enabling the
                             (org-icompleting-read "Select file to rename: "
                                                   staged-file-names)
                             bog-stage-directory))))
-    (message "Renamed %s to %s" staged-file
-             (funcall bog-file-renaming-func staged-file citekey))))
+    (bog--rename-file-to-citekey staged-file citekey)))
+
+;;;###autoload
+(defun bog-rename-citekey-file (&optional no-context)
+  "Associate a citekey file with a new citekey.
+
+This allows you to update a file's name if you change the
+citekey.
+
+The new citekey is taken from the text under point if it matches
+`bog-citekey-format' or from the current tree.
+
+With prefix argument NO-CONTEXT, prompt with citekeys present in
+any note file.  Do the same if locating a citekey from context
+fails."
+  (interactive "P")
+  (let ((file-paths (mapcar (lambda (path)
+                              (cons (file-name-nondirectory path) path))
+                            (bog-all-citekey-files))))
+    (bog--rename-file-to-citekey
+     (cdr (assoc-string (org-icompleting-read "Rename file: " file-paths)
+                        file-paths))
+     (bog-citekey-from-surroundings-or-all no-context))))
+
+(defun bog--rename-file-to-citekey (file citekey)
+  (message "Renamed %s to %s" file
+           (funcall bog-file-renaming-func file citekey)))
 
 (defun bog-file-ask-on-conflict (staged-file citekey)
   "Rename citekey file, prompting for a new name if it already exists.
