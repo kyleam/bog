@@ -25,7 +25,7 @@
 (require 'bog)
 
 ;; Modified from magit-tests.el.
-(defmacro bog-tests--with-temp-dir (&rest body)
+(defmacro bog-tests-with-temp-dir (&rest body)
   (declare (indent 0) (debug t))
   (let ((dir (cl-gensym)))
     `(let ((,dir (file-name-as-directory (make-temp-file "dir" t))))
@@ -34,7 +34,7 @@
          (delete-directory ,dir t)))))
 
 ;; Modified from org-tests.el.
-(defmacro bog-tests--with-temp-text (text &rest body)
+(defmacro bog-tests-with-temp-text (text &rest body)
   "Run body in a temporary buffer with Org-mode buffer.
 Insert TEXT in buffer.
 
@@ -63,56 +63,50 @@ point at the beginning of the inserted text."
 
 ;;; Citekey functions
 
-;; `bog-citekey-p'
-
 (ert-deftest bog-citekey-p ()
   (should (bog-citekey-p "name2010word"))
   (should (bog-citekey-p "name1900word"))
   (should-not (bog-citekey-p "name201word")))
 
-(ert-deftest bog-citekey-p-with-hyphen-in-name ()
+(ert-deftest bog-citekey-p/hyphen-in-name ()
   (should (bog-citekey-p "hyphen-ok2010word")))
 
-(ert-deftest bog-citekey-p-with-other-text ()
+(ert-deftest bog-citekey/other-text ()
   (should-not (bog-citekey-p "name2010word more text")))
-
-;; `bog--citekey-groups-with-delim'
 
 (ert-deftest bog--citekey-groups-with-delim ()
   (let ((citekey "name2010word"))
     (should (equal (bog--citekey-groups-with-delim citekey ",")
                    "name,2010,word"))))
 
-;; `bog-citekey-at-point'
-
-(ert-deftest bog-citekey-at-point-bob ()
+(ert-deftest bog-citekey-at-point/bob ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert citekey)
       (goto-char (point-min))
       (should (equal (bog-citekey-at-point) citekey)))))
 
-(ert-deftest bog-citekey-at-point-newline ()
+(ert-deftest bog-citekey-at-point/newline ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert "\n" citekey)
       (should (equal (bog-citekey-at-point) citekey)))))
 
-(ert-deftest bog-citekey-at-point-parens ()
+(ert-deftest bog-citekey-at-point/parens ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert "\n(" citekey ")")
       (backward-char 2)
       (should (equal (bog-citekey-at-point) citekey)))))
 
-(ert-deftest bog-citekey-at-point-spaces ()
+(ert-deftest bog-citekey-at-point/spaces ()
   (let ((citekey "name2010word"))
     (with-temp-buffer
       (insert "\n " citekey " ")
       (backward-char 2)
       (should (equal (bog-citekey-at-point) citekey)))))
 
-(ert-deftest bog-citekey-at-point-with-hyphen ()
+(ert-deftest bog-citekey-at-point/with-hyphen ()
   (let ((citekey "hyphen-name2010word"))
     (with-temp-buffer
       (insert citekey)
@@ -131,11 +125,9 @@ point at the beginning of the inserted text."
       (skip-chars-forward "-a-z")
       (should (equal (bog-citekey-at-point) citekey)))))
 
-;; `bog-citekey-from-tree'
-
-(ert-deftest bog-citekey-from-heading-title-current-level ()
+(ert-deftest bog-citekey-from-tree/heading-title-current-level ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** <citekey>
@@ -143,9 +135,18 @@ some text
 <point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-(ert-deftest bog-citekey-from-heading-title-in-parent ()
+(ert-deftest bog-citekey-from-tree/heading-title-on-heading ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
+        "
+* top level
+** <citekey><point>
+some text"
+      (should (equal (bog-citekey-from-tree) citekey)))))
+
+(ert-deftest bog-citekey-from-tree/heading-title-in-parent ()
+  (let ((citekey "name2010word"))
+    (bog-tests-with-temp-text
         "
 * top level
 ** <citekey>
@@ -154,18 +155,9 @@ some text
 <point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-(ert-deftest bog-citekey-from-heading-title-on-heading ()
+(ert-deftest bog-citekey-from-tree/property-current-level ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
-        "
-* top level
-** <citekey><point>
-some text"
-      (should (equal (bog-citekey-from-tree) citekey)))))
-
-(ert-deftest bog-citekey-from-property-current-level ()
-  (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** subhead
@@ -176,9 +168,9 @@ some text"
 some text<point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-(ert-deftest bog-citekey-from-property-in-parent ()
+(ert-deftest bog-citekey-from-tree/property-in-parent ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
   :PROPERTIES:
@@ -191,9 +183,9 @@ some text
 <point>"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-(ert-deftest bog-citekey-from-property-on-heading ()
+(ert-deftest bog-citekey-from-tree/property-on-heading ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** <point>subhead
@@ -203,38 +195,36 @@ some text
 some text"
       (should (equal (bog-citekey-from-tree) citekey)))))
 
-;; `bog-citekey-from-surroundings'
-
-(ert-deftest bog-citekey-from-surroundings-on-heading ()
+(ert-deftest bog-citekey-from-surroundings/on-heading ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** <point><citekey>
 some text"
       (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-surroundings-before-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings/before-text-citekey ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** other2000key
 some text and <point><citekey>"
       (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-surroundings-after-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings/after-text-citekey ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** other2000key
 some text and <citekey><point>"
       (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-surroundings-on-text-citekey ()
+(ert-deftest bog-citekey-from-surroundings/on-text-citekey ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 * top level
 ** other2000key
@@ -242,8 +232,8 @@ some text and <point><citekey>"
       (forward-char)
       (should (equal (bog-citekey-from-surroundings) citekey)))))
 
-(ert-deftest bog-citekey-from-surroundings-no-citekey ()
-  (bog-tests--with-temp-text
+(ert-deftest bog-citekey-from-surroundings/no-citekey ()
+  (bog-tests-with-temp-text
       "
 * top level
 ** second"
@@ -251,7 +241,7 @@ some text and <point><citekey>"
 
 (ert-deftest bog-citekeys-in-buffer ()
   (should (equal '("abc1900def" "ghi1950jkl" "mno2000pqr")
-           (bog-tests--with-temp-text
+           (bog-tests-with-temp-text
             "
 * abc1900def
 ghi1950jkl
@@ -261,77 +251,73 @@ ghi1950jkl
 
 (ert-deftest bog-heading-citekeys-in-buffer ()
   (should (equal '("abc1900def" "mno2000pqr")
-           (bog-tests--with-temp-text
+           (bog-tests-with-temp-text
             "
 * abc1900def
 ghi1950jkl
 * mno2000pqr"
             (bog-heading-citekeys-in-buffer)))))
 
-;; bog-{next,previous}-non-heading-citekey
-
-(ert-deftest bog-next-non-heading-citekey-default-arg ()
+(ert-deftest bog-next-non-heading-citekey/default-arg ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 <point>
 <citekey> other2000key"
       (bog-next-non-heading-citekey)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-next-non-heading-citekey-pos-arg ()
+(ert-deftest bog-next-non-heading-citekey/pos-arg ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 <point>
 other2000key <citekey>"
       (bog-next-non-heading-citekey 2)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-next-non-heading-citekey-on-citekey ()
+(ert-deftest bog-next-non-heading-citekey/on-citekey ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 <point>other2000key
 <citekey>"
       (bog-next-non-heading-citekey)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-next-non-heading-citekey-pos-neg-arg ()
+(ert-deftest bog-next-non-heading-citekey/pos-neg-arg ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "<citekey> <point>"
       (bog-next-non-heading-citekey -1)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-previous-non-heading-citekey-default-arg ()
+(ert-deftest bog-previous-non-heading-citekey/default-arg ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "other2000key <citekey> <point>"
       (bog-previous-non-heading-citekey)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-previous-non-heading-citekey-on-citekey ()
+(ert-deftest bog-previous-non-heading-citekey/on-citekey ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 <citekey>
 <point>other2000key"
       (bog-previous-non-heading-citekey)
       (should (equal citekey (bog-citekey-at-point))))))
 
-(ert-deftest bog-previous-non-heading-citekey-pos-arg ()
+(ert-deftest bog-previous-non-heading-citekey/pos-arg ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "<citekey> other2000key <point>"
       (bog-previous-non-heading-citekey 2)
       (should (equal citekey (bog-citekey-at-point))))))
 
-;; `bog--find-citekey-heading-in-buffer'
-
-(ert-deftest bog--find-citekey-heading-in-buffer-citekey-heading ()
+(ert-deftest bog--find-citekey-heading-in-buffer/citekey-heading ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         "
 <point>
 * other heading
@@ -340,9 +326,9 @@ other2000key <citekey>"
       (goto-char (bog--find-citekey-heading-in-buffer citekey))
       (should (equal citekey (org-get-heading t t))))))
 
-(ert-deftest bog--find-citekey-heading-in-buffer-citekey-property ()
+(ert-deftest bog--find-citekey-heading-in-buffer/citekey-property ()
   (let ((citekey "name2010word"))
-    (bog-tests--with-temp-text
+    (bog-tests-with-temp-text
         (format "
 <point>
 * other heading
@@ -366,7 +352,7 @@ other2000key <citekey>"
   (should-not (bog-file-citekey "leader_name2000word.pdf")))
 
 (ert-deftest bog-all-file-citekeys ()
-  (bog-tests--with-temp-dir
+  (bog-tests-with-temp-dir
    (let ((bog-file-directory (expand-file-name "citekey-files")))
      (make-directory bog-file-directory)
      (let ((default-directory bog-file-directory))
@@ -377,15 +363,15 @@ other2000key <citekey>"
      (should (equal (bog-all-file-citekeys)
                     '("one2010key" "two1980key"))))))
 
-(ert-deftest bog-rename-staged-file-to-citekey-one-file ()
-  (bog-tests--with-temp-dir
+(ert-deftest bog-rename-staged-file-to-citekey/one-file ()
+  (bog-tests-with-temp-dir
    (let ((bog-stage-directory (expand-file-name "stage"))
          (bog-file-directory (expand-file-name "citekey-files"))
          (citekey "name2010word"))
      (make-directory bog-stage-directory)
      (make-directory bog-file-directory)
      (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
-     (bog-tests--with-temp-text
+     (bog-tests-with-temp-text
          "
 * top level
 ** <point><citekey>
@@ -396,8 +382,8 @@ some text"
      (should-not (file-exists-p (expand-file-name
                                  "one.pdf" bog-stage-directory))))))
 
-(ert-deftest bog-rename-staged-file-to-citekey-one-file-subdir ()
-  (bog-tests--with-temp-dir
+(ert-deftest bog-rename-staged-file-to-citekey/one-file-subdir ()
+  (bog-tests-with-temp-dir
    (let ((bog-stage-directory (expand-file-name "stage"))
          (bog-file-directory (expand-file-name "citekey-files"))
          (citekey "name2010word")
@@ -405,7 +391,7 @@ some text"
      (make-directory bog-stage-directory)
      (make-directory bog-file-directory)
      (write-region "" nil (expand-file-name "one.pdf" bog-stage-directory))
-     (bog-tests--with-temp-text
+     (bog-tests-with-temp-text
          "
 * top level
 ** <point><citekey>
@@ -416,8 +402,8 @@ some text"
      (should-not (file-exists-p (expand-file-name
                                  "one.pdf" bog-stage-directory))))))
 
-(ert-deftest bog-file-citekeys-multiple-variants ()
-  (bog-tests--with-temp-dir
+(ert-deftest bog-file-citekeys/multiple-variants ()
+  (bog-tests-with-temp-dir
    (let* ((bog-file-directory (expand-file-name "citekey-files"))
           (citekey "name2010word")
           (variants (list (concat citekey ".pdf")
@@ -434,10 +420,8 @@ some text"
 
 ;;; BibTeX functions
 
-;; `bog--prepare-bib-file'
-
 (ert-deftest bog--prepare-bib-file ()
-  (bog-tests--with-temp-dir
+  (bog-tests-with-temp-dir
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
                       nil ".bib"))
@@ -460,8 +444,8 @@ some text"
         (should-not new-buffer)
         (delete-file new-file)))))
 
-(ert-deftest bog--prepare-bib-file-was-open ()
-  (bog-tests--with-temp-dir
+(ert-deftest bog--prepare-bib-file/was-open ()
+  (bog-tests-with-temp-dir
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
                       nil ".bib"))
@@ -483,8 +467,8 @@ some text"
         (kill-buffer new-buffer)
         (delete-file new-file)))))
 
-(ert-deftest bog--prepare-bib-file-subdir ()
-  (bog-tests--with-temp-dir
+(ert-deftest bog--prepare-bib-file/subdir ()
+  (bog-tests-with-temp-dir
     (let ((temp-file (make-temp-file
                       (expand-file-name "bog-testing-" default-directory)
                       nil ".bib"))
@@ -506,10 +490,8 @@ some text"
         (should (file-exists-p new-file))
         (delete-file new-file)))))
 
-;; `bog-sort-topic-headings-in-buffer'
-
 (ert-deftest bog-sort-topic-headings-in-buffer ()
-  (bog-tests--with-temp-text
+  (bog-tests-with-temp-text
       "
 * topic heading
 ** zoo2000key
@@ -528,8 +510,8 @@ some text"
       (should (equal (org-no-properties (org-get-heading t t))
                      "banana2000key")))))
 
-(ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-heading ()
-  (bog-tests--with-temp-text
+(ert-deftest bog-sort-topic-headings-in-buffer/ignore-citekey-heading ()
+  (bog-tests-with-temp-text
       "
 * topic heading
 ** zoo2000key
@@ -547,8 +529,8 @@ some text"
       (should (equal (org-no-properties (org-get-heading t t))
                      "orange2000key")))))
 
-(ert-deftest bog-sort-topic-headings-in-buffer-ignore-citekey-property ()
-  (bog-tests--with-temp-text
+(ert-deftest bog-sort-topic-headings-in-buffer/ignore-citekey-property ()
+  (bog-tests-with-temp-text
       (format  "
 * topic heading
 ** zoo2000key
@@ -570,8 +552,8 @@ some text"
       (should (equal (org-no-properties (org-get-heading t t))
                      "orange2000key")))))
 
-(ert-deftest bog-sort-topic-headings-in-buffer-passed-sorting-type ()
-  (bog-tests--with-temp-text
+(ert-deftest bog-sort-topic-headings-in-buffer/passed-sorting-type ()
+  (bog-tests-with-temp-text
       "
 * topic heading
 ** zoo2000key
