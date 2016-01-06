@@ -394,7 +394,7 @@ some text"
      (should (file-exists-p (expand-file-name
                              (concat citekey ".pdf") bog-file-directory)))
      (should-not (file-exists-p (expand-file-name
-                                 (concat "one.pdf") bog-stage-directory))))))
+                                 "one.pdf" bog-stage-directory))))))
 
 (ert-deftest bog-rename-staged-file-to-citekey-one-file-subdir ()
   (bog-tests--with-temp-dir
@@ -414,7 +414,7 @@ some text"
      (should (file-exists-p (expand-file-name
                              (concat "2010/" citekey ".pdf") bog-file-directory)))
      (should-not (file-exists-p (expand-file-name
-                                 (concat "one.pdf") bog-stage-directory))))))
+                                 "one.pdf" bog-stage-directory))))))
 
 (ert-deftest bog-file-citekeys-multiple-variants ()
   (bog-tests--with-temp-dir
