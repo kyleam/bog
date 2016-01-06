@@ -1,6 +1,6 @@
 ;;; bog-tests.el --- Tests for Bog
 
-;; Copyright (C) 2013-2015 Kyle Meyer <kyle@kyleam.com>
+;; Copyright (C) 2013-2016 Kyle Meyer <kyle@kyleam.com>
 
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 
