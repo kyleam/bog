@@ -493,8 +493,12 @@ file."
       (insert "\n")
       (dolist (file files)
         (let* ((text-cks (bog-non-heading-citekeys-in-file file))
-               (nohead-cks (nreverse (cl-set-difference text-cks heading-cks
-                                                        :test #'string=))))
+               (nohead-cks (cl-set-difference text-cks heading-cks
+                                              :test #'string=)))
+          ;; As of Emacs 25.1, `cl-set-difference' keeps the order of
+          ;; LIST1 rather than leaving it reversed.
+          (unless (string-lessp (nth 0 nohead-cks) (nth 1 nohead-cks))
+            (setq nohead-cks (nreverse nohead-cks)))
           (when nohead-cks
             (insert (format "* %s\n\n%s\n\n"
                             (file-name-nondirectory file)
