@@ -305,8 +305,8 @@ Otherwise, prompt for CATEGORY."
                        (mapcar (lambda (c) (symbol-name (car c)))
                                bog--citekey-cache)))))))
   (setq bog--citekey-cache
-        (unless (eq category t)
-          (assq-delete-all category bog--citekey-cache))))
+        (and (not (eq category t))
+             (assq-delete-all category bog--citekey-cache))))
 
 (defvar bog--no-sort nil)
 (defun bog--maybe-sort (values)
