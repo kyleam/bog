@@ -301,9 +301,9 @@ Otherwise, prompt for CATEGORY."
    (list (or (equal current-prefix-arg '(4))
              (and bog--citekey-cache
                   (intern (org-icompleting-read
-                       "Category: "
-                       (mapcar (lambda (c) (symbol-name (car c)))
-                               bog--citekey-cache)))))))
+                           "Category: "
+                           (mapcar (lambda (c) (symbol-name (car c)))
+                                   bog--citekey-cache)))))))
   (setq bog--citekey-cache
         (and (not (eq category t))
              (assq-delete-all category bog--citekey-cache))))
