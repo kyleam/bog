@@ -1295,6 +1295,11 @@ Topic headings are determined by `bog-topic-heading-level'."
   `((,bog-citekey-format . 'bog-citekey-face))
   "Citekey font-lock for non-Org buffers.")
 
+(defvar bog-font-lock-function
+  (if (fboundp 'font-lock-flush)
+      #'font-lock-flush
+    #'font-lock-fontify-buffer))
+
 
 ;;; Minor mode
 
@@ -1344,19 +1349,20 @@ if ARG is omitted or nil.
   :group 'bog
   :lighter " Bog"
   :require 'bog
-  (cond
-   (bog-mode
-    (if (derived-mode-p 'org-mode)
-        (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
-      (font-lock-add-keywords nil bog-citekey-font-lock-keywords))
-    (font-lock-ensure))
-   (t
-    (if (derived-mode-p 'org-mode)
-        (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
-      (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
-    (font-lock-ensure)
-    (when (bound-and-true-p bog-view-mode)
-      (bog-view-mode -1)))))
+  (progn
+    (cond
+     (bog-mode
+      (if (derived-mode-p 'org-mode)
+          (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+        (font-lock-add-keywords nil bog-citekey-font-lock-keywords)))
+     (t
+      (if (derived-mode-p 'org-mode)
+          (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+        (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
+      (when (bound-and-true-p bog-view-mode)
+        (bog-view-mode -1))))
+    (when font-lock-mode
+      (funcall bog-font-lock-function))))
 
 
 ;;; View minor mode
