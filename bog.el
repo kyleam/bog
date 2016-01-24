@@ -267,7 +267,7 @@ treated as word characters.")
 
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
-  (let (case-fold-search)
+  (let ((case-fold-search nil))
     (string-match-p (format "\\`%s\\'" bog-citekey-format) text)))
 
 (defun bog-citekey-at-point ()
@@ -278,7 +278,7 @@ word constituents."
   (save-excursion
     (with-syntax-table bog-citekey-syntax-table
       (skip-syntax-backward "w")
-      (let (case-fold-search)
+      (let ((case-fold-search nil))
         (and (looking-at bog-citekey-format)
              (match-string-no-properties 0))))))
 
@@ -403,8 +403,8 @@ Otherwise, prompt for CATEGORY."
 (defun bog-citekeys-in-buffer ()
   "Return all citekeys in current buffer."
   (save-excursion
-    (let (citekeys
-          case-fold-search)
+    (let ((case-fold-search nil)
+          citekeys)
       (goto-char (point-min))
       (while (re-search-forward bog-citekey-format nil t)
         (push (match-string-no-properties 0) citekeys))
@@ -417,8 +417,8 @@ Otherwise, prompt for CATEGORY."
 
 (defun bog-non-heading-citekeys-in-file (file)
   "Return all non-heading citekeys in FILE."
-  (let (citekeys
-        case-fold-search)
+  (let ((case-fold-search nil)
+        citekeys)
     (with-temp-buffer
       (let ((default-directory (file-name-directory file)))
         (insert-file-contents file)
@@ -595,7 +595,7 @@ determined by `bog-subdirectory-group'."
 (defun bog--get-subdir (citekey)
   "Return subdirectory for citekey file.
 Subdirectory is determined by `bog-subdirectory-group'."
-  (let (case-fold-search)
+  (let ((case-fold-search nil))
     (and bog-subdirectory-group
          (string-match bog-citekey-format citekey)
          (match-string-no-properties bog-subdirectory-group
@@ -708,7 +708,7 @@ Generate a file name with the form
 (defun bog-file-citekey (file)
   "Return leading citekey part from base name of FILE."
   (let ((fname (file-name-base file))
-        case-fold-search)
+        (case-fold-search nil))
     (and (string-match (concat "^" bog-citekey-format) fname)
          (match-string 0 fname))))
 
@@ -949,7 +949,7 @@ If the citekey prompt is slow to appear, consider enabling the
 (defun bog--citekey-groups-with-delim (citekey delim)
   "Return expression groups CITEKEY, seperated by DELIM.
 Groups are specified by `bog-citekey-web-search-groups'."
-  (let (case-fold-search)
+  (let ((case-fold-search nil))
     (string-match bog-citekey-format citekey)
     (mapconcat (lambda (g) (match-string-no-properties g citekey))
                bog-citekey-web-search-groups delim)))
@@ -1246,7 +1246,7 @@ With argument ARG, do it ARG times."
       (bog-previous-non-heading-citekey (- arg))
     (with-syntax-table bog-citekey-syntax-table
       (skip-syntax-forward "w")
-      (let (case-fold-search)
+      (let ((case-fold-search nil))
         (while (and (> arg 0)
                     (re-search-forward bog-citekey-format nil t))
           (unless (org-at-heading-p)
@@ -1260,7 +1260,7 @@ With argument ARG, do it ARG times."
   (interactive "p")
   (setq arg (or arg 1))
   (with-syntax-table bog-citekey-syntax-table
-    (let (case-fold-search)
+    (let ((case-fold-search nil))
       (while (and (> arg 0)
                   (re-search-backward bog-citekey-format nil t))
         (unless (org-at-heading-p)
@@ -1286,7 +1286,7 @@ Topic headings are determined by `bog-topic-heading-level'."
 
 (defun bog-fontify-non-heading-citekeys (limit)
   "Highlight non-heading citekey in an Org buffer."
-  (let (case-fold-search)
+  (let ((case-fold-search nil))
     (while (re-search-forward bog-citekey-format limit t)
       (unless (save-match-data (org-at-heading-p))
         (add-text-properties (match-beginning 0) (match-end 0)
