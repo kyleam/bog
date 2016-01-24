@@ -75,7 +75,6 @@ settings:
         bibtex-autokey-titlewords-stretch 0
         bibtex-autokey-titlewords 1
         bibtex-autokey-year-title-separator \"\")"
-  :group 'bog
   :type 'regexp)
 
 (defcustom bog-citekey-web-search-groups '(1 2 3)
@@ -83,25 +82,21 @@ settings:
 The default groups correspond to the last name of the first
 author, the publication year, and the first meaningful word in
 the title."
-  :group 'bog
   :type '(repeat integer))
 
 (defcustom bog-citekey-property "CUSTOM_ID"
   "Property name used to store citekey.
 The default corresponds to the default value of
 `org-bibtex-key-property'."
-  :group 'bog
   :type 'string)
 
 (defcustom bog-root-directory "~/bib/"
   "Root directory for default values of other Bog directories."
-  :group 'bog
   :type 'directory)
 
 (defcustom bog-note-directory
   (expand-file-name "notes/" bog-root-directory)
   "Directory with Org research notes."
-  :group 'bog
   :type 'directory)
 
 (defcustom bog-file-directory
@@ -109,7 +104,6 @@ The default corresponds to the default value of
   "Directory with citekey-associated files.
 Files are stored in subdirectories if `bog-subdirectory-group' is
 non-nil."
-  :group 'bog
   :type 'directory)
 
 (defcustom bog-stage-directory
@@ -118,7 +112,6 @@ non-nil."
 `bog-rename-staged-file-to-citekey' and
 `bog-rename-staged-bib-to-citekey' searches here for files to
 rename."
-  :group 'bog
   :type 'directory)
 
 (defcustom bog-find-citekey-bib-func 'bog-find-citekey-bib-file
@@ -130,14 +123,12 @@ entry BibTeX files in `bog-bib-directory'.
 The other option is `bog-find-citekey-entry', which searches
 within a single BibTeX file, `bog-bib-file', for the citekey
 entry."
-  :group 'bog
   :type 'function)
 
 (defcustom bog-subdirectory-group nil
   "Regexp group from `bog-citekey-format' to use as subdirectory name.
 If non-nil, use the indicated group to generate the subdirectory
 name for BibTeX and citekey-associated files."
-  :group 'bog
   :type '(choice (const :tag "Don't use subdirectories" nil)
                  (integer :tag "Regexp group number")))
 
@@ -147,14 +138,12 @@ name for BibTeX and citekey-associated files."
 This is only meaningful if `bog-find-citekey-bib-func' set to
 `bog-find-citekey-bib-file'.  Files are stored in subdirectories
 if `bog-subdirectory-group' is non-nil."
-  :group 'bog
   :type 'directory)
 
 (defcustom bog-bib-file nil
   "BibTeX file name.
 This is only meaningful if `bog-find-citekey-bib-func' set to
 `bog-find-citekey-entry'."
-  :group 'bog
   :type '(choice (const :tag "Don't use single file" nil)
                  (file :tag "Single file")))
 
@@ -162,7 +151,6 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   "Whether `bog-create-combined-bib' ignores missing bib files.
 If non-nil, `bog-create-combined-bib' does not ask whether to
 continue when a citekey's bib file is not found."
-  :group 'bog
   :type 'boolean)
 
 (defcustom bog-citekey-file-name-separators "[-_]"
@@ -170,7 +158,6 @@ continue when a citekey's bib file is not found."
 When `bog-find-citekey-file' is run on <citekey>, it will find
 files with the format <citekey>.* and <citekey><sep>*.<ext>,
 where <sep> is matched by this regular expression.."
-  :group 'bog
   :type 'regexp)
 
 (defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
@@ -178,7 +165,6 @@ where <sep> is matched by this regular expression.."
 This function should accept a file name and a citekey as
 arguments and return the name of the final file.  Currently the
 only built-in function is `bog-file-ask-on-conflict'."
-  :group 'bog
   :type 'function)
 
 (defcustom bog-file-secondary-name "-supplement"
@@ -187,14 +173,12 @@ If <citekey>.<ext> already exists, `bog-file-ask-on-conflict'
 prompts for another name.
 <citekey>`bog-file-secondary-name'.<ext> is the default value for
 the prompt."
-  :group 'bog
   :type 'string)
 
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"
   "URL to use for CITEKEY search.
 It should contain the placeholder \"%s\" for the query."
-  :group 'bog
   :type 'string)
 
 (defcustom bog-topic-heading-level 1
@@ -202,17 +186,14 @@ It should contain the placeholder \"%s\" for the query."
 Topic headings for studies may be at any level, but
 `bog-sort-topic-headings' and `bog-jump-to-topic-heading' use
 this variable to determine what level to operate on."
-  :group 'bog
   :type 'integer)
 
 (defcustom bog-refile-maxlevel bog-topic-heading-level
   "Consider up to this level when refiling with `bog-refile'."
-  :group 'bog
   :type 'integer)
 
 (defcustom bog-keymap-prefix (kbd "C-c \"")
   "Bog keymap prefix."
-  :group 'bog
   :type 'key-sequence)
 
 (defcustom bog-use-citekey-cache nil
@@ -235,7 +216,6 @@ to update the list of citekeys.  To see newly added citekeys,
 clear the cache with `bog-clear-citekey-cache'.
 
 This cache will not persist across sessions."
-  :group 'bog
   :type '(choice
           (const :tag "Disable cache" nil)
           (const :tag "Cache all" t)
@@ -250,7 +230,6 @@ This cache will not persist across sessions."
   "Keep the previous buffer from `bog-citekey-tree-to-indirect-buffer'.
 Otherwise, each call to `bog-citekey-tree-to-indirect-buffer'
 kills the indirect buffer created by the previous call."
-  :group 'bog
   :type 'boolean)
 
 (defvar bog-citekey-syntax-table
