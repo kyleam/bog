@@ -334,7 +334,7 @@ Otherwise, prompt for CATEGORY."
   (interactive
    (list (or (equal current-prefix-arg '(4))
              (and bog--citekey-cache
-                  (intern (org-icompleting-read
+                  (intern (completing-read
                            "Category: "
                            (mapcar (lambda (c) (symbol-name (car c)))
                                    bog--citekey-cache)))))))
@@ -451,7 +451,7 @@ If NO-CONTEXT is non-nil, immediately fall back."
 
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
-  (org-icompleting-read "Select citekey: " citekeys))
+  (completing-read "Select citekey: " citekeys))
 
 ;;;; Other
 
@@ -573,7 +573,7 @@ If the citekey prompt is slow to appear, consider enabling the
                (mapcar (lambda (path)
                          (cons (file-name-nondirectory path) path))
                        citekey-files))
-              (fname (org-icompleting-read "Select file: " fname-paths)))
+              (fname (completing-read "Select file: " fname-paths)))
          (cdr (assoc-string fname fname-paths)))))))
 
 (defun bog-citekey-files (citekey)
@@ -625,8 +625,8 @@ If the citekey prompt is slow to appear, consider enabling the
       (0 (setq staged-file (org-iread-file-name "Select file to rename: ")))
       (1 (setq staged-file (car staged-files)))
       (t (setq staged-file (expand-file-name
-                            (org-icompleting-read "Select file to rename: "
-                                                  staged-file-names)
+                            (completing-read "Select file to rename: "
+                                             staged-file-names)
                             bog-stage-directory))))
     (bog--rename-file-to-citekey staged-file citekey)))
 
@@ -648,7 +648,7 @@ fails."
                               (cons (file-name-nondirectory path) path))
                             (bog-all-citekey-files))))
     (bog--rename-file-to-citekey
-     (cdr (assoc-string (org-icompleting-read "Rename file: " file-paths)
+     (cdr (assoc-string (completing-read "Rename file: " file-paths)
                         file-paths))
      (bog-citekey-from-surroundings-or-all no-context))))
 
@@ -1100,7 +1100,7 @@ level `bog-refile-maxlevel' are considered."
   (let ((note-paths (mapcar (lambda (path)
                               (cons (file-name-nondirectory path) path))
                             (bog-notes))))
-    (cdr (assoc-string (org-icompleting-read "File: " note-paths)
+    (cdr (assoc-string (completing-read "File: " note-paths)
                        note-paths))))
 
 (defmacro bog--with-search-lprops (&rest body)
