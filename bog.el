@@ -265,7 +265,60 @@ treated as word characters.")
 
 ;;; Citekey methods
 
-;;;; Collection
+(defun bog-citekey-p (text)
+  "Return non-nil if TEXT matches `bog-citekey-format'."
+  (let (case-fold-search)
+    (string-match-p (format "\\`%s\\'" bog-citekey-format) text)))
+
+(defun bog-citekey-at-point ()
+  "Return citekey at point.
+The citekey must have the format specified by
+`bog-citekey-format'.  Hyphens and underscores are considered as
+word constituents."
+  (save-excursion
+    (with-syntax-table bog-citekey-syntax-table
+      (skip-syntax-backward "w")
+      (let (case-fold-search)
+        (and (looking-at bog-citekey-format)
+             (match-string-no-properties 0))))))
+
+(defun bog-citekey-from-heading-title ()
+  "Retrieve citekey from heading title."
+  (when (derived-mode-p 'org-mode)
+    (unless (org-before-first-heading-p)
+      (let ((heading (org-no-properties (org-get-heading t t))))
+        (and (bog-citekey-p heading)
+             heading)))))
+
+(defun bog-citekey-from-heading ()
+  "Retrieve citekey from current heading title or property."
+  (or (bog-citekey-from-heading-title)
+      (bog-citekey-from-property)))
+
+(defun bog-citekey-from-tree ()
+  "Retrieve citekey from first parent heading associated with citekey."
+  (when (derived-mode-p 'org-mode)
+    (org-with-wide-buffer
+     (let (maybe-citekey)
+       (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
+                   ;; This isn't actually safe in Org mode <= 8.2.10.
+                   ;; Fixed in Org mode commit
+                   ;; 9ba9f916e87297d863c197cb87199adbb39da894.
+                   (ignore-errors (org-up-heading-safe))))
+       maybe-citekey))))
+
+(defun bog-citekey-from-surroundings ()
+  "Get the citekey from the context of the Org file."
+  (or (bog-citekey-at-point)
+      (bog-citekey-from-tree)))
+
+(defun bog-citekey-from-property ()
+  "Retrieve citekey from `bog-citekey-property'."
+  (when (derived-mode-p 'org-mode)
+    (let ((ck (org-entry-get (point) bog-citekey-property)))
+      (and ck (bog-citekey-p ck) ck))))
+
+;;;; Collections
 
 (defvar bog--citekey-cache nil
   "Alist of cached citekeys.
@@ -315,58 +368,11 @@ Otherwise, prompt for CATEGORY."
   (or (and bog--no-sort values)
       (sort values #'string-lessp)))
 
-(defun bog-citekey-at-point ()
-  "Return citekey at point.
-The citekey must have the format specified by
-`bog-citekey-format'.  Hyphens and underscores are considered as
-word constituents."
-  (save-excursion
-    (with-syntax-table bog-citekey-syntax-table
-      (skip-syntax-backward "w")
-      (let (case-fold-search)
-        (and (looking-at bog-citekey-format)
-             (match-string-no-properties 0))))))
-
-(defun bog-citekey-from-surroundings ()
-  "Get the citekey from the context of the Org file."
-  (or (bog-citekey-at-point)
-      (bog-citekey-from-tree)))
-
-(defun bog-citekey-from-tree ()
-  "Retrieve citekey from first parent heading associated with citekey."
-  (when (derived-mode-p 'org-mode)
-    (org-with-wide-buffer
-     (let (maybe-citekey)
-       (while (and (not (setq maybe-citekey (bog-citekey-from-heading)))
-                   ;; This isn't actually safe in Org mode <= 8.2.10.
-                   ;; Fixed in Org mode commit
-                   ;; 9ba9f916e87297d863c197cb87199adbb39da894.
-                   (ignore-errors (org-up-heading-safe))))
-       maybe-citekey))))
-
-(defun bog-citekey-from-heading ()
-  "Retrieve citekey from current heading title or property."
-  (or (bog-citekey-from-heading-title)
-      (bog-citekey-from-property)))
-
-(defun bog-citekey-from-heading-title ()
-  "Retrieve citekey from heading title."
-  (when (derived-mode-p 'org-mode)
-    (unless (org-before-first-heading-p)
-      (let ((heading (org-no-properties (org-get-heading t t))))
-        (and (bog-citekey-p heading)
-             heading)))))
-
-(defun bog-citekey-from-property ()
-  "Retrieve citekey from `bog-citekey-property'."
-  (when (derived-mode-p 'org-mode)
-    (let ((ck (org-entry-get (point) bog-citekey-property)))
-      (and ck (bog-citekey-p ck) ck))))
-
-(defun bog-citekey-p (text)
-  "Return non-nil if TEXT matches `bog-citekey-format'."
-  (let (case-fold-search)
-    (string-match-p (format "\\`%s\\'" bog-citekey-format) text)))
+(defun bog-citekeys-in-file (file)
+  "Return all citekeys in FILE."
+  (with-temp-buffer
+    (insert-file-contents file)
+    (bog-citekeys-in-buffer)))
 
 (defun bog-all-citekeys ()
   "Return all citekeys in notes."
@@ -375,18 +381,24 @@ word constituents."
      (let ((bog--no-sort t))
        (cl-mapcan #'bog-citekeys-in-file (bog-notes))))))
 
+(defun bog-heading-citekeys-in-buffer ()
+  "Return all heading citekeys in current buffer."
+  (bog--maybe-sort (delq nil (org-map-entries #'bog-citekey-from-heading))))
+
+(defun bog-heading-citekeys-in-file (file)
+  "Return all citekeys in headings of FILE."
+  (with-temp-buffer
+    (let ((default-directory (file-name-directory file)))
+      (insert-file-contents file)
+      (org-mode)
+      (bog-heading-citekeys-in-buffer))))
+
 (defun bog-all-heading-citekeys ()
   "Return citekeys that have a heading in any note file."
   (bog--with-citekey-cache 'headings
     (bog--maybe-sort
      (let ((bog--no-sort t))
        (cl-mapcan #'bog-heading-citekeys-in-file (bog-notes))))))
-
-(defun bog-citekeys-in-file (file)
-  "Return all citekeys in FILE."
-  (with-temp-buffer
-    (insert-file-contents file)
-    (bog-citekeys-in-buffer)))
 
 (defun bog-citekeys-in-buffer ()
   "Return all citekeys in current buffer."
@@ -397,18 +409,6 @@ word constituents."
       (while (re-search-forward bog-citekey-format nil t)
         (push (match-string-no-properties 0) citekeys))
       (bog--maybe-sort (delete-dups citekeys)))))
-
-(defun bog-heading-citekeys-in-file (file)
-  "Return all citekeys in headings of FILE."
-  (with-temp-buffer
-    (let ((default-directory (file-name-directory file)))
-      (insert-file-contents file)
-      (org-mode)
-      (bog-heading-citekeys-in-buffer))))
-
-(defun bog-heading-citekeys-in-buffer ()
-  "Return all heading citekeys in current buffer."
-  (bog--maybe-sort (delq nil (org-map-entries #'bog-citekey-from-heading))))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
   "Return all citekeys in current buffer, without any narrowing."
