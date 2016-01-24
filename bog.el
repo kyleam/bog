@@ -281,15 +281,16 @@ Keys match values in `bog-use-citekey-cache'.")
 Use cached values if `bog-use-citekey-cache' is non-nil for KEY.
 Cached values are updated to the return values of BODY."
   (declare (indent 1))
-  `(let* ((use-cache-p (bog--use-cache-p ,key))
-          (citekeys (or (and use-cache-p
-                             (cdr (assq ,key bog--citekey-cache)))
-                        ,@body)))
-     (when use-cache-p
-       (setq bog--citekey-cache
-             (cons (cons ,key citekeys)
-                   (assq-delete-all ,key bog--citekey-cache))))
-     citekeys))
+  (let ((use-cache-p (cl-gensym "use-cache-p")))
+    `(let* ((,use-cache-p (bog--use-cache-p ,key))
+            (citekeys (or (and ,use-cache-p
+                               (cdr (assq ,key bog--citekey-cache)))
+                          ,@body)))
+       (when ,use-cache-p
+         (setq bog--citekey-cache
+               (cons (cons ,key citekeys)
+                     (assq-delete-all ,key bog--citekey-cache))))
+       citekeys)))
 
 (defun bog-clear-citekey-cache (category)
   "Clear cache of citekeys for CATEGORY.
