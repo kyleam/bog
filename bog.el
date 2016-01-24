@@ -1326,9 +1326,7 @@ if ARG is omitted or nil.
 
 \\{bog-mode-map}"
   :keymap bog-mode-map
-  :group 'bog
   :lighter " Bog"
-  :require 'bog
   (progn
     (cond
      (bog-mode
@@ -1385,9 +1383,7 @@ To exit Bog View mode, type \\[bog-view-quit].
 
 \\{bog-view-mode-map}"
   :keymap bog-view-mode-map
-  :group 'bog
   :lighter " Bog-view"
-  :require 'bog
   (cond
    (bog-view-mode
     (setq bog-view--old-buffer-read-only buffer-read-only
