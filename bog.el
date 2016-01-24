@@ -151,6 +151,7 @@ This is only meaningful if `bog-find-citekey-bib-func' set to
   "Whether `bog-create-combined-bib' ignores missing bib files.
 If non-nil, `bog-create-combined-bib' does not ask whether to
 continue when a citekey's bib file is not found."
+  :package-version '(bog . "1.1.0")
   :type 'boolean)
 
 (defcustom bog-citekey-file-name-separators "[-_]"
