@@ -539,24 +539,42 @@ locating a citekey from context fails.
 If the citekey prompt is slow to appear, consider enabling the
 `files' category in `bog-use-citekey-cache'."
   (interactive "P")
-  (bog--find-citekey-file
-   (bog-citekey-from-surroundings-or-files no-context)))
+  (org-open-file
+   (bog--get-citekey-file
+    (bog-citekey-from-surroundings-or-files no-context))))
 
-(defun bog--find-citekey-file (citekey)
+;;;###autoload
+(defun bog-dired-jump-to-citekey-file (&optional no-context)
+  "Jump to citekey file in Dired.
+
+The citekey is taken from the text under point if it matches
+`bog-citekey-format' or from the current tree.
+
+With prefix argument NO-CONTEXT, prompt with citekeys that have
+an associated file in `bog-file-directory'.  Do the same if
+locating a citekey from context fails.
+
+If the citekey prompt is slow to appear, consider enabling the
+`files' category in `bog-use-citekey-cache'."
+  (interactive "P")
+  (dired-jump
+   'other-window
+   (bog--get-citekey-file
+    (bog-citekey-from-surroundings-or-files no-context))))
+
+(defun bog--get-citekey-file (citekey)
   (let* ((citekey-files (bog-citekey-files citekey))
-         (num-choices (length citekey-files))
-         citekey-file)
+         (num-choices (length citekey-files)))
     (cl-case num-choices
       (0 (user-error "No file found for %s" citekey))
-      (1 (setq citekey-file (car citekey-files)))
+      (1 (car citekey-files))
       (t
        (let* ((fname-paths
                (mapcar (lambda (path)
                          (cons (file-name-nondirectory path) path))
                        citekey-files))
               (fname (org-icompleting-read "Select file: " fname-paths)))
-         (setq citekey-file (cdr (assoc-string fname fname-paths))))))
-    (org-open-file citekey-file)))
+         (cdr (assoc-string fname fname-paths)))))))
 
 (defun bog-citekey-files (citekey)
   "Return files in `bog-file-directory' associated with CITEKEY.
@@ -1290,6 +1308,7 @@ Topic headings are determined by `bog-topic-heading-level'."
     (define-key map "b" 'bog-find-citekey-bib)
     (define-key map "c" 'bog-search-notes-for-citekey)
     (define-key map "f" 'bog-find-citekey-file)
+    (define-key map "F" 'bog-dired-jump-to-citekey-file)
     (define-key map "g" 'bog-search-citekey-on-web)
     (define-key map "h" 'bog-goto-citekey-heading-in-notes)
     (define-key map "i" 'bog-citekey-tree-to-indirect-buffer)
@@ -1351,6 +1370,7 @@ if ARG is omitted or nil.
     (define-key map "b" 'bog-find-citekey-bib)
     (define-key map "c" 'bog-search-notes-for-citekey)
     (define-key map "f" 'bog-find-citekey-file)
+    (define-key map "F" 'bog-dired-jump-to-citekey-file)
     (define-key map "g" 'bog-search-citekey-on-web)
     (define-key map "h" 'bog-goto-citekey-heading-in-notes)
     (define-key map "i" 'bog-citekey-tree-to-indirect-buffer)

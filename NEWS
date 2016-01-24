@@ -1,5 +1,11 @@
 Bog NEWS -- history of user-visible changes         -*- mode: org; -*-
 
+* Master (unreleased)
+
+** New features
+
+- New command ~bog-dired-jump-to-citekey-file~.
+
 * v1.1.0
 
 ** New features
