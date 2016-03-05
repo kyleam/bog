@@ -332,12 +332,15 @@ indicates to clear all categories.  Interactively, clear all
 categories when a single \\[universal-argument] is given.
 Otherwise, prompt for CATEGORY."
   (interactive
-   (list (or (equal current-prefix-arg '(4))
-             (and bog--citekey-cache
-                  (intern (completing-read
-                           "Category: "
-                           (mapcar (lambda (c) (symbol-name (car c)))
-                                   bog--citekey-cache)))))))
+   (progn
+     (unless bog--citekey-cache
+       (user-error "Citekey cache is empty"))
+     (list (or (equal current-prefix-arg '(4))
+               (and bog--citekey-cache
+                    (intern (completing-read
+                             "Category: "
+                             (mapcar (lambda (c) (symbol-name (car c)))
+                                     (or bog--citekey-cache)))))))))
   (setq bog--citekey-cache
         (and (not (eq category t))
              (assq-delete-all category bog--citekey-cache))))
