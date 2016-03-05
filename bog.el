@@ -336,11 +336,11 @@ Otherwise, prompt for CATEGORY."
      (unless bog--citekey-cache
        (user-error "Citekey cache is empty"))
      (list (or (equal current-prefix-arg '(4))
-               (and bog--citekey-cache
-                    (intern (completing-read
-                             "Category: "
-                             (mapcar (lambda (c) (symbol-name (car c)))
-                                     (or bog--citekey-cache)))))))))
+               (let ((choice (and bog--citekey-cache
+                                  (completing-read
+                                   "Category: "
+                                   (cons "*all*" bog--citekey-cache)))))
+                 (if (equal choice "*all*") t (intern choice)))))))
   (setq bog--citekey-cache
         (and (not (eq category t))
              (assq-delete-all category bog--citekey-cache))))
