@@ -1100,9 +1100,10 @@ If the citekey prompt is slow to appear, consider enabling the
                   (if (and (not bog-keep-indirect)
                            (eq bog--last-indirect-buffer orig-buf))
                       'current-window
-                    'other-window))
-                 (last-buf-p (not (buffer-live-p bog--last-indirect-buffer))))
-             (org-tree-to-indirect-buffer (or bog-keep-indirect last-buf-p))
+                    'other-window)))
+             (org-tree-to-indirect-buffer
+              (or bog-keep-indirect
+                  (not (buffer-live-p bog--last-indirect-buffer))))
              (setq bog--last-indirect-buffer org-last-indirect-buffer))))
       (message "Heading for %s not found in notes" citekey))))
 
