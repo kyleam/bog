@@ -1091,7 +1091,9 @@ If the citekey prompt is slow to appear, consider enabling the
   (interactive "P")
   (let* ((orig-buf (current-buffer))
          (citekey (bog-citekey-from-point-or-all-headings no-context))
-         (marker (bog--find-citekey-heading-in-notes citekey)))
+         (marker (with-current-buffer (or (buffer-base-buffer)
+                                          (current-buffer))
+                     (bog--find-citekey-heading-in-notes citekey))))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (org-with-wide-buffer
