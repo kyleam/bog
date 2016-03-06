@@ -462,6 +462,14 @@ If NO-CONTEXT is non-nil, immediately fall back."
 (unless (fboundp 'outline-show-all)
   (defalias 'outline-show-all 'show-all))
 
+(defun bog--set-difference (list1 list2)
+  (let ((sdiff (cl-set-difference list1 list2 :test #'string=)))
+    ;; As of Emacs 25.1, `cl-set-difference' keeps the order of LIST1
+    ;; rather than leaving it reversed.
+    (if (string-lessp (nth 0 sdiff) (nth 1 sdiff))
+        sdiff
+      (nreverse sdiff))))
+
 (defun bog-list-orphan-citekeys (&optional file)
   "List citekeys that appear in notes but don't have a heading.
 With prefix argument FILE, include only orphan citekeys from that
@@ -477,12 +485,7 @@ file."
       (insert "\n")
       (dolist (file files)
         (let* ((text-cks (bog-non-heading-citekeys-in-file file))
-               (nohead-cks (cl-set-difference text-cks heading-cks
-                                              :test #'string=)))
-          ;; As of Emacs 25.1, `cl-set-difference' keeps the order of
-          ;; LIST1 rather than leaving it reversed.
-          (unless (string-lessp (nth 0 nohead-cks) (nth 1 nohead-cks))
-            (setq nohead-cks (nreverse nohead-cks)))
+               (nohead-cks (bog--set-difference text-cks heading-cks)))
           (when nohead-cks
             (insert (format "* %s\n\n%s\n\n"
                             (file-name-nondirectory file)
