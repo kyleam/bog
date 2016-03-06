@@ -914,6 +914,26 @@ instead of citekeys from file names in `bog-bib-directory'."
                   (lambda (dir) (directory-files dir nil ".*\\.bib$" t))
                   dirs)))))))
 
+;;;###autoload
+(defun bog-list-orphan-bibs ()
+  "Find bib citekeys that don't have a citekey heading."
+  (interactive)
+  (let ((orphans (bog--set-difference (bog-bib-citekeys)
+                                      (bog-all-heading-citekeys)))
+        (orphan-bufname "*Bog orphan bibs*"))
+    (if orphans
+        (with-current-buffer (get-buffer-create orphan-bufname)
+          (erase-buffer)
+          (setq default-directory bog-root-directory)
+          (insert ?\n)
+          (insert (mapconcat #'identity orphans "\n"))
+          (goto-char (point-min))
+          (org-mode)
+          (pop-to-buffer (current-buffer)))
+      (let ((old-buf (get-buffer-create orphan-bufname)))
+        (when old-buf
+          (kill-buffer old-buf)))
+      (message "No orphans found"))))
 
 ;;; Web
 
