@@ -628,7 +628,7 @@ If the citekey prompt is slow to appear, consider enabling the
          (num-choices (length staged-file-names))
          staged-file)
     (cl-case num-choices
-      (0 (setq staged-file (org-iread-file-name "Select file to rename: ")))
+      (0 (setq staged-file (read-file-name "Select file to rename: ")))
       (1 (setq staged-file (car staged-files)))
       (t (setq staged-file (expand-file-name
                             (completing-read "Select file to rename: "
