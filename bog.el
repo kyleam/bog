@@ -1374,7 +1374,6 @@ and disable it otherwise.  If called from Lisp, enable the mode
 if ARG is omitted or nil.
 
 \\{bog-mode-map}"
-  :keymap bog-mode-map
   :lighter " Bog"
   (progn
     (cond
@@ -1432,7 +1431,6 @@ many of the Bog commands a single-letter key binding.
 To exit Bog View mode, type \\[bog-view-quit].
 
 \\{bog-view-mode-map}"
-  :keymap bog-view-mode-map
   :lighter " Bog-view"
   (cond
    (bog-view-mode
