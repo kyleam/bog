@@ -234,9 +234,13 @@ kills the indirect buffer created by the previous call."
   :type 'boolean)
 
 (defvar bog-citekey-syntax-table
-  (let ((st (make-syntax-table org-mode-syntax-table)))
+  (let ((st (make-syntax-table text-mode-syntax-table)))
     (modify-syntax-entry ?- "w" st)
     (modify-syntax-entry ?_ "w" st)
+    (modify-syntax-entry ?@ "w" st)
+    (modify-syntax-entry ?\" "\"" st)
+    (modify-syntax-entry ?\\ "_" st)
+    (modify-syntax-entry ?~ "_" st)
     st)
   "Syntax table used when working with citekeys.
 Like `org-mode-syntax-table', but hyphens and underscores are
