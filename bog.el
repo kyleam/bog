@@ -63,6 +63,8 @@ then lower case letters.
 
 The format should be restricted to word characters and anchored
 by word boundaries (i.e. '\\b..\\b' or '\\\\=<..\\>').
+`bog-citekey-format-allow-at' controls whether '@' is considered
+a word character.
 
 This is case-sensitive (i.e., `case-fold-search' will be set to
 nil).
@@ -76,6 +78,23 @@ settings:
         bibtex-autokey-titlewords 1
         bibtex-autokey-year-title-separator \"\")"
   :type 'regexp)
+
+(defcustom bog-citekey-format-allow-at t
+  "Treat '@' as a word charcter, as it is in Org mode.
+
+If this value is nil, Bog functions treat '@' as a punctuation
+character, which allows them to work on Pandoc's @citekey format.
+
+Warning: Setting this variable after Bog is loaded does not have
+an effect.  However, it can be changed at any time through the
+Customize interface."
+  :package-version '(bog . "1.3.0")
+  :set (lambda (var val)
+         (set var val)
+         (when (boundp 'bog-citekey-syntax-table)
+           (modify-syntax-entry ?@ (if val "w" ".")
+                                bog-citekey-syntax-table)))
+  :type 'boolean)
 
 (defcustom bog-citekey-web-search-groups '(1 2 3)
   "List of citekey subexpressions to use for web search.
@@ -237,14 +256,15 @@ kills the indirect buffer created by the previous call."
   (let ((st (make-syntax-table text-mode-syntax-table)))
     (modify-syntax-entry ?- "w" st)
     (modify-syntax-entry ?_ "w" st)
-    (modify-syntax-entry ?@ "w" st)
+    (modify-syntax-entry ?@ (if bog-citekey-format-allow-at "w" ".") st)
     (modify-syntax-entry ?\" "\"" st)
     (modify-syntax-entry ?\\ "_" st)
     (modify-syntax-entry ?~ "_" st)
     st)
   "Syntax table used when working with citekeys.
 Like `org-mode-syntax-table', but hyphens and underscores are
-treated as word characters.")
+treated as word characters.  '@' will be considered a word
+character if `bog-citekey-format-allow-at' is non-nil.")
 
 
 ;;; Citekey methods
@@ -256,10 +276,7 @@ treated as word characters.")
       (string-match-p (format "\\`%s\\'" bog-citekey-format) text))))
 
 (defun bog-citekey-at-point ()
-  "Return citekey at point.
-The citekey must have the format specified by
-`bog-citekey-format'.  Hyphens and underscores are considered as
-word constituents."
+  "Return citekey at point."
   (save-excursion
     (with-syntax-table bog-citekey-syntax-table
       (skip-syntax-backward "w")
