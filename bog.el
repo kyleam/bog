@@ -247,8 +247,9 @@ treated as word characters.")
 
 (defun bog-citekey-p (text)
   "Return non-nil if TEXT matches `bog-citekey-format'."
-  (let ((case-fold-search nil))
-    (string-match-p (format "\\`%s\\'" bog-citekey-format) text)))
+  (with-syntax-table bog-citekey-syntax-table
+    (let ((case-fold-search nil))
+      (string-match-p (format "\\`%s\\'" bog-citekey-format) text))))
 
 (defun bog-citekey-at-point ()
   "Return citekey at point.
@@ -389,8 +390,9 @@ Otherwise, prompt for CATEGORY."
     (let ((case-fold-search nil)
           citekeys)
       (goto-char (point-min))
-      (while (re-search-forward bog-citekey-format nil t)
-        (push (match-string-no-properties 0) citekeys))
+      (with-syntax-table bog-citekey-syntax-table
+        (while (re-search-forward bog-citekey-format nil t)
+          (push (match-string-no-properties 0) citekeys)))
       (bog--maybe-sort (delete-dups citekeys)))))
 
 (defun bog-heading-citekeys-in-wide-buffer ()
@@ -406,10 +408,11 @@ Otherwise, prompt for CATEGORY."
       (let ((default-directory (file-name-directory file)))
         (insert-file-contents file)
         (org-mode)
-        (while (re-search-forward bog-citekey-format nil t)
-          (unless (or (org-at-heading-p)
-                      (org-at-property-p))
-            (push (match-string-no-properties 0) citekeys))))
+        (with-syntax-table bog-citekey-syntax-table
+          (while (re-search-forward bog-citekey-format nil t)
+            (unless (or (org-at-heading-p)
+                        (org-at-property-p))
+              (push (match-string-no-properties 0) citekeys)))))
       (bog--maybe-sort (delete-dups citekeys)))))
 
 ;;;; Selection
@@ -599,11 +602,12 @@ determined by `bog-subdirectory-group'."
 (defun bog--get-subdir (citekey)
   "Return subdirectory for citekey file.
 Subdirectory is determined by `bog-subdirectory-group'."
-  (let ((case-fold-search nil))
-    (and bog-subdirectory-group
-         (string-match bog-citekey-format citekey)
-         (match-string-no-properties bog-subdirectory-group
-                                     citekey))))
+  (with-syntax-table bog-citekey-syntax-table
+    (let ((case-fold-search nil))
+      (and bog-subdirectory-group
+           (string-match bog-citekey-format citekey)
+           (match-string-no-properties bog-subdirectory-group
+                                       citekey)))))
 
 ;;;###autoload
 (defun bog-rename-staged-file-to-citekey (&optional no-context)
@@ -713,8 +717,12 @@ Generate a file name with the form
   "Return leading citekey part from base name of FILE."
   (let ((fname (file-name-base file))
         (case-fold-search nil))
-    (and (string-match (concat "^" bog-citekey-format) fname)
-         (match-string 0 fname))))
+    ;; Use `org-mode-syntax-table' instead of
+    ;; `bog-citekey-syntax-table' so the hyphens and underscores are
+    ;; treated as word boundaries.
+    (with-syntax-table org-mode-syntax-table
+      (and (string-match (concat "^" bog-citekey-format) fname)
+           (match-string 0 fname)))))
 
 (defun bog-all-citekey-files ()
   "Return list of all files in `bog-file-directory'."
@@ -748,14 +756,16 @@ Generate a file name with the form
       (erase-buffer)
       (setq default-directory bog-root-directory)
       (insert ?\n)
-      (dolist (ck-file (bog-all-citekey-files))
-        (let ((base-name (file-name-nondirectory ck-file))
-              (case-fold-search nil))
-          (unless (and (string-match (concat "\\`" bog-citekey-format)
-                                     base-name)
-                       (member (match-string-no-properties 0 base-name)
-                               head-cks))
-            (insert (format "- [[file:%s]]\n" (file-relative-name ck-file))))))
+      (with-syntax-table bog-citekey-syntax-table
+        (dolist (ck-file (bog-all-citekey-files))
+          (let ((base-name (file-name-nondirectory ck-file))
+                (case-fold-search nil))
+            (unless (and (string-match (concat "\\`" bog-citekey-format)
+                                       base-name)
+                         (member (match-string-no-properties 0 base-name)
+                                 head-cks))
+              (insert (format "- [[file:%s]]\n"
+                              (file-relative-name ck-file)))))))
       (goto-char (point-min))
       (org-mode)
       (if (/= (buffer-size) 1)
@@ -973,10 +983,11 @@ If the citekey prompt is slow to appear, consider enabling the
 (defun bog--citekey-groups-with-delim (citekey delim)
   "Return expression groups CITEKEY, seperated by DELIM.
 Groups are specified by `bog-citekey-web-search-groups'."
-  (let ((case-fold-search nil))
-    (string-match bog-citekey-format citekey)
-    (mapconcat (lambda (g) (match-string-no-properties g citekey))
-               bog-citekey-web-search-groups delim)))
+  (with-syntax-table bog-citekey-syntax-table
+    (let ((case-fold-search nil))
+      (string-match bog-citekey-format citekey)
+      (mapconcat (lambda (g) (match-string-no-properties g citekey))
+                 bog-citekey-web-search-groups delim))))
 
 
 ;;; Notes-related
@@ -1312,12 +1323,13 @@ Topic headings are determined by `bog-topic-heading-level'."
   "Face used to highlight text that matches `bog-citekey-format'.")
 
 (defun bog-fontify-non-heading-citekeys (limit)
-  "Highlight non-heading citekey in an Org buffer."
-  (let ((case-fold-search nil))
-    (while (re-search-forward bog-citekey-format limit t)
-      (unless (save-match-data (org-at-heading-p))
-        (add-text-properties (match-beginning 0) (match-end 0)
-                             '(face bog-citekey-face))))))
+  "Highlight non-heading citekeys."
+  (with-syntax-table bog-citekey-syntax-table
+    (let ((case-fold-search nil))
+      (while (re-search-forward bog-citekey-format limit t)
+        (unless (save-match-data (org-at-heading-p))
+          (add-text-properties (match-beginning 0) (match-end 0)
+                               '(face bog-citekey-face)))))))
 
 (defvar bog-citekey-font-lock-keywords
   `((,bog-citekey-format . 'bog-citekey-face))
