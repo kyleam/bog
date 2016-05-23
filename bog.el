@@ -64,7 +64,7 @@ then lower case letters.
 The format must be anchored by '\\b' and should be restricted to
 letters, digits, '-', and '_'.
 
-This is case-sensitive (i.e., case-fold-search will be set to
+This is case-sensitive (i.e., `case-fold-search' will be set to
 nil).
 
 The default format corresponds to the following BibTeX autokey
