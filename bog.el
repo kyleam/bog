@@ -1324,16 +1324,17 @@ Topic headings are determined by `bog-topic-heading-level'."
 
 (defun bog-fontify-non-heading-citekeys (limit)
   "Highlight non-heading citekeys."
-  (with-syntax-table bog-citekey-syntax-table
-    (let ((case-fold-search nil))
-      (while (re-search-forward bog-citekey-format limit t)
-        (unless (save-match-data (org-at-heading-p))
-          (add-text-properties (match-beginning 0) (match-end 0)
-                               '(face bog-citekey-face)))))))
+  (let ((org-buffer-p (derived-mode-p 'org-mode)))
+    (with-syntax-table bog-citekey-syntax-table
+      (let ((case-fold-search nil))
+        (while (re-search-forward bog-citekey-format limit t)
+          (unless (and org-buffer-p
+                       (save-match-data (org-at-heading-p)))
+            (add-text-properties (match-beginning 0) (match-end 0)
+                                 '(face bog-citekey-face))))))))
 
 (defvar bog-citekey-font-lock-keywords
-  `((,bog-citekey-format . 'bog-citekey-face))
-  "Citekey font-lock for non-Org buffers.")
+  '((bog-fontify-non-heading-citekeys . bog-citekey-face)))
 
 (defvar bog-font-lock-function
   (if (fboundp 'font-lock-flush)
