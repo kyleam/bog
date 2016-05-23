@@ -61,8 +61,8 @@ By default, this matches any sequence of lower case
 letters (allowing hyphenation) that is followed by 4 digits and
 then lower case letters.
 
-The format must be anchored by '\\b' and should be restricted to
-letters, digits, '-', and '_'.
+The format should be restricted to word characters and anchored
+by word boundaries (i.e. '\\b..\\b' or '\\\\=<..\\>').
 
 This is case-sensitive (i.e., `case-fold-search' will be set to
 nil).
