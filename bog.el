@@ -711,7 +711,7 @@ controls the default string for the prompt."
                (read-string
                 (format "File %s already exists.  Name to use instead: "
                         (file-name-base citekey-file))
-                new-file-name nil nil '(new-file-name)))
+                new-file-name))
          (setq citekey-file (expand-file-name new-file-name dir))
          (rename-file staged-file citekey-file))))
     citekey-file))
