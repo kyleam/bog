@@ -478,7 +478,7 @@ If NO-CONTEXT is non-nil, immediately fall back."
 
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
-  (completing-read "Select citekey: " citekeys))
+  (completing-read "Select citekey: " citekeys nil t))
 
 ;;;; Other
 
