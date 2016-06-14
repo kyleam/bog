@@ -476,9 +476,12 @@ If NO-CONTEXT is non-nil, immediately fall back."
                       bog-citekey-at-point
                       bog-all-heading-citekeys)
 
+(defvar bog-citekey-history nil)
+
 (defun bog-select-citekey (citekeys)
   "Prompt for citekey from CITEKEYS."
-  (completing-read "Select citekey: " citekeys nil t))
+  (completing-read "Select citekey: " citekeys
+                   nil t nil 'bog-citekey-history))
 
 ;;;; Other
 
