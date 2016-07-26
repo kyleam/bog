@@ -187,13 +187,19 @@ arguments and return the name of the final file.  Currently the
 only built-in function is `bog-file-ask-on-conflict'."
   :type 'function)
 
-(defcustom bog-file-secondary-name "-supplement"
+(defcustom bog-file-secondary-name ".supplement"
   "Modification to make to file name on renaming confict.
+
 If <citekey>.<ext> already exists, `bog-file-ask-on-conflict'
 prompts for another name.
 <citekey>`bog-file-secondary-name'.<ext> is the default value for
-the prompt."
-  :type 'string)
+the prompt.
+
+For `bog-list-orphan-files' to work correctly, the first
+character should be a non-word character according to
+`bog-citekey-syntax-table'."
+  :type 'string
+  :package-version '(bog . "1.3.0"))
 
 (defcustom bog-web-search-url
   "http://scholar.google.com/scholar?q=%s"

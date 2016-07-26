@@ -8,6 +8,11 @@ Bog NEWS -- history of user-visible changes         -*- mode: org; -*-
   make it easier to use Bog commands on citekeys that use Pandoc's
   @citekey format.
 
+** Other changes
+
+- The default value for ~bog-file-secondary-name~ has been changed
+  from "-supplement" to ".supplement".
+
 * v1.2.0
 
 ** New features
