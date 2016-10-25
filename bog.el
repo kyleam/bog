@@ -272,6 +272,13 @@ Like `org-mode-syntax-table', but hyphens and underscores are
 treated as word characters.  '@' will be considered a word
 character if `bog-citekey-format-allow-at' is non-nil.")
 
+(defcustom bog-clean-bib-hook nil
+  "Hook run during `bog-clean-and-rename-staged-bibs' call.
+After each bib file is processed, functions in this hook will be
+called in a buffer visiting the bib file."
+  :package-version '(bog . "1.3.0")
+  :type 'hook)
+
 
 ;;; Citekey methods
 
@@ -870,7 +877,8 @@ one entry per BibTeX file."
       (let ((dir (file-name-directory bib-file)))
         (unless (file-exists-p dir)
           (make-directory dir)))
-      (write-file bib-file))
+      (write-file bib-file)
+      (run-hooks 'bog-clean-bib-hook))
     ;; If a buffer was visiting the original bib file, point it to the
     ;; new file.
     (let ((file-buf (find-buffer-visiting file)))

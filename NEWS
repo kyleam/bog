@@ -8,6 +8,9 @@ Bog NEWS -- history of user-visible changes         -*- mode: org; -*-
   make it easier to use Bog commands on citekeys that use Pandoc's
   @citekey format.
 
+- New hook ~bog-clean-bib-hook~ is run for each file processed with
+  ~bog-clean-and-rename-staged-bibs~.
+
 ** Other changes
 
 - The default value for ~bog-file-secondary-name~ has been changed
