@@ -11,7 +11,7 @@ and taking notes with Org, not on writing research articles with Org.
 
 * Installation
 
-Bog is available on [[http://melpa.milkbox.net/][MELPA]].
+Bog is available on [[https://melpa.org/][MELPA]].
 
 To enable Bog in all Org buffers, add it to =org-mode-hook=.
 
