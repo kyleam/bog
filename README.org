@@ -16,7 +16,7 @@ Bog is available on [[https://melpa.org/][MELPA]].
 To enable Bog in all Org buffers, add it to =org-mode-hook=.
 
 #+begin_src emacs-lisp
-  (add-hook 'org-mode-hook 'bog-mode)
+  (add-hook 'org-mode-hook #'bog-mode)
 #+end_src
 
 * Workflow
