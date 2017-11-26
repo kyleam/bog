@@ -26,8 +26,8 @@ information that must be included in the notes.  This unique identifier
 is used as a link to the BibTeX file and other associated files.
 
 In the example below, the citekey "name2000word" is a study heading.  A
-study heading is defined as a heading the has a citekey as a title or as
-the value of =bog-citekey-property=.  When a citekey occurs anywhere
+study heading is defined as a heading that has a citekey as a title or
+as the value of =bog-citekey-property=.  When a citekey occurs anywhere
 else (like "another1999study" below), it is taken as a reference to
 another study (which may or may not have a subtree in this or another
 Org file).
@@ -130,7 +130,7 @@ The variables below are important for specifying how Bog behaves.
 
 - =bog-citekey-format=
 
-  A regular expression that defines the format used for citekeys
+  A regular expression that defines the format used for citekeys.
 
 - =bog-find-citekey-bib-function=
 
