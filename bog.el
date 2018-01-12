@@ -632,8 +632,8 @@ determined by `bog-subdirectory-group'."
                (or (and subdir (expand-file-name subdir bog-file-directory))
                    bog-file-directory))))
     (directory-files dir t
-                     (format "^%s\\(%s.*\\)\\{0,1\\}\\..*"
-                             citekey
+                     (format "\\`%s\\(%s.*\\)?\\."
+                             (regexp-quote citekey)
                              bog-citekey-file-name-separators))))
 
 (defun bog--get-subdir (citekey)
@@ -758,7 +758,7 @@ Generate a file name with the form
     ;; `bog-citekey-syntax-table' so the hyphens and underscores are
     ;; treated as word boundaries.
     (with-syntax-table org-mode-syntax-table
-      (and (string-match (concat "^" bog-citekey-format) fname)
+      (and (string-match (concat "\\`" bog-citekey-format) fname)
            (match-string 0 fname)))))
 
 (defun bog-all-citekey-files ()
@@ -857,7 +857,7 @@ Search for new BibTeX files in `bog-stage-directory', and run
 This function is only useful if you use the non-standard setup of
 one entry per BibTeX file."
   (interactive)
-  (let ((staged (directory-files bog-stage-directory t ".*\\.bib$")))
+  (let ((staged (directory-files bog-stage-directory t "\\.bib\\'")))
     (dolist (file staged)
       (bog--prepare-bib-file file t))))
 
@@ -959,7 +959,7 @@ instead of citekeys from file names in `bog-bib-directory'."
         (bog--maybe-sort
          (mapcar #'file-name-sans-extension
                  (cl-mapcan
-                  (lambda (dir) (directory-files dir nil ".*\\.bib$" t))
+                  (lambda (dir) (directory-files dir nil "\\.bib\\'" t))
                   dirs)))))))
 
 ;;;###autoload
@@ -1171,7 +1171,7 @@ level `bog-refile-maxlevel' are considered."
 (defun bog-notes ()
   "Return Org files in `bog-note-directory'."
   (directory-files bog-note-directory t
-                   "^[^\\.].*.org$"))
+                   "\\`[^.].*\\.org\\'"))
 
 (defun bog-read-note-file-name ()
   "Read name of Org file in `bog-note-directory'."
