@@ -50,7 +50,7 @@ settings can be modified.
 
 #+begin_src emacs-lisp
   (setq bibtex-autokey-year-length 4
-        bibtex-autokey-titleword-length nil
+        bibtex-autokey-titleword-length 'infty
         bibtex-autokey-titlewords-stretch 0
         bibtex-autokey-titlewords 1
         bibtex-autokey-year-title-separator "")

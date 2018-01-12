@@ -80,7 +80,7 @@ settings:
   :type 'regexp)
 
 (defcustom bog-citekey-format-allow-at t
-  "Treat '@' as a word charcter, as it is in Org mode.
+  "Treat '@' as a word character, as it is in Org mode.
 
 If this value is nil, Bog functions treat '@' as a punctuation
 character, which allows them to work on Pandoc's @citekey format.
@@ -1245,7 +1245,7 @@ nil, use ?a.  The level to sort is determined by
 Unlike `bog-sort-topic-headings-in-buffer', sort topic headings
 in all note files."
   (interactive)
-  (org-map-entries (lambda ()  (bog-sort-if-topic-header sorting-type))
+  (org-map-entries (lambda () (bog-sort-if-topic-header sorting-type))
                    nil (bog-notes)))
 
 (defun bog-sort-if-topic-header (sorting-type)
