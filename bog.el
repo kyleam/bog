@@ -747,7 +747,7 @@ Generate a file name with the form
   "Return a list of citekeys for files in `bog-file-directory'."
   (bog--with-citekey-cache 'files
     (bog--maybe-sort
-     (delq nil (delete-dups (mapcar #'bog-file-citekey
+     (delete-dups (delq nil (mapcar #'bog-file-citekey
                                     (bog-all-citekey-files)))))))
 
 (defun bog-file-citekey (file)
@@ -978,7 +978,7 @@ instead of citekeys from file names in `bog-bib-directory'."
           (goto-char (point-min))
           (org-mode)
           (pop-to-buffer (current-buffer)))
-      (let ((old-buf (get-buffer-create orphan-bufname)))
+      (let ((old-buf (get-buffer orphan-bufname)))
         (when old-buf
           (kill-buffer old-buf)))
       (message "No orphans found"))))
