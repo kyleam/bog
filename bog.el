@@ -19,7 +19,7 @@
 ;; GNU General Public License for more details.
 ;;
 ;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
+;; along with GNU Emacs.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 ;;
@@ -202,7 +202,7 @@ character should be a non-word character according to
   :package-version '(bog . "1.3.0"))
 
 (defcustom bog-web-search-url
-  "http://scholar.google.com/scholar?q=%s"
+  "https://scholar.google.com/scholar?q=%s"
   "URL to use for CITEKEY search.
 It should contain the placeholder \"%s\" for the query."
   :type 'string)

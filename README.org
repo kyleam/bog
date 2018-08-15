@@ -3,9 +3,9 @@
 #+startup: showall
 
 [[https://travis-ci.org/kyleam/bog][https://travis-ci.org/kyleam/bog.svg]]
-[[http://melpa.org/#/bog][http://melpa.org/packages/bog-badge.svg]]
+[[https://melpa.org/#/bog][https://melpa.org/packages/bog-badge.svg]]
 
-Bog is a system for taking research notes in [[http://orgmode.org/][Org mode]].  It adds a few
+Bog is a system for taking research notes in [[https://orgmode.org/][Org mode]].  It adds a few
 research-specific features, nearly all of which are focused on managing
 and taking notes with Org, not on writing research articles with Org.
 
