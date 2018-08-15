@@ -188,7 +188,7 @@ only built-in function is `bog-file-ask-on-conflict'."
   :type 'function)
 
 (defcustom bog-file-secondary-name ".supplement"
-  "Modification to make to file name on renaming confict.
+  "Modification to make to file name on renaming conflict.
 
 If <citekey>.<ext> already exists, `bog-file-ask-on-conflict'
 prompts for another name.
@@ -921,7 +921,7 @@ reverse the meaning of `bog-combined-bib-ignore-not-found'."
           (insert-file-contents (cdr citekey-bib))
           (goto-char (point-max)))
          ((or arg
-              (y-or-n-p (format "No BibTeX entry found for %s.  Skip it?"
+              (y-or-n-p (format "No BibTeX entry found for %s.  Skip it? "
                                 (car citekey-bib)))))
          (t
           (kill-buffer bib-buffer-name)
@@ -1019,7 +1019,7 @@ If the citekey prompt is slow to appear, consider enabling the
           (bog--citekey-groups-with-delim citekey "+")))
 
 (defun bog--citekey-groups-with-delim (citekey delim)
-  "Return expression groups CITEKEY, seperated by DELIM.
+  "Return expression groups CITEKEY, separated by DELIM.
 Groups are specified by `bog-citekey-web-search-groups'."
   (with-syntax-table bog-citekey-syntax-table
     (let ((case-fold-search nil))
@@ -1314,7 +1314,7 @@ context fails."
 
 ;;;###autoload
 (defun bog-next-non-heading-citekey (&optional arg)
-  "Move foward to next non-heading citekey.
+  "Move forward to next non-heading citekey.
 With argument ARG, do it ARG times."
   (interactive "p")
   (setq arg (or arg 1))
