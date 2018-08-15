@@ -100,7 +100,6 @@ the first parent heading that is a study heading.
 Other useful functions include
 
 - =bog-citekey-tree-to-indirect-buffer=
-- =bog-goto-citekey-heading-in-buffer=
 - =bog-goto-citekey-heading-in-notes=
 - =bog-insert-heading-citekey=
 - =bog-jump-to-topic-heading=
@@ -132,7 +131,7 @@ The variables below are important for specifying how Bog behaves.
 
   A regular expression that defines the format used for citekeys.
 
-- =bog-find-citekey-bib-function=
+- =bog-find-citekey-bib-func=
 
   A function to find a citekey in a BibTeX file.  This determines
   whether a directory of single-entry BibTeX files or a single BibTeX
