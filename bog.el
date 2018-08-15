@@ -717,7 +717,7 @@ controls the default string for the prompt."
       (make-directory dir))
     (condition-case nil
         (rename-file staged-file citekey-file)
-      (file-error
+      (file-already-exists
        (let ((dir (file-name-directory citekey-file))
              (new-file-name
               (file-name-nondirectory
