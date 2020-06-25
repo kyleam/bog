@@ -1,4 +1,4 @@
-;;; bog.el --- Extensions for research notes in Org mode
+;;; bog.el --- Extensions for research notes in Org mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013-2016 Kyle Meyer <kyle@kyleam.com>
 
@@ -133,7 +133,7 @@ non-nil."
 rename."
   :type 'directory)
 
-(defcustom bog-find-citekey-bib-func 'bog-find-citekey-bib-file
+(defcustom bog-find-citekey-bib-func #'bog-find-citekey-bib-file
   "Function used to find BibTeX entry for citekey.
 
 Default is `bog-find-citekey-bib-file', which locates single
@@ -180,7 +180,7 @@ files with the format <citekey>.* and <citekey><sep>*.<ext>,
 where <sep> is matched by this regular expression.."
   :type 'regexp)
 
-(defcustom bog-file-renaming-func 'bog-file-ask-on-conflict
+(defcustom bog-file-renaming-func #'bog-file-ask-on-conflict
   "Function used to rename staged files.
 This function should accept a file name and a citekey as
 arguments and return the name of the final file.  Currently the
@@ -348,8 +348,8 @@ Keys match values in `bog-use-citekey-cache'.")
   "Execute BODY, maybe using cached citekey values for KEY.
 Use cached values if `bog-use-citekey-cache' is non-nil for KEY.
 Cached values are updated to the return values of BODY."
-  (declare (indent 1))
-  (let ((use-cache-p (cl-gensym "use-cache-p")))
+  (declare (indent 1) (debug t))
+  (let ((use-cache-p (make-symbol "use-cache-p")))
     `(let* ((,use-cache-p (bog--use-cache-p ,key))
             (citekeys (or (and ,use-cache-p
                                (cdr (assq ,key bog--citekey-cache)))
@@ -463,11 +463,11 @@ behavior:
      ,(format "Select citekey with `%s'.
 Fall back on `%s'.
 If NO-CONTEXT is non-nil, immediately fall back."
-              (symbol-name context-method)
-              (symbol-name collection-method))
-      (or (and no-context (bog-select-citekey (,collection-method)))
-          (,context-method)
-          (bog-select-citekey (,collection-method)))))
+              context-method
+              collection-method)
+     (or (and no-context (bog-select-citekey (,collection-method)))
+         (,context-method)
+         (bog-select-citekey (,collection-method)))))
 
 (bog-selection-method "surroundings-or-files"
                       bog-citekey-from-surroundings
@@ -1181,25 +1181,32 @@ level `bog-refile-maxlevel' are considered."
     (cdr (assoc-string (completing-read "File: " note-paths)
                        note-paths))))
 
+(defvar bog--agenda-map
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map org-agenda-mode-map)
+    (define-key map "r" 'bog-agenda-redo)
+    (define-key map "g" 'bog-agenda-redo)
+    map)
+  "Local keymap for Bog-related agendas.")
+
 (defmacro bog--with-search-lprops (&rest body)
   "Execute BODY with Bog-related agenda values.
 Restore the `org-lprops' property value for
 `org-agenda-redo-command' after executing BODY."
-  (declare (indent 0))
-  `(let ((org-lprops (get 'org-agenda-redo-command 'org-lprops))
-         (bog-lprops '((org-agenda-buffer-name "*Bog search*")
-                       (org-agenda-files (bog-notes))
-                       org-agenda-text-search-extra-files
-                       org-agenda-sticky)))
-     (put 'org-agenda-redo-command 'org-lprops bog-lprops)
-     (put 'org-agenda-files 'org-restrict nil)
-     (org-let bog-lprops ,@body)
-     (use-local-map (let ((map (make-sparse-keymap)))
-                      (set-keymap-parent map org-agenda-mode-map)
-                      (define-key map "r" 'bog-agenda-redo)
-                      (define-key map "g" 'bog-agenda-redo)
-                      map))
-     (put 'org-agenda-redo-command 'org-lprops org-lprops)))
+  (declare (indent 0) (debug t))
+  (let ((bog-lprops '((org-agenda-buffer-name "*Bog search*")
+                      (org-agenda-files (bog-notes))
+                      org-agenda-text-search-extra-files
+                      org-agenda-sticky))
+        (org-lprops (make-symbol "org-lprops")))
+    `(let ((,org-lprops (get 'org-agenda-redo-command 'org-lprops)))
+       (unwind-protect
+           (let ,bog-lprops
+             (put 'org-agenda-redo-command 'org-lprops ',bog-lprops)
+             (put 'org-agenda-files 'org-restrict nil)
+             ,@body
+             (use-local-map bog--agenda-map))
+         (put 'org-agenda-redo-command 'org-lprops ,org-lprops)))))
 
 ;;;###autoload
 (defun bog-search-notes (&optional todo-only string)
@@ -1209,7 +1216,7 @@ STRING is non-nil, use it as the search term (instead of
 prompting for one)."
   (interactive "P")
   (bog--with-search-lprops
-    '(org-search-view todo-only string)))
+    (org-search-view todo-only string)))
 
 ;;;###autoload
 (defun bog-search-notes-for-citekey (&optional todo-only)
@@ -1230,7 +1237,7 @@ If the citekey prompt is slow to appear, consider enabling the
 (defun bog-agenda-redo (&optional all)
   (interactive "P")
   (bog--with-search-lprops
-    '(org-agenda-redo all)))
+    (org-agenda-redo all)))
 
 (defun bog-sort-topic-headings-in-buffer (&optional sorting-type)
   "Sort topic headings in this buffer.
@@ -1265,8 +1272,8 @@ argument CURRENT-BUFFER, limit to heading citekeys from the
 current buffer."
   (interactive "P")
   (let ((citekey-func (if current-buffer
-                          'bog-heading-citekeys-in-wide-buffer
-                        'bog-all-heading-citekeys)))
+                          #'bog-heading-citekeys-in-wide-buffer
+                        #'bog-all-heading-citekeys)))
     (insert (bog-select-citekey (funcall citekey-func)))))
 
 ;;;###autoload
@@ -1403,7 +1410,7 @@ Topic headings are determined by `bog-topic-heading-level'."
     (define-key map "v" 'bog-view-mode)
     (define-key map "y" 'bog-insert-heading-citekey)
     map)
-  "Map for Bog commands.
+  "Keymap for Bog commands.
 In Bog mode, these are under `bog-keymap-prefix'.
 `bog-command-map' can also be bound to a key outside of Bog
 mode.")
@@ -1430,11 +1437,11 @@ if ARG is omitted or nil.
     (cond
      (bog-mode
       (if (derived-mode-p 'org-mode)
-          (add-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+          (add-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
         (font-lock-add-keywords nil bog-citekey-font-lock-keywords)))
      (t
       (if (derived-mode-p 'org-mode)
-          (remove-hook 'org-font-lock-hook 'bog-fontify-non-heading-citekeys)
+          (remove-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
         (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
       (when (bound-and-true-p bog-view-mode)
         (bog-view-mode -1))))

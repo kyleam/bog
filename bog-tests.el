@@ -1,4 +1,4 @@
-;;; bog-tests.el --- Tests for Bog
+;;; bog-tests.el --- Tests for Bog -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013-2016 Kyle Meyer <kyle@kyleam.com>
 
@@ -19,15 +19,17 @@
 
 ;;; Code:
 
+(require 'bog)
 (require 'ert)
 (require 'org)
-(require 'cl-lib)
-(require 'bog)
+
+(with-no-warnings ;; Silence "lacks a prefix" warning.
+  (defvar citekey))
 
 ;; Modified from magit-tests.el.
 (defmacro bog-tests-with-temp-dir (&rest body)
   (declare (indent 0) (debug t))
-  (let ((dir (cl-gensym)))
+  (let ((dir (make-symbol "dir")))
     `(let ((,dir (file-name-as-directory (make-temp-file "dir" t))))
        (unwind-protect
            (let ((default-directory ,dir)) ,@body)
@@ -44,21 +46,18 @@ value of the variable `citekey'.
 If the string \"<point>\" appears in TEXT then remove it and
 place the point there before running BODY, otherwise place the
 point at the beginning of the inserted text."
-  (declare (indent 1))
-  `(let* ((inside-text (if (stringp ,text) ,text (eval ,text)))
-          (is-citekey (string-match "<citekey>" inside-text)))
-     (when (and is-citekey citekey)
-       (setq inside-text (replace-match citekey nil nil inside-text)))
-     (with-temp-buffer
-       (org-mode)
-       (let ((point (string-match "<point>" inside-text)))
-         (if point
-             (progn
-               (insert (replace-match "" nil nil inside-text))
-               (goto-char (1+ (match-beginning 0))))
-           (insert inside-text)
-           (goto-char (point-min))))
-       ,@body)))
+  (declare (indent 1) (debug t))
+  `(with-temp-buffer
+     (org-mode)
+     (insert ,text)
+     (goto-char (point-min))
+     (when (and (bound-and-true-p citekey)
+                (search-forward "<citekey>" nil t))
+       (replace-match citekey t t))
+     (goto-char (point-min))
+     (when (search-forward "<point>" nil t)
+       (replace-match "" t t))
+     ,@body))
 
 
 ;;; Citekey functions
@@ -410,7 +409,7 @@ some text"
                           (concat citekey ".txt")
                           (concat citekey "_0.pdf")
                           (concat citekey "-supplement.pdf")))
-          found-files)
+          files-found)
      (make-directory bog-file-directory)
      (dolist (var variants)
        (write-region "" nil (expand-file-name var bog-file-directory)))
@@ -582,3 +581,5 @@ some text"
                  (sort (bog--find-duplicates
                         (list "a" "b" "c" "b" "a"))
                        #'string-lessp))))
+
+;;; bog-tests.el ends here
