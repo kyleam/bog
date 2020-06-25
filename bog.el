@@ -1366,7 +1366,7 @@ Topic headings are determined by `bog-topic-heading-level'."
 ;;; Font-lock
 
 (defface bog-citekey-face
-  '((t (:inherit org-link :underline nil)))
+  '((t :inherit org-link :underline nil))
   "Face used to highlight text that matches `bog-citekey-format'.")
 
 (defun bog-fontify-non-heading-citekeys (limit)
