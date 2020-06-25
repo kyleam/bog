@@ -1436,11 +1436,11 @@ if ARG is omitted or nil.
   (cond
    (bog-mode
     (if (derived-mode-p 'org-mode)
-        (add-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
+        (add-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys nil t)
       (font-lock-add-keywords nil bog-citekey-font-lock-keywords)))
    (t
     (if (derived-mode-p 'org-mode)
-        (remove-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
+        (remove-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys t)
       (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
     (when (bound-and-true-p bog-view-mode)
       (bog-view-mode -1))))
