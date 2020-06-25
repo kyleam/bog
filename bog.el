@@ -499,8 +499,10 @@ If NO-CONTEXT is non-nil, immediately fall back."
 ;;;; Other
 
 ;; `show-all' is obsolete as of Emacs 25.1.
-(unless (fboundp 'outline-show-all)
-  (defalias 'outline-show-all 'show-all))
+(defalias 'bog--outline-show-all
+  (if (fboundp 'outline-show-all)
+      #'outline-show-all
+    'show-all))
 
 (defun bog--set-difference (list1 list2)
   (let ((sdiff (cl-set-difference list1 list2 :test #'string=)))
@@ -532,7 +534,7 @@ file."
                             (mapconcat #'identity nohead-cks "\n"))))))
       (org-mode)
       (bog-mode 1)
-      (outline-show-all)
+      (bog--outline-show-all)
       (goto-char (point-min)))
     (pop-to-buffer bufname)))
 
@@ -1381,7 +1383,7 @@ Topic headings are determined by `bog-topic-heading-level'."
 (defvar bog-citekey-font-lock-keywords
   '((bog-fontify-non-heading-citekeys . bog-citekey-face)))
 
-(defvar bog-font-lock-function
+(defalias 'bog--font-lock-function
   (if (fboundp 'font-lock-flush)
       #'font-lock-flush
     #'font-lock-fontify-buffer))
@@ -1445,7 +1447,7 @@ if ARG is omitted or nil.
     (when (bound-and-true-p bog-view-mode)
       (bog-view-mode -1))))
   (when font-lock-mode
-    (funcall bog-font-lock-function)))
+    (bog--font-lock-function)))
 
 
 ;;; View minor mode
