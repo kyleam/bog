@@ -1142,7 +1142,7 @@ If the citekey prompt is slow to appear, consider enabling the
          (citekey (bog-citekey-from-point-or-all-headings no-context))
          (marker (with-current-buffer (or (buffer-base-buffer)
                                           (current-buffer))
-                     (bog--find-citekey-heading-in-notes citekey))))
+                   (bog--find-citekey-heading-in-notes citekey))))
     (if marker
         (with-current-buffer (marker-buffer marker)
           (org-with-wide-buffer
@@ -1433,20 +1433,19 @@ if ARG is omitted or nil.
 
 \\{bog-mode-map}"
   :lighter " Bog"
-  (progn
-    (cond
-     (bog-mode
-      (if (derived-mode-p 'org-mode)
-          (add-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
-        (font-lock-add-keywords nil bog-citekey-font-lock-keywords)))
-     (t
-      (if (derived-mode-p 'org-mode)
-          (remove-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
-        (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
-      (when (bound-and-true-p bog-view-mode)
-        (bog-view-mode -1))))
-    (when font-lock-mode
-      (funcall bog-font-lock-function))))
+  (cond
+   (bog-mode
+    (if (derived-mode-p 'org-mode)
+        (add-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
+      (font-lock-add-keywords nil bog-citekey-font-lock-keywords)))
+   (t
+    (if (derived-mode-p 'org-mode)
+        (remove-hook 'org-font-lock-hook #'bog-fontify-non-heading-citekeys)
+      (font-lock-remove-keywords nil bog-citekey-font-lock-keywords))
+    (when (bound-and-true-p bog-view-mode)
+      (bog-view-mode -1))))
+  (when font-lock-mode
+    (funcall bog-font-lock-function)))
 
 
 ;;; View minor mode
