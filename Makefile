@@ -1,6 +1,7 @@
 
+EMACS ?= emacs
 LOAD_PATH ?=
-BATCH = emacs -Q --batch $(LOAD_PATH)
+BATCH = $(EMACS) -Q --batch $(LOAD_PATH)
 
 all: bog.elc bog-autoloads.el
 
