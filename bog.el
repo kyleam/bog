@@ -1198,17 +1198,13 @@ Restore the `org-lprops' property value for
   (declare (indent 0) (debug t))
   (let ((bog-lprops '((org-agenda-buffer-name "*Bog search*")
                       (org-agenda-files (bog-notes))
-                      org-agenda-text-search-extra-files
-                      org-agenda-sticky))
-        (org-lprops (make-symbol "org-lprops")))
-    `(let ((,org-lprops (get 'org-agenda-redo-command 'org-lprops)))
-       (unwind-protect
-           (let ,bog-lprops
-             (put 'org-agenda-redo-command 'org-lprops ',bog-lprops)
-             (put 'org-agenda-files 'org-restrict nil)
-             ,@body
-             (use-local-map bog--agenda-map))
-         (put 'org-agenda-redo-command 'org-lprops ,org-lprops)))))
+                      (org-agenda-text-search-extra-files ())
+                      (org-agenda-sticky nil))))
+    `(cl-letf (((get 'org-agenda-redo-command 'org-lprops) ',bog-lprops)
+               ,@bog-lprops)
+       (put 'org-agenda-files 'org-restrict nil)
+       ,@body
+       (use-local-map bog--agenda-map))))
 
 ;;;###autoload
 (defun bog-search-notes (&optional todo-only string)
