@@ -1,6 +1,7 @@
 ;;; bog.el --- Extensions for research notes in Org mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013-2016 Kyle Meyer <kyle@kyleam.com>
+;; Copyright (C) 2020 Basil L. Contovounesios <contovob@tcd.ie>
 
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 ;; URL: https://github.com/kyleam/bog
