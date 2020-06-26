@@ -897,8 +897,8 @@ one entry per BibTeX file."
 (defun bog-create-combined-bib (&optional arg)
   "Create a buffer that has entries for a collection of citekeys.
 If in Dired, collect citekeys from marked files.  Otherwise,
-collect citekeys the current buffer.  With prefix argument ARG,
-reverse the meaning of `bog-combined-bib-ignore-not-found'."
+collect citekeys from the current buffer.  With prefix argument
+ARG, reverse the meaning of `bog-combined-bib-ignore-not-found'."
   (interactive (list (if current-prefix-arg
                          (not bog-combined-bib-ignore-not-found)
                        bog-combined-bib-ignore-not-found)))
