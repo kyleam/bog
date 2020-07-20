@@ -6,7 +6,7 @@
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 ;; URL: https://github.com/kyleam/bog
 ;; Keywords: bib, outlines
-;; Version: 1.3.1
+;; Version: 1.3.2
 ;; Package-Requires: ((cl-lib "0.5"))
 
 ;; This program is free software; you can redistribute it and/or modify
