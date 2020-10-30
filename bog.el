@@ -517,15 +517,12 @@ If NO-CONTEXT is non-nil, immediately fall back."
   "List citekeys that appear in notes but don't have a heading.
 With prefix argument FILE, include only orphan citekeys from that
 file."
-  (interactive (list (and current-prefix-arg
-                          (bog-read-note-file-name))))
-  (let ((files (or (and file (list file))
-                   (bog-notes)))
-        (heading-cks (bog-all-heading-citekeys))
-        (bufname "*Bog orphan citekeys*"))
-    (with-current-buffer (get-buffer-create bufname)
+  (interactive (and current-prefix-arg
+                    (list (bog-read-note-file-name))))
+  (let ((files (if file (list file) (bog-notes)))
+        (heading-cks (bog-all-heading-citekeys)))
+    (with-current-buffer (get-buffer-create "*Bog orphan citekeys*")
       (erase-buffer)
-      (insert "\n")
       (dolist (file files)
         (let* ((text-cks (bog-non-heading-citekeys-in-file file))
                (nohead-cks (bog--set-difference text-cks heading-cks)))
@@ -533,11 +530,15 @@ file."
             (insert (format "* %s\n\n%s\n\n"
                             (file-name-nondirectory file)
                             (mapconcat #'identity nohead-cks "\n"))))))
-      (org-mode)
-      (bog-mode 1)
-      (bog--outline-show-all)
-      (goto-char (point-min)))
-    (pop-to-buffer bufname)))
+      (if (> (buffer-size) 0)
+          (progn
+            (org-mode)
+            (bog-mode)
+            (bog--outline-show-all)
+            (goto-char (point-min))
+            (pop-to-buffer (current-buffer)))
+        (kill-buffer)
+        (message "No orphans found")))))
 
 (defun bog-list-duplicate-heading-citekeys (&optional clear-cache)
   "List citekeys that have more than one heading.
@@ -554,7 +555,7 @@ is only active if `bog-use-citekey-cache' is non-nil)."
                     (kill-buffer bufname)))
       (with-current-buffer (get-buffer-create bufname)
         (erase-buffer)
-        (insert (mapconcat #'identity dup-cks "\n"))
+        (insert (mapconcat #'identity dup-cks "\n") ?\n)
         (org-mode)
         (bog-mode 1)
         (goto-char (point-min)))
@@ -795,7 +796,6 @@ Generate a file name with the form
     (with-current-buffer (get-buffer-create "*Bog orphan files*")
       (erase-buffer)
       (setq default-directory bog-root-directory)
-      (insert ?\n)
       (with-syntax-table bog-citekey-syntax-table
         (dolist (ck-file (bog-all-citekey-files))
           (let ((base-name (file-name-nondirectory ck-file))
@@ -808,7 +808,7 @@ Generate a file name with the form
                               (file-relative-name ck-file)))))))
       (goto-char (point-min))
       (org-mode)
-      (if (/= (buffer-size) 1)
+      (if (> (buffer-size) 0)
           (pop-to-buffer (current-buffer))
         (message "No orphans found")
         (kill-buffer)))))
@@ -976,8 +976,7 @@ instead of citekeys from file names in `bog-bib-directory'."
         (with-current-buffer (get-buffer-create orphan-bufname)
           (erase-buffer)
           (setq default-directory bog-root-directory)
-          (insert ?\n)
-          (insert (mapconcat #'identity orphans "\n"))
+          (insert (mapconcat #'identity orphans "\n") ?\n)
           (goto-char (point-min))
           (org-mode)
           (pop-to-buffer (current-buffer)))
