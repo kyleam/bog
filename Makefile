@@ -19,5 +19,10 @@ clean:
 
 bog-autoloads.el: bog.el
 	@$(BATCH) -L . --eval \
-	"(let (make-backup-files) \
-	  (update-file-autoloads \"$(CURDIR)/$<\" t \"$(CURDIR)/$@\"))"
+	"(let* ((default-directory (file-name-as-directory \"$(CURDIR)\")) \
+	        (target (expand-file-name \"$@\")) \
+	        (excludes (list \"bog-tests.el\")) \
+	        (make-backup-files nil)) \
+	   (if (fboundp (quote loaddefs-generate)) \
+	       (loaddefs-generate default-directory target excludes) \
+	     (update-file-autoloads \"$<\" t target)))"
