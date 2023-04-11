@@ -1,7 +1,7 @@
 ;;; bog.el --- Extensions for research notes in Org mode -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2013-2016 Kyle Meyer <kyle@kyleam.com>
-;; Copyright (C) 2020 Basil L. Contovounesios <contovob@tcd.ie>
+;; Copyright (C) 2020-2023 Basil L. Contovounesios <contovob@tcd.ie>
 
 ;; Author: Kyle Meyer <kyle@kyleam.com>
 ;; URL: https://github.com/kyleam/bog
@@ -1032,6 +1032,12 @@ Groups are specified by `bog-citekey-web-search-groups'."
 
 ;;; Notes-related
 
+;; `org-show-context' is obsolete as of Org 9.6.
+(defalias 'bog--fold-show-context
+  (if (fboundp 'org-fold-show-context)
+      #'org-fold-show-context
+    'org-show-context))
+
 ;;;###autoload
 (defun bog-goto-citekey-heading-in-notes (&optional no-context)
   "Find citekey heading in notes.
@@ -1062,7 +1068,7 @@ buffer, the narrowing is removed."
                 (> marker (point-max)))
         (widen))
       (goto-char marker)
-      (org-show-context))))
+      (bog--fold-show-context))))
 
 (defun bog--find-citekey-heading-in-buffer (citekey &optional pos-only)
   "Return the marker of heading for CITEKEY.
@@ -1332,7 +1338,7 @@ With argument ARG, do it ARG times."
                     (re-search-forward bog-citekey-format nil t))
           (unless (org-at-heading-p)
             (setq arg (1- arg))))))
-    (org-show-context)))
+    (bog--fold-show-context)))
 
 ;;;###autoload
 (defun bog-previous-non-heading-citekey (&optional arg)
@@ -1347,7 +1353,7 @@ With argument ARG, do it ARG times."
         (unless (org-at-heading-p)
           (setq arg (1- arg)))))
     (skip-syntax-backward "w"))
-  (org-show-context))
+  (bog--fold-show-context))
 
 ;;;###autoload
 (defun bog-jump-to-topic-heading ()
