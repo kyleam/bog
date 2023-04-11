@@ -2,7 +2,7 @@
 #+options: toc:nil
 #+startup: showall
 
-[[https://travis-ci.org/kyleam/bog][https://travis-ci.org/kyleam/bog.svg]]
+[[https://github.com/kyleam/bog/actions/workflows/test.yml][https://github.com/kyleam/bog/actions/workflows/test.yml/badge.svg]]
 [[https://melpa.org/#/bog][https://melpa.org/packages/bog-badge.svg]]
 
 Bog is a system for taking research notes in [[https://orgmode.org/][Org mode]].  It adds a few
