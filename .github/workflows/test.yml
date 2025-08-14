@@ -25,11 +25,13 @@ jobs:
           - 29.1
           - 29.2
           - 29.3
+          - 29.4
+          - 30.1
           - release-snapshot
           - snapshot
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         persist-credentials: false
 
